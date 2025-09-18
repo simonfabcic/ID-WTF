@@ -1,0 +1,31 @@
+# This is a sample GitHub Actions workflow file for testing a Django backend project.
+name: test_backend
+on: [pull_request, push] # activates the workflow when there is a push or pull request in the repo
+jobs:
+    test_project:
+        runs-on: ubuntu-latest # operating system your code will run on
+        env:
+            DJANGO_CONFIGURATION: Test
+        # services:
+        #     postgres:
+        #         image: postgres:latest
+        #         env:
+        #             POSTGRES_DB: test
+        #             POSTGRES_USER: myusername
+        #             POSTGRES_PASSWORD: mysecretpassword
+        #         ports:
+        #             - 5432:5432
+        #         # needed because the postgres container does not provide a healthcheck
+        #         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: "3.12"
+            - run: pip install pipenv
+            - name: Setup and run tests
+              run: |
+                  pipenv install --dev
+                  pipenv run ruff check --output-format=github .
+                  pipenv run python manage.py migrate
+                  pipenv run python manage.py test

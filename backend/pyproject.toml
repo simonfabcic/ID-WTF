@@ -1,0 +1,40 @@
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # docstring formatting & presence
+    "D",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # Django-specific best practices
+    "DJ",
+]
+ignore = [
+    # Module imported but unused (useful to ignore temporarily during development)
+    # "F401",
+    # multi-line docstring opening """ should start at the first line
+    "D203",
+    # multi-line docstring closing and opening """ should be on a line by itself
+    "D212",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+docstring-code-format = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "gars_is.settings"
+python_files = "tests.py test_*.py *_tests.py"
