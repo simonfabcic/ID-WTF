@@ -17,3 +17,11 @@ Adding the ID-WTFs, which contains:
 -   Export
 -   Search
 -   Share
+
+# Development
+
+[Flow chart](https://www.figma.com/board/5RspyDWSauSqpnul3UkK4m/ID-WTF--I-dont---want-to-forget-?node-id=0-1&p=f&t=DIUv2Xb5AGBKWDHR-0)
+
+## Backend
+
+See backend `readme.md` file.
