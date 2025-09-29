@@ -22,6 +22,7 @@ class Profile(models.Model):
     # `profile1.follows.all()` - gets `Tag_s` this profile follows
     # `tag1.followed_by_profiles.all()` gets `Profile_s` who follows this tag
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"User: {self.user.username}"
@@ -46,12 +47,54 @@ class Tag(models.Model):
         return self.tag_name
 
 
+LANGUAGE_TO_COUNTRY = {
+    "en": "US",  # English → default US flag
+    "es": "ES",  # Spanish → Spain
+    "fr": "FR",  # French → France
+    "de": "DE",  # German → Germany
+    "it": "IT",  # Italian → Italy
+    "pt": "PT",  # Portuguese → Portugal
+    "ru": "RU",  # Russian → Russia
+    "zh": "CN",  # Chinese → China
+    "ja": "JP",  # Japanese → Japan
+    "ko": "KR",  # Korean → South Korea
+    "sl": "SI",  # Slovene → Slovenia
+    "ar": "SA",  # Arabic → Saudi Arabia
+    "hi": "IN",  # Hindi → India
+    "nl": "NL",  # Dutch → Netherlands
+    "pl": "PL",  # Polish → Poland
+    "tr": "TR",  # Turkish → Turkey
+    "sv": "SE",  # Swedish → Sweden
+    "da": "DK",  # Danish → Denmark
+    "fi": "FI",  # Finnish → Finland
+    "cs": "CZ",  # Czech → Czech Republic
+    "el": "GR",  # Greek → Greece
+    "he": "IL",  # Hebrew → Israel
+    "uk": "UA",  # Ukrainian → Ukraine
+    "ro": "RO",  # Romanian → Romania
+    "hu": "HU",  # Hungarian → Hungary
+}
+
+
 class Language(models.Model):
     code = models.CharField(max_length=5, unique=True)  # 'en', 'es', 'fr'
     name = models.CharField(max_length=50)  # 'English', 'Spanish', 'French'
+    flag = models.CharField(max_length=4, blank=True)  # e.g. "\U0001F1FA\U0001F1F8" for "US"
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # if user entered emoji manually, keep it
+        if not self.flag:
+            country_code = LANGUAGE_TO_COUNTRY.get(self.code.lower())
+            if country_code:
+                self.flag = "".join(chr(127397 + ord(c)) for c in country_code.upper())
+        super().save(*args, **kwargs)
+
+    # Usage:
+    # Language.objects.create(code="en", name="English")
+    # Language.objects.create(code="en", name="English", flag="🇬🇧")
 
 
 class Fact(models.Model):
@@ -65,10 +108,10 @@ class Fact(models.Model):
     content = models.TextField()
     source = models.TextField()
     tags = models.ManyToManyField(Tag, related_name="facts")
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     visibility = models.CharField(max_length=20, choices=VISIBILITY_CHOICES, default="private", blank=False)
     upvotes = models.IntegerField(default=0)
     language = models.ForeignKey(Language, on_delete=models.PROTECT)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
 
