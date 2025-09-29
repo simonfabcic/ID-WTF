@@ -14,9 +14,12 @@ Adding the ID-WTFs, which contains:
 ## Implemented later
 
 -   Tags (custom user tags)
+-   Likes (`WTF!` Wow, thats fascinating / `Nod` Like, I agree)
+-   Comments (maybe)
 -   Export
 -   Search
 -   Share
+-   On home page show ID-WTFs from connections (`ID-link` / `WTFans`)
 
 # Development
 

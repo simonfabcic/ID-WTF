@@ -1,5 +1,5 @@
 [tool.ruff]
-line-length = 110
+line-length = 120
 target-version = "py312"
 
 
@@ -29,6 +29,18 @@ ignore = [
     "D203",
     # multi-line docstring closing and opening """ should be on a line by itself
     "D212",
+    # missing docstring in magic method
+    "D105",
+    # missing docstring in public nested class
+    "D106",
+    # missing docstring in public class
+    "D101",
+    # missing docstring in public module
+    "D100",
+    # missing docstring in public function
+    "D103",
+    # missing docstring in public method
+    "D102",
 ]
 
 [tool.ruff.format]

@@ -50,30 +50,6 @@ echo "from django.contrib.auth.models import User; User.objects.create_superuser
 
 # Start app inside project
 
-1. `cd` to project root directory (where is also 'manage.py' file) and run:
-
-```shell
-python manage.py startapp appname
-```
-
-1. Add app to `INSTALLED_APPS` inside `projectname/settings.py`:
-
-```py
-INSTALLED_APPS = [
-    ... ,
-    'appname',
-]
-```
-
-    In some cases (I don't know when), you have to add:
-
-```py
-INSTALLED_APPS = [
-    ... ,
-    'appname.apps.AppnameConfig',
-]
-```
-
 1. Try the app:
 
     1. In appname/views.py:

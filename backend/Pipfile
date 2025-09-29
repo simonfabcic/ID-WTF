@@ -14,6 +14,7 @@ django-cors-headers = "*"
 [dev-packages]
 ruff = "*"
 pre-commit = "*"
+factory-boy = "*"
 
 [requires]
 python_version = "3.12"
