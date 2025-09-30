@@ -1,9 +1,8 @@
-import React from "react";
 import { useAuth } from "../context/authContext";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-    var { user, userLogout, userLogin } = useAuth();
+    var { user, userLogout } = useAuth();
     const navigate = useNavigate();
 
     return (

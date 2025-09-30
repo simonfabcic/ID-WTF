@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/authContext";
 import { useAxios } from "../utils/useAxios";
 
 const FeedPage = () => {
-    const { user, loading } = useAuth();
+    const { loading } = useAuth();
     const [facts, setFacts] = useState(null);
     let axiosInstance = useAxios();
 
