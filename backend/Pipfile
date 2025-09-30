@@ -10,6 +10,7 @@ python-dotenv = "*"
 docutils = "*"
 djangorestframework = "*"
 django-cors-headers = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 ruff = "*"
