@@ -8,20 +8,28 @@ import LoginPage from "./pages/LoginPage";
 // import HomePage from "./pages/HomePage";
 import FeedPage from "./pages/FeedPage";
 import { AuthProvider } from "./context/authContext";
+import MainPage from "./pages/MainPage";
+import { FactProvider } from "./context/factContext";
+import ClaudeAi from "./pages/ClaudeAi";
+import TestPageMiddleScroll from "./pages/TestPageMiddleScroll";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <BrowserRouter>
             <AuthProvider>
-                <Header />
-                <Routes>
-                    {/* <Route element={<PrivateRoute />}>
+                <FactProvider>
+                    {/* <Header /> */}
+                    <Routes>
+                        {/* <Route element={<PrivateRoute />}>
                         <Route path="/feed" element={<HomePage />} />
                     </Route> */}
-                    <Route path="/feed" element={<FeedPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/" element={<Navigate to="/feed" replace />} />
-                </Routes>
+                        {/* <Route path="/feed" element={<FeedPage />} />
+                    <Route path="/login" element={<LoginPage />} /> */}
+                        <Route path="/" element={<MainPage />} />
+                        <Route path="/claude" element={<ClaudeAi />} />
+                        <Route path="/test" element={<TestPageMiddleScroll />} />
+                    </Routes>
+                </FactProvider>
             </AuthProvider>
         </BrowserRouter>
     </StrictMode>

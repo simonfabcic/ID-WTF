@@ -52,6 +52,15 @@ class LanguageFactory(factory.django.DjangoModelFactory):
         }.get(obj.code, "Unknown")
     )
 
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """Get or create instead of always creating, to avoid UNIQUE constraint errors."""
+        obj, created = model_class.objects.get_or_create(
+            code=kwargs.get("code"),  # unique field
+            defaults=kwargs,  # other fields to set if created
+        )
+        return obj
+
 
 class TagFactory(factory.django.DjangoModelFactory):
     """Factory for Tag model."""

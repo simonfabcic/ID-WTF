@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 localStorage.setItem("JWTs", JSON.stringify(newJWTs));
                 setUser(jwtDecode<MyJWTAccessPayload>(newJWTs.access));
                 setJWTs(newJWTs);
-                navigate("/feed");
+                // navigate("/feed");
             }
         } catch (error) {
             // TODO handle http error wrong password
@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {
-        throw new Error("useAuth must be used within an AuthProvider");
+        throw new Error("useAuth must be used within an AuthProvider.");
     }
     return context;
 };

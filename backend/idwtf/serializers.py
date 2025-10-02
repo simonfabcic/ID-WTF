@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
-from rest_framework.serializers import HyperlinkedModelSerializer, HyperlinkedRelatedField, ModelSerializer
+from rest_framework.serializers import CharField, HyperlinkedModelSerializer, ModelSerializer
 
-from .models import Fact, Language, Profile, Tag
+from idwtf.models import Fact, Language, Profile, Tag
 
 
 class UserSerializer(ModelSerializer):
@@ -11,11 +11,11 @@ class UserSerializer(ModelSerializer):
 
 
 class ProfileSerializer(HyperlinkedModelSerializer):
-    facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
+    # facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
 
     class Meta:
         model = Profile
-        fields = ["id", "user", "followers", "created_at"]
+        fields = ["id", "user"]
 
 
 class TagSerializer(ModelSerializer):
@@ -27,14 +27,20 @@ class TagSerializer(ModelSerializer):
 class LanguageSerializer(ModelSerializer):
     class Meta:
         model = Language
-        fields = ["id", "code", "name"]
+        fields = ["id", "code", "name", "flag"]
 
 
 class FactSerializer(ModelSerializer):
+    username = CharField(source="profile.user.username", read_only=True)
+    profile = ProfileSerializer(read_only=True)
+    tags = TagSerializer(read_only=True, many=True)
+    language = LanguageSerializer(read_only=True)
+
     class Meta:
         model = Fact
         fields = [
             "id",
+            "username",
             "profile",
             "content",
             "source",
@@ -43,6 +49,4 @@ class FactSerializer(ModelSerializer):
             "visibility",
             "upvotes",
             "language",
-            "is_deleted",
-            "deleted_at",
         ]

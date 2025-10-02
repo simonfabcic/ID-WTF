@@ -17,11 +17,12 @@ export const useAxios = () => {
         const accessExp = jwtDecode(JWTs.access).exp;
         if (accessExp && dayjs.unix(accessExp).isBefore(dayjs())) {
             try {
-                const response = await axios.post(`${import.meta.env.VITE_API_ENDPOINT}/auth/token/refresh`, {
+                console.log("Refreshing token with:", JWTs.access);
+                const response = await axios.post(`${import.meta.env.VITE_API_ENDPOINT}/auth/token/refresh/`, {
                     refresh: JWTs.refresh,
                 });
                 setUser(jwtDecode(response.data.access));
-                localStorage.setItem("JWTS", JSON.stringify(response.data));
+                localStorage.setItem("JWTs", JSON.stringify(response.data));
                 setJWTs(response.data);
                 req.headers["Authorization"] = `Bearer ${response.data.access}`;
             } catch (error) {

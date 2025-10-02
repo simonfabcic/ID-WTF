@@ -20,9 +20,7 @@
 
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import permissions, viewsets
-
-from idwtf.permissions import IsOwnerOrReadOnly
+from rest_framework import viewsets
 
 from .models import Fact, Language, Profile, Tag
 from .serializers import FactSerializer, LanguageSerializer, ProfileSerializer, TagSerializer, UserSerializer
@@ -59,23 +57,30 @@ class LanguageViewSet(viewsets.ModelViewSet):
 class FactViewSet(viewsets.ModelViewSet):
     """CRUD for Facts."""
 
-    queryset = Fact.objects.all()
     serializer_class = FactSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    # queryset = Fact.objects.all()
+    # permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         """Return only Facts, that the user owns or which user follows by tag."""
         user = self.request.user
 
-        # creator = Profile.objects.filter(user=user)
-        # # followed_profiles = user.profile.tags.all()
-        # followed_profiles = Profile.objects.filter(follows__profile=creator)
+        if user.is_authenticated:
+            users_profile = Profile.objects.get(user=user)
+            followed_tags = users_profile.follows.all()
+            facts = Fact.objects.filter(Q(profile=users_profile) | Q(tags__in=followed_tags))
+            # If too little facts from user, add random facts
+            if facts.count() > 10:
+                return facts
+            additional_facts = (
+                Fact.objects.filter(visibility="public")
+                .exclude(id__in=facts.values_list("id", flat=True))
+                .order_by("?")[: 10 - facts.count()]
+            )
+            return list(facts) + list(additional_facts)
 
-        users_profile = Profile.objects.get(user=user)
-        followed_tags = users_profile.follows.all()
-
-        # Facts by the user or by followed users
-        facts = Fact.objects.filter(Q(profile__user=user) | Q(tags__in=followed_tags))
+        else:
+            facts = Fact.objects.filter(visibility="public").order_by("?")[:2]  # random 2
 
         return facts
 
