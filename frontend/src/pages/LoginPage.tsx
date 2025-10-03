@@ -1,4 +1,3 @@
-import React from "react";
 import { useAuth } from "../context/authContext";
 
 const LoginPage = () => {

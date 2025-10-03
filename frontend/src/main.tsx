@@ -12,12 +12,13 @@ import MainPage from "./pages/MainPage";
 import { FactProvider } from "./context/factContext";
 import ClaudeAi from "./pages/ClaudeAi";
 import TestPageMiddleScroll from "./pages/TestPageMiddleScroll";
+import ClaudeAi2 from "./pages/ClaudeAi2";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <BrowserRouter>
-            <AuthProvider>
-                <FactProvider>
+            <FactProvider>
+                <AuthProvider>
                     {/* <Header /> */}
                     <Routes>
                         {/* <Route element={<PrivateRoute />}>
@@ -27,10 +28,11 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/login" element={<LoginPage />} /> */}
                         <Route path="/" element={<MainPage />} />
                         <Route path="/claude" element={<ClaudeAi />} />
+                        <Route path="/claude2" element={<ClaudeAi2 />} />
                         <Route path="/test" element={<TestPageMiddleScroll />} />
                     </Routes>
-                </FactProvider>
-            </AuthProvider>
+                </AuthProvider>
+            </FactProvider>
         </BrowserRouter>
     </StrictMode>
 );

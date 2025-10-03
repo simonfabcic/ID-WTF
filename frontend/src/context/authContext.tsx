@@ -1,6 +1,7 @@
 import { jwtDecode, type JwtPayload } from "jwt-decode";
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { useFact } from "./factContext";
 
 const baseURL = import.meta.env.VITE_API_ENDPOINT;
 
@@ -33,6 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<MyJWTAccessPayload | null>(null);
     const [JWTs, setJWTs] = useState<JWTs | null>(null);
     const [loading, setLoading] = useState(true);
+    var { setSideMenuCurrentSelection } = useFact();
 
     useEffect(() => {
         try {
@@ -41,6 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const JWTsObject = JSON.parse(JWTs);
                 setUser(jwtDecode<MyJWTAccessPayload>(JWTsObject.access));
                 setJWTs(JWTsObject);
+                setSideMenuCurrentSelection("discover");
             }
         } catch (error) {
             console.log("Error parsing stored JWTs or no token!", error);
@@ -74,6 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 localStorage.setItem("JWTs", JSON.stringify(newJWTs));
                 setUser(jwtDecode<MyJWTAccessPayload>(newJWTs.access));
                 setJWTs(newJWTs);
+                setSideMenuCurrentSelection("discover");
                 // navigate("/feed");
             }
         } catch (error) {
