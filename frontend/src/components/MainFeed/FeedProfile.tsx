@@ -69,10 +69,10 @@ const FeedProfile = () => {
                     <div className="flex gap-1.5 p-2">
                         {[...Array(3)].map((_, index) => (
                             <div key={index} className="flex content-center">
-                                <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r-1 border-r-white">
+                                <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
                                     #tag1
                                 </span>
-                                <div className="flex items-center justify-around bg-gray-300 border-r-1 border-r-white w-6 cursor-pointer">
+                                <div className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer">
                                     <Trash2 className="h-3 w-3" />
                                 </div>
                                 <div className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer">
@@ -88,10 +88,10 @@ const FeedProfile = () => {
                     <div className="flex gap-1.5 p-2">
                         {[...Array(3)].map((_, index) => (
                             <div key={index} className="flex content-center">
-                                <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r-1 border-r-white">
+                                <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
                                     #tag1
                                 </span>
-                                <div className="flex items-center justify-around bg-gray-300 border-r-1 border-r-white w-6 cursor-pointer">
+                                <div className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer">
                                     <Trash2 className="h-3 w-3" />
                                 </div>
                                 <div className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer">
