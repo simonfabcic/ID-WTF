@@ -28,3 +28,10 @@ Adding the ID-WTFs, which contains:
 ## Backend
 
 See backend `readme.md` file.
+
+## Frontend
+
+```shell
+cd frontend
+npm install
+```
