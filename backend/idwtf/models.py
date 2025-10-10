@@ -24,7 +24,7 @@ class Profile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # TODO profile_image = ...
-    languages = models.ManyToManyField("Language", related_name="profiles")  # TODO auto add "en"
+    # languages = models.ManyToManyField("Language", related_name="profiles")  # TODO auto add "en"
 
     def __str__(self):
         return f"User: {self.user.username}"
@@ -115,6 +115,7 @@ class Fact(models.Model):
             invalid_tags = self.tags.exclude(profile=self.profile)
             if invalid_tags.exists():
                 raise ValidationError("All tags must belong to the fact's profile owner.")
+        # CONTINUE This does not work...
 
     def delete(self, *args, **kwargs):
         self.is_deleted = True
