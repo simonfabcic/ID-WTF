@@ -40,7 +40,7 @@ class LanguageFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Language
 
-    code = factory.Iterator(["en", "es", "fr", "de", "it", "pt"])
+    code = factory.Iterator(["en", "es", "fr", "de", "it", "pt", "sl"])
     name = factory.LazyAttribute(
         lambda obj: {
             "en": "English",
@@ -49,7 +49,19 @@ class LanguageFactory(factory.django.DjangoModelFactory):
             "de": "German",
             "it": "Italian",
             "pt": "Portuguese",
+            "sl": "Slovene",
         }.get(obj.code, "Unknown")
+    )
+    flag = factory.LazyAttribute(
+        lambda obj: {
+            "en": "🇺🇸",
+            "es": "🇪🇸",
+            "fr": "🇫🇷",
+            "de": "🇩🇪",
+            "it": "🇮🇹",
+            "pt": "🇵🇹",
+            "sl": "🇸🇮",
+        }.get(obj.code, "🏳️")
     )
 
     @classmethod
