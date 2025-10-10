@@ -4,7 +4,7 @@ const FeedFollows = () => {
     return (
         <div className="flex flex-col gap-6">
             {[...Array(10)].map((_, index) => (
-                <div className="flex bg-white rounded-md p-4 gap-4">
+                <div className="flex bg-white rounded-md p-4 gap-4" key={index}>
                     <div className="">
                         {" "}
                         <img

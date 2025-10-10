@@ -5,7 +5,7 @@ const FeedFollowing = () => {
     return (
         <div className="flex flex-col gap-6">
             {[...Array(10)].map((_, index) => (
-                <div className="flex bg-white rounded-md p-4 gap-4">
+                <div className="flex bg-white rounded-md p-4 gap-4" key={index}>
                     <div className="">
                         {" "}
                         <img
@@ -20,7 +20,7 @@ const FeedFollowing = () => {
                             <p>Followed tags</p>
                             {/* TODO this is not done */}
                             <div className="flex gap-1.5 text-sm">
-                                <div key={index} className="flex content-center">
+                                <div className="flex content-center">
                                     <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
                                         #tag1
                                     </span>
@@ -28,7 +28,7 @@ const FeedFollowing = () => {
                                         <Trash2 className="h-3 w-3" />
                                     </div>
                                 </div>{" "}
-                                <div key={index} className="flex content-center">
+                                <div className="flex content-center">
                                     <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
                                         #tag2
                                     </span>
@@ -36,7 +36,7 @@ const FeedFollowing = () => {
                                         <Trash2 className="h-3 w-3" />
                                     </div>
                                 </div>{" "}
-                                <div key={index} className="flex content-center">
+                                <div className="flex content-center">
                                     <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
                                         #tag3
                                     </span>

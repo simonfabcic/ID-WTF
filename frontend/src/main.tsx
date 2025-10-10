@@ -13,6 +13,13 @@ import { FactProvider } from "./context/factContext";
 import ClaudeAi from "./pages/ClaudeAi";
 import TestPageMiddleScroll from "./pages/TestPageMiddleScroll";
 import ClaudeAi2 from "./pages/ClaudeAi2";
+import FeedDiscover from "./components/MainFeed/FeedDiscover";
+import FeedProfile from "./components/MainFeed/FeedProfile";
+import FeedLogin from "./components/MainFeed/FeedLogin";
+import FeedMine from "./components/MainFeed/FeedMine";
+import FeedSaved from "./components/MainFeed/FeedSaved";
+import FeedFollowing from "./components/MainFeed/FeedFollowing";
+import FeedFollows from "./components/MainFeed/FeedFollows";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
@@ -26,7 +33,15 @@ createRoot(document.getElementById("root")!).render(
                     </Route> */}
                         {/* <Route path="/feed" element={<FeedPage />} />
                     <Route path="/login" element={<LoginPage />} /> */}
-                        <Route path="/" element={<MainPage />} />
+                        <Route path="/" element={<MainPage />}>
+                            <Route path="discover" element={<FeedDiscover />} />
+                            <Route path="profile" element={<FeedProfile />} />
+                            <Route path="login" element={<FeedLogin />} />
+                            <Route path="mine" element={<FeedMine />} />
+                            <Route path="saved" element={<FeedSaved />} />
+                            <Route path="following" element={<FeedFollowing />} />
+                            <Route path="follows" element={<FeedFollows />} />
+                        </Route>
                         <Route path="/claude" element={<ClaudeAi />} />
                         <Route path="/claude2" element={<ClaudeAi2 />} />
                         <Route path="/test" element={<TestPageMiddleScroll />} />

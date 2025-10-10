@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const JWTsObject = JSON.parse(JWTs);
                 setUser(jwtDecode<MyJWTAccessPayload>(JWTsObject.access));
                 setJWTs(JWTsObject);
-                setSideMenuCurrentSelection("discover");
+                // setSideMenuCurrentSelection("discover");
             }
         } catch (error) {
             console.log("Error parsing stored JWTs or no token!", error);

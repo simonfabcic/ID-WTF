@@ -5,8 +5,8 @@ const FeedDiscover = () => {
     return (
         <div className="flex flex-col gap-6">
             {/* fact card */}
-            {[...Array(3)].map((_, i) => (
-                <div key={i} className="flex gap-4 bg-white rounded-lg p-4">
+            {[...Array(3)].map((_, index) => (
+                <div key={index} className="flex gap-4 bg-white rounded-lg p-4">
                     {/* fact creator image */}
                     <img
                         src="https://picsum.photos/200/200"

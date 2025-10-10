@@ -1,8 +1,8 @@
 import React from "react";
 import Header from "../components/Header";
 import LeftSideBar from "../components/LeftSideBar";
-import MainFeed from "../components/MainFeed/MainFeed";
 import RightSidebar from "../components/RightSidebar";
+import { Outlet } from "react-router-dom";
 
 const MainPage = () => {
     return (
@@ -13,7 +13,8 @@ const MainPage = () => {
                     <LeftSideBar />
                 </aside>
                 <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                    <MainFeed />
+                    {/* <MainFeed /> */}
+                    <Outlet />
                 </div>
                 <aside className="w-80">
                     <RightSidebar />
