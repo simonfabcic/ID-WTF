@@ -2,8 +2,7 @@ import { jwtDecode, type JwtPayload } from "jwt-decode";
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFact } from "./factContext";
-
-const baseURL = import.meta.env.VITE_API_ENDPOINT;
+import axios from "axios";
 
 interface AuthContextType {
     userLogin: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
@@ -34,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<MyJWTAccessPayload | null>(null);
     const [JWTs, setJWTs] = useState<JWTs | null>(null);
     const [loading, setLoading] = useState(true);
-    var { setSideMenuCurrentSelection } = useFact();
+    let { setSideMenuCurrentSelection } = useFact();
 
     useEffect(() => {
         try {
@@ -43,7 +42,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const JWTsObject = JSON.parse(JWTs);
                 setUser(jwtDecode<MyJWTAccessPayload>(JWTsObject.access));
                 setJWTs(JWTsObject);
-                // setSideMenuCurrentSelection("discover");
             }
         } catch (error) {
             console.log("Error parsing stored JWTs or no token!", error);
@@ -57,33 +55,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const username = event.currentTarget.username.value;
         const password = event.currentTarget.password.value;
 
-        try {
-            // TODO change to use Axios
-            let response = await fetch(`${baseURL}/auth/token/`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.status === 200) {
-                const newJWTs = data;
+        axios
+            .post(`${import.meta.env.VITE_API_ENDPOINT}/auth/token/`, {
+                username: username,
+                password: password,
+            })
+            .then(function (responseAxios) {
+                console.log(responseAxios);
+                const newJWTs = responseAxios.data;
                 localStorage.setItem("JWTs", JSON.stringify(newJWTs));
                 setUser(jwtDecode<MyJWTAccessPayload>(newJWTs.access));
                 setJWTs(newJWTs);
                 setSideMenuCurrentSelection("discover");
-                // navigate("/feed");
-            }
-        } catch (error) {
-            // TODO handle http error wrong password
-            console.error("During the login, an error occurred: ", error);
-        }
+            })
+            .catch(function (error) {
+                if (error.status === 401) {
+                    window.alert("Wrong user/pass combination. Fields are case sensitive");
+                } else {
+                    console.error("During the login, an error occurred: ", error);
+                }
+            });
     };
 
     const userLogout = (): void => {
