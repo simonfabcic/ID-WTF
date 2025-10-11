@@ -22,11 +22,15 @@ class FactEndpointTestCase(APITestCase):
 
     def setUp(self):
         """Set up test data."""
+        # Create profiles
         self.profile1 = ProfileFactory()
         self.profile2 = ProfileFactory()
 
         # Create language
         self.language = LanguageFactory()
+
+        # Create tag
+        self.tag_for_profile2 = TagFactory()
 
         # Create test facts
         self.public_fact = FactFactory(
@@ -60,12 +64,12 @@ class FactEndpointTestCase(APITestCase):
 
         url = reverse("fact-list")
         data = {
-            "profile": self.profile1.id,
+            "profile_id": self.profile1.id,
             "content": "New fact content",
             "source": "New source",
             "language": self.language.id,
             "visibility": "public",
-            "tags": [self.tag_for_profile1.id],
+            "tag_ids": [self.tag_for_profile1.id],
         }
 
         response = self.client.post(url, data, format="json")
@@ -121,6 +125,27 @@ class FactEndpointTestCase(APITestCase):
 
         # Should not appear in active_objects
         self.assertEqual(Fact.objects.count(), 1)  # Only private_fact remains
+
+    def test_create_fact_with_invalid_tags(self):
+        """Test that creating a fact with tags from another profile fails."""
+        self.client.force_authenticate(user=self.profile1.user)
+
+        # Try to create a fact with profile1 but use profile2's tags
+        url = reverse("fact-list")
+        data = {
+            "profile_id": self.profile1.id,  # Changed from "profile"
+            "content": "Test fact",
+            "source": "Test source",
+            "language": self.language.id,
+            "tag_ids": [self.tag_for_profile2.id],  # Changed from "tags"
+            "visibility": "public",
+        }
+
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("tags", response.data)
+        self.assertIn("don't belong to the selected profile", str(response.data["tags"]))
 
     def test_unauthorized_access(self):
         """Test that unauthorized users can't create/update/delete facts."""

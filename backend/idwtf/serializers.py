@@ -1,5 +1,11 @@
 from django.contrib.auth.models import User
-from rest_framework.serializers import CharField, HyperlinkedModelSerializer, ModelSerializer
+from rest_framework.serializers import (
+    CharField,
+    HyperlinkedModelSerializer,
+    ModelSerializer,
+    PrimaryKeyRelatedField,
+    ValidationError,
+)
 
 from idwtf.models import Fact, Language, Profile, Tag
 
@@ -32,20 +38,74 @@ class LanguageSerializer(ModelSerializer):
 
 class FactSerializer(ModelSerializer):
     username = CharField(source="profile.user.username", read_only=True)
+
+    # For reading: nested serializer
     profile = ProfileSerializer(read_only=True)
+    # For writing: just tag IDs
+    profile_id = PrimaryKeyRelatedField(
+        queryset=Profile.objects.all(),  # Validates that the ID exists in the database
+        write_only=True,
+        source="profile",
+    )
+
+    # For reading: nested serializer
     tags = TagSerializer(read_only=True, many=True)
+    # For writing: just tag IDs
+    tag_ids = PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),  # Validates that the ID exists in the database
+        write_only=True,
+        source="tags",
+        many=True,
+    )
+
+    # CONTINUE will be OK to have "language_id" instead of "language" field?
 
     class Meta:
         model = Fact
         fields = [
             "id",
             "username",
-            "profile",
+            "profile",  # For reading
+            "profile_id",  # For writing
             "content",
             "source",
-            "tags",
+            "tags",  # For reading
+            "tag_ids",  # For writing
             "created_at",
             "visibility",
             "upvotes",
             "language",
         ]
+
+    def validate(self, data):
+        """
+        Validate that all tags belong to the fact's profile owner.
+
+        Args:
+            data: Dictionary of validated field data
+
+        Returns:
+            dict: The validated data
+
+        Raises:
+            ValidationError: If tags don't belong to the profile
+
+        """
+        # Get profile from data (POST/PUT) or from existing instance (PATCH)
+        profile = data.get("profile") or (self.instance.profile if self.instance else None)
+        tags = data.get("tags", [])  # Now this will have the actual tag objects!
+
+        # If both profile and tags are provided, validate ownership
+        if profile and tags:
+            invalid_tags = [tag for tag in tags if tag.profile != profile]
+
+            if invalid_tags:
+                invalid_names = ", ".join(tag.tag_name for tag in invalid_tags)
+                raise ValidationError(
+                    {
+                        "tags": f"These tags don't belong to the selected profile: {invalid_names}. "
+                        f"Only tags owned by '{profile.user.username}' can be used."
+                    }
+                )
+
+        return data

@@ -98,25 +98,6 @@ class Fact(models.Model):
     def __str__(self):
         return f"Fact by {self.profile.user.username}: {self.content[:30]}"
 
-    def clean(self):
-        """Ensure tags belong to the same profile that owns the fact."""
-        # The validation is only fired on `some_fact.full_clean()` call
-        from django.core.exceptions import ValidationError
-
-        super().clean()
-        # Django's Model class might have its own validation logic
-        # By calling super().clean(), you ensure:
-        # 1. Any built-in Django validations run first
-        # 2. Any parent class custom validations run
-        # 3. You don't accidentally override important base functionality
-
-        # Check if any tags don't belong to this profile
-        if self.pk:  # Only check for existing fact
-            invalid_tags = self.tags.exclude(profile=self.profile)
-            if invalid_tags.exists():
-                raise ValidationError("All tags must belong to the fact's profile owner.")
-        # CONTINUE This does not work...
-
     def delete(self, *args, **kwargs):
         self.is_deleted = True
         self.deleted_at = timezone.now()
