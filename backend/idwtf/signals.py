@@ -13,6 +13,7 @@ def validate_fact_tags(sender, instance, action, pk_set, **kwargs):
     Works for both directions:
     - fact.tags.add(tag)  → instance is Fact
     - tag.facts.add(fact) → instance is Tag
+    Catches direct model manipulation (admin, shell, scripts)
 
     Args:
         sender: The intermediate model (Fact.tags.through)
