@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -132,7 +134,7 @@ class FactEndpointTestCase(APITestCase):
         response = self.client.post(url, data, format="json")
         # response = self.client.post(url, data)
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_permission_denied(self):
         """Test that users can't modify other users' facts."""

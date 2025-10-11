@@ -33,14 +33,14 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("✅  Tags created successfully!"))
 
         # create facts
-        fact1 = FactFactory(profile=profile_creator_en, language=english, visibility="followers")
-        fact2 = FactFactory(profile=profile_creator_en, language=english, visibility="followers")
-        fact3 = FactFactory(profile=profile_creator_de, language=german, visibility="followers")
-        fact4 = FactFactory(profile=profile_creator_de, language=german, visibility="followers")
-        fact1.tags.add(en_science)
-        fact2.tags.add(en_marin_biology)
-        fact3.tags.add(en_marin_biology)
-        fact4.tags.add(de_wissenschaft)
+        fact_en_1 = FactFactory(profile=profile_creator_en, language=english, visibility="followers")
+        fact_en_2 = FactFactory(profile=profile_creator_en, language=english, visibility="followers")
+        fact_de_1 = FactFactory(profile=profile_creator_de, language=german, visibility="followers")
+        fact_de_2 = FactFactory(profile=profile_creator_de, language=german, visibility="followers")
+        fact_en_1.tags.add(en_science)
+        fact_en_2.tags.add(en_marin_biology)
+        fact_de_1.tags.add(en_marin_biology)
+        fact_de_2.tags.add(de_wissenschaft)
         self.stdout.write(self.style.SUCCESS("✅  Facts created successfully!"))
 
         # define following

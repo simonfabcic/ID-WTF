@@ -137,11 +137,11 @@ class TestLanguage(TestCase):
 
     def test_unique_language_codes(self):
         """Test that language codes must be unique."""
-        LanguageFactory(code="en", name="English")
+        LanguageFactory(code="en")
 
         # Attempting to create another language with same code should raise error
         with self.assertRaises(IntegrityError):
-            LanguageFactory(code="en", name="American English")
+            LanguageFactory(code="en")
 
 
 class TestFact(TestCase):

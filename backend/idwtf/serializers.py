@@ -34,7 +34,6 @@ class FactSerializer(ModelSerializer):
     username = CharField(source="profile.user.username", read_only=True)
     profile = ProfileSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
-    language = LanguageSerializer(read_only=True)
 
     class Meta:
         model = Fact
