@@ -58,8 +58,6 @@ class FactSerializer(ModelSerializer):
         many=True,
     )
 
-    # CONTINUE will be OK to have "language_id" instead of "language" field?
-
     class Meta:
         model = Fact
         fields = [

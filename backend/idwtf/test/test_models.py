@@ -212,10 +212,9 @@ class TestFact(TestCase):
         fact.clean()  # Should not raise any error
 
         # Adding profile2's tag should fail validation
-        fact.tags.add(tag2)
         with self.assertRaises(ValidationError) as context:
-            fact.clean()
-        self.assertIn("All tags must belong to the fact's profile owner", str(context.exception))
+            fact.tags.add(tag2)
+        self.assertIn("Cannot add tags from other profiles:", str(context.exception))
 
     def test_soft_delete_functionality(self):
         """Test the soft delete fields work as expected."""
