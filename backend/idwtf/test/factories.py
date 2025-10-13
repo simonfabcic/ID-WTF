@@ -4,8 +4,12 @@ Factory definitions for creating test data using factory-boy.
 These factories help create realistic test objects with proper relationships.
 """
 
+import datetime
+import random
+
 import factory
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from idwtf.models import Fact, Language, Profile, Tag
 
@@ -96,3 +100,13 @@ class FactFactory(factory.django.DjangoModelFactory):
     source = factory.Faker("url")
     visibility = factory.Iterator(["public", "private", "followers"])
     language = factory.SubFactory(LanguageFactory)
+    upvotes = random.randint(150, 750)
+
+    @factory.lazy_attribute
+    def created_at(self):
+        """Random timestamp between one month ago and now."""
+        # CONTINUE check if his works
+        now = timezone.now()
+        start = now - datetime.timedelta(days=30)
+        random_seconds = random.uniform(0, (now - start).total_seconds())
+        return start + datetime.timedelta(seconds=random_seconds)

@@ -39,8 +39,12 @@ const FeedLogin = () => {
                         <div className="flex gap-1.5 pl-2">
                             <input type="checkbox" name="remember-me" id="remember-me" />
                             <label htmlFor="remember-me">Remember me</label>
+                            {/* TODO handle `remember me` checkbox */}
                         </div>
-                        <button type="submit" className="w-full py-2 bg-yellow-400 font-semibold rounded-lg">
+                        <button
+                            type="submit"
+                            className="w-full py-2 bg-yellow-400 font-semibold rounded-lg cursor-pointer"
+                        >
                             Sign In
                         </button>
                     </form>

@@ -16,18 +16,33 @@ export const useAxios = () => {
 
         const accessExp = jwtDecode(JWTs.access).exp;
         if (accessExp && dayjs.unix(accessExp).isBefore(dayjs())) {
-            try {
-                console.log("Refreshing token with:", JWTs.access);
-                const response = await axios.post(`${import.meta.env.VITE_API_ENDPOINT}/auth/token/refresh/`, {
+            axios
+                .post(`${import.meta.env.VITE_API_ENDPOINT}/auth/token/refresh/`, {
                     refresh: JWTs.refresh,
+                })
+                .then(function (responseAxios) {
+                    setUser(jwtDecode(responseAxios.data.access));
+                    localStorage.setItem("JWTs", JSON.stringify(responseAxios.data));
+                    setJWTs(responseAxios.data);
+                    req.headers["Authorization"] = `Bearer ${responseAxios.data.access}`;
+                })
+                .catch(function (error) {
+                    console.error("During the refreshing JWTs, error occurred: ", error);
                 });
-                setUser(jwtDecode(response.data.access));
-                localStorage.setItem("JWTs", JSON.stringify(response.data));
-                setJWTs(response.data);
-                req.headers["Authorization"] = `Bearer ${response.data.access}`;
-            } catch (error) {
-                console.error("During refreshing JWTs, error occurred: ", error);
-            }
+
+            // old try/catch option:
+            // try {
+            //     console.log("Refreshing token with:", JWTs.access);
+            //     const response = await axios.post(`${import.meta.env.VITE_API_ENDPOINT}/auth/token/refresh/`, {
+            //         refresh: JWTs.refresh,
+            //     });
+            //     setUser(jwtDecode(response.data.access));
+            //     localStorage.setItem("JWTs", JSON.stringify(response.data));
+            //     setJWTs(response.data);
+            //     req.headers["Authorization"] = `Bearer ${response.data.access}`;
+            // } catch (error) {
+            //     console.error("During refreshing JWTs, error occurred: ", error);
+            // }
         } else {
             req.headers["Authorization"] = `Bearer ${JWTs.access}`;
         }

@@ -41,11 +41,21 @@ class Command(BaseCommand):
         fact_de_1.tags.add(de_geschichte)
         fact_de_2 = FactFactory(profile=profile_creator_de, language=german, visibility="followers")
         fact_de_2.tags.add(de_wissenschaft)
+        self.stdout.write(self.style.SUCCESS("✅  Follows facts created successfully!"))
+
         # four public facts
-        FactFactory(profile=profile_creator_en, language=english, visibility="public")
-        FactFactory(profile=profile_creator_en, language=english, visibility="public")
-        FactFactory(profile=profile_creator_de, language=german, visibility="public")
-        FactFactory(profile=profile_creator_de, language=german, visibility="public")
+        public_fact_en_1 = FactFactory(profile=profile_creator_en, language=english, visibility="public")
+        public_fact_en_1.tags.add(en_science)
+        public_fact_en_1.tags.add(en_marin_biology)
+        public_fact_en_2 = FactFactory(profile=profile_creator_en, language=english, visibility="public")
+        public_fact_en_2.tags.add(en_science)
+        public_fact_en_2.tags.add(en_marin_biology)
+        public_fact_de_1 = FactFactory(profile=profile_creator_de, language=german, visibility="public")
+        public_fact_de_1.tags.add(de_geschichte)
+        public_fact_de_1.tags.add(de_wissenschaft)
+        public_fact_de_2 = FactFactory(profile=profile_creator_de, language=german, visibility="public")
+        public_fact_de_2.tags.add(de_geschichte)
+        public_fact_de_2.tags.add(de_wissenschaft)
         self.stdout.write(self.style.SUCCESS("✅  Facts created successfully!"))
 
         # define following
