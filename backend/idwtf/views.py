@@ -63,9 +63,12 @@ class FactViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Override to handle list vs detail views differently."""
+        print("get_queryset fired up")
         user = self.request.user
 
         if not user.is_authenticated:
+            print("user is not logged in and action is `retrieve`")
+            # CONTINUE user is logged in but not recognized
             # for detail view (retrieve), return ALL accessible facts
             if self.action == "retrieve":
                 return Fact.objects.filter(visibility="public")

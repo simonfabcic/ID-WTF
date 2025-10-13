@@ -1,7 +1,47 @@
 import { ExternalLink, Heart, Save, Share2 } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useAxios } from "../../utils/useAxios";
+
+type Fact = {
+    id: number;
+    content: string;
+    created_at: string;
+    language: {
+        code: string;
+        flag: string;
+        name: string;
+    };
+    source: string;
+    tags: {
+        id: number;
+        profile: string;
+        tagname: string;
+    }[];
+    upvotes: number;
+    username: string;
+    visibility: "public" | "private" | "followers";
+};
 
 const FeedDiscover = () => {
+    const [facts, setFacts] = useState<Fact>();
+    let axiosInstance = useAxios();
+
+    let getFacts = async () => {
+        axiosInstance
+            .get(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`)
+            .then(function (responseAxios) {
+                console.log(responseAxios);
+                setFacts(responseAxios.data);
+            })
+            .catch(function (error) {
+                console.error("During the getting the facts, error occurred: ", error);
+            });
+    };
+
+    useEffect(() => {
+        getFacts();
+    }, []);
+
     return (
         <div className="flex flex-col gap-6">
             {/* fact card */}
@@ -60,6 +100,8 @@ const FeedDiscover = () => {
                     </div>
                 </div>
             ))}
+            <div>{JSON.stringify(facts)}</div>
+            {/* CONTINUE list facts into the cards above */}
         </div>
     );
 };

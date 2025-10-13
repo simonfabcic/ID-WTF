@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 password: password,
             })
             .then(function (responseAxios) {
-                console.log(responseAxios);
+                // console.log(responseAxios);
                 const newJWTs = responseAxios.data;
                 localStorage.setItem("JWTs", JSON.stringify(newJWTs));
                 setUser(jwtDecode<MyJWTAccessPayload>(newJWTs.access));
