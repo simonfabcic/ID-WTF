@@ -13,12 +13,13 @@ import ClaudeAi from "./pages/ClaudeAi";
 import TestPageMiddleScroll from "./pages/TestPageMiddleScroll";
 import ClaudeAi2 from "./pages/ClaudeAi2";
 import FeedDiscover from "./components/MainFeed/FeedDiscover";
-import FeedProfile from "./components/MainFeed/FeedProfile";
+import FeedProfileUser from "./components/MainFeed/FeedProfileUser";
 import FeedLogin from "./components/MainFeed/FeedLogin";
 import FeedMine from "./components/MainFeed/FeedMine";
 import FeedSaved from "./components/MainFeed/FeedSaved";
 import FeedFollowing from "./components/MainFeed/FeedFollowing";
 import FeedFollows from "./components/MainFeed/FeedFollows";
+import FeedProfileCreator from "./components/MainFeed/FeedProfileCreator";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
@@ -34,7 +35,8 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/login" element={<LoginPage />} /> */}
                         <Route path="/" element={<MainPage />}>
                             <Route path="discover" element={<FeedDiscover />} />
-                            <Route path="profile" element={<FeedProfile />} />
+                            <Route path="profile/:profileId" element={<FeedProfileCreator />} />
+                            <Route path="profile" element={<FeedProfileUser />} />
                             <Route path="login" element={<FeedLogin />} />
                             <Route path="mine" element={<FeedMine />} />
                             <Route path="saved" element={<FeedSaved />} />

@@ -2,7 +2,15 @@ import { useMemo } from "react";
 import { createContext, useContext, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export type SideMenuOptionsType = "discover" | "profile" | "login" | "mine" | "saved" | "following" | "follows";
+export type SideMenuOptionsType =
+    | "discover"
+    | "profile"
+    | "login"
+    | "mine"
+    | "saved"
+    | "following"
+    | "follows"
+    | "other";
 
 interface FactContextType {
     sideMenuCurrentSelection: SideMenuOptionsType;
@@ -17,7 +25,8 @@ export const FactProvider = ({ children }: { children: ReactNode }) => {
 
     // Derive from URL (single source of truth)
     const sideMenuCurrentSelection: SideMenuOptionsType = useMemo(() => {
-        const segment = location.pathname.split("/").filter(Boolean)[0] as SideMenuOptionsType | undefined;
+        const pathSegments = location.pathname.split("/").filter(Boolean);
+        let segment = pathSegments[0] as SideMenuOptionsType | undefined;
         const validOptions: SideMenuOptionsType[] = [
             "discover",
             "profile",
@@ -26,7 +35,12 @@ export const FactProvider = ({ children }: { children: ReactNode }) => {
             "saved",
             "following",
             "follows",
+            "other",
         ];
+        if (pathSegments && segment === "profile" && pathSegments.length === 2) {
+            segment = "other";
+        }
+
         return segment && validOptions.includes(segment) ? segment : "discover";
     }, [location.pathname]);
 

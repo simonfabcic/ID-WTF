@@ -1,6 +1,7 @@
-import { AtSign, FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
+import { FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
 
-const FeedProfile = () => {
+const FeedProfileCreator = () => {
+    // Component for viewing the others profiles
     return (
         <div className="flex flex-col gap-6">
             <div className="flex  bg-white rounded-lg p-4 gap-6">
@@ -34,7 +35,9 @@ const FeedProfile = () => {
                 </div>
             </div>
             <div className="flex flex-col bg-white rounded-lg  gap-3">
-                <h3 className="w-1/2 border-b-2 border-yellow-400 text-center px-4 py-3">My facts</h3>
+                <h3 className="w-1/2 border-b-2 border-yellow-400 text-center px-4 py-3">
+                    IAmFactCreator's achievements
+                </h3>
                 <div className="flex justify-between text-center p-4">
                     <div className="flex flex-col gap-2">
                         <span className="text-2xl">📅</span>
@@ -61,7 +64,7 @@ const FeedProfile = () => {
             <div className="flex flex-col bg-white rounded-lg p-4 gap-4">
                 <div className="flex gap-1.5 items-center">
                     <Tag className="h-5 w-5" />
-                    <h3>My tags</h3>
+                    <h3>IAmFactCreator's tags</h3>
                 </div>
                 <div>
                     {/* <span>🇺🇸 English</span> */}
@@ -102,8 +105,9 @@ const FeedProfile = () => {
                     </div>
                 </div>
             </div>
+            <div>List of IAmFactCreator's facts: ...</div>
         </div>
     );
 };
 
-export default FeedProfile;
+export default FeedProfileCreator;
