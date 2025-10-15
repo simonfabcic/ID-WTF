@@ -1,19 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/authContext";
-import {
-    Bookmark,
-    Divide,
-    FileUser,
-    Home,
-    LogIn,
-    LogInIcon,
-    LogOut,
-    LucideLogIn,
-    Rss,
-    SaveAll,
-    User,
-    UserCheck,
-} from "lucide-react";
+import { FileUser, Home, LogIn, LogOut, Rss, SaveAll, User, UserCheck } from "lucide-react";
 import { useFact } from "../context/factContext";
 import type { SideMenuOptionsType } from "../context/factContext";
 
@@ -54,28 +41,6 @@ const LeftSideBar = () => {
                 <MenuButton buttonOption="discover" icon={Home} buttonLabel="Discover" />
                 {(user && (
                     <>
-                        {/* <MenuButton buttonOption="profile" icon={User} buttonLabel="Profile" /> */}
-
-                        {/* <div className={`flex justify-between rounded-lg cursor-pointer overflow-hidden `}>
-                            <button
-                                className={`flex gap-2 pl-4 py-3 font-medium border-r border-r-white w-full ${
-                                    sideMenuCurrentSelection === "profile"
-                                        ? "bg-yellow-100 text-gray-900"
-                                        : "hover:bg-gray-100 text-gray-600 cursor-pointer"
-                                }`}
-                                onClick={() => setSideMenuCurrentSelection("profile")}
-                            >
-                                <User className="w-5 h-5" />
-                                Profile
-                            </button>
-                            <button
-                                className={`p-1.5 border-2 border-gray-300 rounded-r-lg ${"hover:bg-gray-100 text-gray-600"}`}
-                                onClick={userLogout}
-                            >
-                                <LogOut className="w-5 h-5 text-gray-600 cursor-pointer" />
-                            </button>
-                        </div> */}
-
                         <button
                             className={`flex items-center justify-between pl-4 font-medium rounded-lg w-full ${
                                 sideMenuCurrentSelection === "profile"

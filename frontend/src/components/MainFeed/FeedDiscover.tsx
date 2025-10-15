@@ -1,5 +1,5 @@
-import { Divide, ExternalLink, Heart, Save, Share2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { ExternalLink, Heart, Save, Share2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useAxios } from "../../utils/useAxios";
 import { useAuth } from "../../context/authContext";
 import dayjs from "dayjs";
