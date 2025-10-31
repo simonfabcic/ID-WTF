@@ -36,11 +36,11 @@ const FeedLogin = () => {
                                 placeholder="Enter your password"
                             />
                         </div>
-                        <div className="flex gap-1.5 pl-2">
+                        {/* <div className="flex gap-1.5 pl-2">
                             <input type="checkbox" name="remember-me" id="remember-me" />
                             <label htmlFor="remember-me">Remember me</label>
-                            {/* TODO handle `remember me` checkbox */}
-                        </div>
+                        </div> */}
+                        {/* TODO handle `remember me` checkbox */}
                         <button
                             type="submit"
                             className="w-full py-2 bg-yellow-400 font-semibold rounded-lg cursor-pointer"

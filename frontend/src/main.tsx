@@ -34,6 +34,9 @@ createRoot(document.getElementById("root")!).render(
                         {/* <Route path="/feed" element={<FeedPage />} />
                     <Route path="/login" element={<LoginPage />} /> */}
                         <Route path="/" element={<MainPage />}>
+                            {/* Redirect from "/" to "/discover" */}
+                            <Route index element={<Navigate to="discover" replace />} />
+
                             <Route path="discover" element={<FeedDiscover />} />
                             <Route path="profile/:profileId" element={<FeedProfileCreator />} />
                             <Route path="profile" element={<FeedProfileUser />} />

@@ -92,6 +92,8 @@ class TagFactory(factory.django.DjangoModelFactory):
 class FactFactory(factory.django.DjangoModelFactory):
     """Factory for Fact model with realistic content and relationships."""
 
+    print("factFActory fired!")
+
     class Meta:
         model = Fact
 
@@ -102,11 +104,12 @@ class FactFactory(factory.django.DjangoModelFactory):
     language = factory.SubFactory(LanguageFactory)
     upvotes = random.randint(150, 750)
 
-    @factory.lazy_attribute
-    def created_at(self):
-        """Random timestamp between one month ago and now."""
-        # CONTINUE check if his works
-        now = timezone.now()
-        start = now - datetime.timedelta(days=30)
-        random_seconds = random.uniform(0, (now - start).total_seconds())
-        return start + datetime.timedelta(seconds=random_seconds)
+    @factory.post_generation
+    def set_created_at(obj, create, extracted, **kwargs):
+        """Random `created_at` timestamp between one month ago and now."""
+        if not create:
+            return
+
+        random_seconds = random.uniform(0, datetime.timedelta(days=30).total_seconds())
+        obj.created_at = timezone.now() - datetime.timedelta(seconds=random_seconds)
+        obj.save(update_fields=["created_at"])

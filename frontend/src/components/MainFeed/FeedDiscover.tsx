@@ -39,19 +39,21 @@ const FeedDiscover = () => {
     let axiosInstance = useAxios();
     const { loading } = useAuth();
 
-    let getFacts = async () => {
+    let getFacts = () => {
         axiosInstance
             .get(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`)
             .then(function (responseAxios) {
                 setFacts(responseAxios.data);
             })
             .catch(function (error) {
-                console.error("During the getting the facts, error occurred: ", error);
+                console.error("During getting the facts, error occurred: ", error);
             });
     };
 
     useEffect(() => {
-        if (!loading) getFacts();
+        if (!loading) {
+            getFacts();
+        }
     }, [loading]);
 
     return (

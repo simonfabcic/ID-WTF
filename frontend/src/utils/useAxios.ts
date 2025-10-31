@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
 
 export const useAxios = () => {
-    const { JWTs, setJWTs, setUser } = useAuth();
+    const { JWTs, setJWTs, setUser, userLogout } = useAuth();
     const axiosInstance = axios.create({
         baseURL: import.meta.env.VITE_API_ENDPOINT,
     });
@@ -16,7 +16,7 @@ export const useAxios = () => {
 
         const accessExp = jwtDecode(JWTs.access).exp;
         if (accessExp && dayjs.unix(accessExp).isBefore(dayjs())) {
-            axios
+            await axios
                 .post(`${import.meta.env.VITE_API_ENDPOINT}/auth/token/refresh/`, {
                     refresh: JWTs.refresh,
                 })
@@ -28,21 +28,8 @@ export const useAxios = () => {
                 })
                 .catch(function (error) {
                     console.error("During the refreshing JWTs, error occurred: ", error);
+                    // TODO handle refresh fail (user logged in on two sessions)
                 });
-
-            // old try/catch option:
-            // try {
-            //     console.log("Refreshing token with:", JWTs.access);
-            //     const response = await axios.post(`${import.meta.env.VITE_API_ENDPOINT}/auth/token/refresh/`, {
-            //         refresh: JWTs.refresh,
-            //     });
-            //     setUser(jwtDecode(response.data.access));
-            //     localStorage.setItem("JWTs", JSON.stringify(response.data));
-            //     setJWTs(response.data);
-            //     req.headers["Authorization"] = `Bearer ${response.data.access}`;
-            // } catch (error) {
-            //     console.error("During refreshing JWTs, error occurred: ", error);
-            // }
         } else {
             req.headers["Authorization"] = `Bearer ${JWTs.access}`;
         }
