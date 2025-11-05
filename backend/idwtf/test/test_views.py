@@ -195,6 +195,16 @@ class UserEndpointTestCase(APITestCase):
         self.assertEqual(response.json()["username"], "testuser")
 
 
+class LanguageEndpointTestCase(APITestCase):
+    def test_language_endpoint(self):
+        """Test GET /language/ endpoint."""
+        LanguageFactory()
+        url = reverse("language-list")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
 # Testing with Authentication Tokens
 # INSTALLED_APPS = [
 #     # ... your other apps ...
