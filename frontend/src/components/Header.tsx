@@ -1,7 +1,7 @@
 // import { useAuth } from "../context/authContext";
 // import { useNavigate } from "react-router-dom";
 import { Search, Plus, X, Languages } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAxios } from "../utils/useAxios";
 
 interface FactData {
@@ -20,11 +20,19 @@ const Header = () => {
     const [showAddFactInputForm, setShowAddFactInputForm] = useState(false);
     let axiosInstance = useAxios();
 
+    // const languages = axiosInstance.get(`${import.meta.env.VITE_API_ENDPOINT}/api/language/`)
+
+    useEffect(() => {
+        axiosInstance.get(`/api/language`).then(function (axiosResponse) {
+            console.log("languages: ", axiosResponse);
+        });
+    }, []);
+    // CONTINUE save languages to variable and show them into the "new fact" modal
+
     const publishFact = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const formData = new FormData(event.currentTarget);
-        const profile_id = 1;
         const content = formData.get("content") as string;
         const source = formData.get("source") as string;
         const language = 1;
@@ -32,12 +40,11 @@ const Header = () => {
         const tag_ids = formData.getAll("tags").map((v) => Number(v));
 
         axiosInstance.post(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`, {
-            profile_id,
             content,
             source,
             language,
             visibility,
-            tag_ids: tag_ids,
+            tag_ids,
         });
 
         setShowAddFactInputForm(false);

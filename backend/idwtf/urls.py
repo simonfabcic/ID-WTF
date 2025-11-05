@@ -9,7 +9,7 @@ from . import views
 router = DefaultRouter()
 router.register(r"users", views.UserViewSet, basename="user")
 router.register(r"facts", views.FactViewSet, basename="fact")
-router.register(r"language", views.FactViewSet, basename="language")
+router.register(r"language", views.LanguageViewSet, basename="language")
 
 # TODO change `user` to `profile`
 urlpatterns = [

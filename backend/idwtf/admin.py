@@ -5,7 +5,14 @@ from .models import Fact, Language, Profile, Tag
 # admin.site.register(Profile)
 admin.site.register(Tag)
 admin.site.register(Language)
-admin.site.register(Fact)
+
+
+@admin.register(Fact)
+class FactAdmin(admin.ModelAdmin):
+    readonly_fields = ("created_at",)
+
+    list_display = ("profile", "content", "visibility", "created_at")
+    list_filter = ("visibility", "created_at")
 
 
 @admin.register(Profile)

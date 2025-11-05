@@ -65,11 +65,10 @@ class FactViewSet(viewsets.ModelViewSet):
         """Override to handle list vs detail views differently."""
         user = self.request.user
 
-        print("self.request.user.is_authenticated: ", self.request.user.is_authenticated)
-        print("self.request.user: ", self.request.user)
+        # print("self.request.user.is_authenticated: ", self.request.user.is_authenticated)
+        # print("self.request.user: ", self.request.user)
 
         if not user.is_authenticated:
-            print("user is not logged in and action is `retrieve`")
             # for detail view (retrieve), return ALL accessible facts
             if self.action == "retrieve":
                 return Fact.objects.filter(visibility="public")
@@ -141,6 +140,4 @@ class FactViewSet(viewsets.ModelViewSet):
             return Fact.objects.filter(visibility="public").order_by("?")[:10]
 
     def perform_create(self, serializer):
-        # TODO check if this is necessary
-        # TODO check if access to the profile is correct
-        serializer.save(profile=self.request.user.profile)
+        serializer.save(profile_id=self.request.user.id)
