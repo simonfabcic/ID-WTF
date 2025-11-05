@@ -10,8 +10,9 @@ import { AuthProvider } from "./context/authContext";
 import MainPage from "./pages/MainPage";
 import { FactProvider } from "./context/factContext";
 import ClaudeAi from "./pages/ClaudeAi";
-import TestPageMiddleScroll from "./pages/TestPageMiddleScroll";
 import ClaudeAi2 from "./pages/ClaudeAi2";
+import ClaudeAi3 from "./pages/ClaudeAi3";
+import TestPageMiddleScroll from "./pages/TestPageMiddleScroll";
 import FeedDiscover from "./components/MainFeed/FeedDiscover";
 import FeedProfileUser from "./components/MainFeed/FeedProfileUser";
 import FeedLogin from "./components/MainFeed/FeedLogin";
@@ -48,6 +49,7 @@ createRoot(document.getElementById("root")!).render(
                         </Route>
                         <Route path="/claude" element={<ClaudeAi />} />
                         <Route path="/claude2" element={<ClaudeAi2 />} />
+                        <Route path="/claude3" element={<ClaudeAi3 />} />
                         <Route path="/test" element={<TestPageMiddleScroll />} />
                     </Routes>
                 </AuthProvider>

@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const userLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        // according to the `name` parameter in the `<input ...>` element
         const username = event.currentTarget.username.value;
         const password = event.currentTarget.password.value;
 

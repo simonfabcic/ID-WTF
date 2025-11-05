@@ -14,7 +14,7 @@ import {
     ExternalLink,
 } from "lucide-react";
 
-export default function IDWTFApp() {
+export default function ClaudeAi3() {
     const [activeTab, setActiveTab] = useState("discover");
     const [showAddFact, setShowAddFact] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
@@ -496,6 +496,33 @@ export default function IDWTFApp() {
                                 placeholder="e.g., biology, ocean, fascinating"
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                             />
+                        </div>
+
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+
+                            {/* Selected Tags */}
+
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                <span className="inline-flex items-center gap-1 bg-yellow-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                                    #tag123
+                                    <button className="hover:text-red-600 transition-colors">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            </div>
+
+                            {/* Add New Tag */}
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Add new tag..."
+                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                                />
+                                <button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors">
+                                    Add
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex gap-3 mt-6">
