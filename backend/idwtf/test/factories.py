@@ -92,8 +92,6 @@ class TagFactory(factory.django.DjangoModelFactory):
 class FactFactory(factory.django.DjangoModelFactory):
     """Factory for Fact model with realistic content and relationships."""
 
-    print("factFActory fired!")
-
     class Meta:
         model = Fact
 
