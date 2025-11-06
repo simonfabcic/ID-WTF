@@ -1,6 +1,6 @@
 // import { useAuth } from "../context/authContext";
 // import { useNavigate } from "react-router-dom";
-import { Search, Plus, X, Languages } from "lucide-react";
+import { Search, Plus, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useAxios } from "../utils/useAxios";
 
@@ -167,7 +167,6 @@ const Header = () => {
                                     <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
                                         🔒 Private
                                     </div>
-                                    {/* CONTINUE Why if I press on the div, the input is selected */}
                                 </label>
                             </div>
 
