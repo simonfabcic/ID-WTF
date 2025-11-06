@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
     Search,
     Plus,
@@ -19,13 +19,7 @@ export default function ClaudeAi3() {
     const [showAddFact, setShowAddFact] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [loginMode, setLoginMode] = useState("login"); // 'login', 'register', 'forgot'
-    const [newFact, setNewFact] = useState({
-        content: "",
-        tags: "",
-        category: "science",
-        source: "",
-        visibility: "public",
-    });
+    const [newFact, setNewFact] = useState({ content: "", tags: "", category: "science", source: "" });
     const [loginForm, setLoginForm] = useState({ username: "", password: "", email: "", confirmPassword: "" });
 
     const categories = [
@@ -451,133 +445,104 @@ export default function ClaudeAi3() {
                             <button
                                 onClick={() => setShowAddFact(false)}
                                 className="text-gray-400 hover:text-gray-600 transition-colors"
-                                type="button"
                             >
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
 
-                        <form onSubmit={() => {}}>
-                            <textarea
-                                name="content"
-                                placeholder="What's the fascinating fact you want to share?"
-                                className="w-full border border-gray-300 rounded-lg p-4 text-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-                                required
-                            />
+                        <textarea
+                            value={newFact.content}
+                            onChange={(e) => setNewFact({ ...newFact, content: e.target.value })}
+                            placeholder="What's the fascinating fact you want to share?"
+                            className="w-full border border-gray-300 rounded-lg p-4 text-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                        />
 
-                            <div className="mt-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Source</label>
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Source</label>
+                            <input
+                                type="text"
+                                value={newFact.source}
+                                onChange={(e) => setNewFact({ ...newFact, source: e.target.value })}
+                                placeholder="e.g., National Geographic, Scientific American, BBC"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                            />
+                        </div>
+
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                            <select
+                                value={newFact.category}
+                                onChange={(e) => setNewFact({ ...newFact, category: e.target.value })}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                            >
+                                {categories
+                                    .filter((c) => c.id !== "all")
+                                    .map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.icon} {cat.name}
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
+
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Tags (comma separated)
+                            </label>
+                            <input
+                                type="text"
+                                value={newFact.tags}
+                                onChange={(e) => setNewFact({ ...newFact, tags: e.target.value })}
+                                placeholder="e.g., biology, ocean, fascinating"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                            />
+                        </div>
+
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+
+                            {/* Selected Tags */}
+
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                <span className="inline-flex items-center gap-1 bg-yellow-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                                    #tag123
+                                    <button className="hover:text-red-600 transition-colors">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            </div>
+
+                            {/* Add New Tag */}
+                            <div className="flex gap-2">
                                 <input
                                     type="text"
-                                    name="source"
-                                    placeholder="e.g., National Geographic, Scientific American, BBC"
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                                    placeholder="Add new tag..."
+                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                                 />
-                            </div>
-
-                            <div className="mt-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                                <select
-                                    name="category"
-                                    defaultValue="science"
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-                                >
-                                    {categories
-                                        .filter((c) => c.id !== "all")
-                                        .map((cat) => (
-                                            <option key={cat.id} value={cat.id}>
-                                                {cat.icon} {cat.name}
-                                            </option>
-                                        ))}
-                                </select>
-                            </div>
-
-                            <div className="mt-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Visibility</label>
-                                <div className="flex gap-3">
-                                    <label className="flex-1">
-                                        <input
-                                            type="radio"
-                                            name="visibility"
-                                            value="public"
-                                            defaultChecked
-                                            className="sr-only peer"
-                                        />
-                                        <div className="px-4 py-3 rounded-lg font-medium transition-colors cursor-pointer text-center peer-checked:bg-yellow-400 peer-checked:text-gray-900 bg-gray-100 text-gray-700 hover:bg-gray-200">
-                                            🌍 Public
-                                        </div>
-                                    </label>
-                                    <label className="flex-1">
-                                        <input
-                                            type="radio"
-                                            name="visibility"
-                                            value="followers"
-                                            className="sr-only peer"
-                                        />
-                                        <div className="px-4 py-3 rounded-lg font-medium transition-colors cursor-pointer text-center peer-checked:bg-yellow-400 peer-checked:text-gray-900 bg-gray-100 text-gray-700 hover:bg-gray-200">
-                                            👥 Followers
-                                        </div>
-                                    </label>
-                                    <label className="flex-1">
-                                        <input
-                                            type="radio"
-                                            name="visibility"
-                                            value="private"
-                                            className="sr-only peer"
-                                        />
-                                        <div className="px-4 py-3 rounded-lg font-medium transition-colors cursor-pointer text-center peer-checked:bg-yellow-400 peer-checked:text-gray-900 bg-gray-100 text-gray-700 hover:bg-gray-200">
-                                            🔒 Private
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div className="mt-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
-
-                                {/* Selected Tags */}
-                                <div className="flex flex-wrap gap-2 mb-3">
-                                    <span className="inline-flex items-center gap-1 bg-yellow-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                                        #tag123
-                                        <input type="hidden" name="tags" value="123" />
-                                        <button type="button" className="hover:text-red-600 transition-colors">
-                                            <X className="w-3 h-3" />
-                                        </button>
-                                    </span>
-                                </div>
-
-                                {/* Add New Tag */}
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        placeholder="Add new tag..."
-                                        className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-                                    />
-                                    <button
-                                        type="button"
-                                        className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors"
-                                    >
-                                        Add
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-3 mt-6">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAddFact(false)}
-                                    className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 px-6 py-3 bg-yellow-400 hover:bg-yellow-500 rounded-lg text-gray-900 font-semibold transition-colors"
-                                >
-                                    Share Fact
+                                <button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors">
+                                    Add
                                 </button>
                             </div>
-                        </form>
+                        </div>
+
+                        <div className="flex gap-3 mt-6">
+                            <button
+                                onClick={() => setShowAddFact(false)}
+                                className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    // Handle fact submission
+                                    setShowAddFact(false);
+                                    setNewFact({ content: "", tags: "", category: "science", source: "" });
+                                }}
+                                className="flex-1 px-6 py-3 bg-yellow-400 hover:bg-yellow-500 rounded-lg text-gray-900 font-semibold transition-colors"
+                            >
+                                Share Fact
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

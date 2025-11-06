@@ -142,6 +142,35 @@ const Header = () => {
                                 <option value="SI">Slovenian</option>
                             </select>
 
+                            <label className="mb-1">Visibility</label>
+                            <div className="flex gap-2">
+                                <label className="w-full">
+                                    <input
+                                        type="radio"
+                                        name="visibility"
+                                        value="public"
+                                        defaultChecked
+                                        className="sr-only peer"
+                                    />
+                                    <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
+                                        🌍 Public
+                                    </div>
+                                </label>
+                                <label className="w-full">
+                                    <input type="radio" name="visibility" value="followers" className="sr-only peer" />
+                                    <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
+                                        👥 Followers
+                                    </div>
+                                </label>
+                                <label className="w-full">
+                                    <input type="radio" name="visibility" value="private" className="sr-only peer" />
+                                    <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
+                                        🔒 Private
+                                    </div>
+                                    {/* CONTINUE Why if I press on the div, the input is selected */}
+                                </label>
+                            </div>
+
                             <span className="mb-1">Tags</span>
                             <div className="flex gap-4 border border-gray-400 rounded-lg px-2.5 py-1.5 mb-4">
                                 <div className="flex items-center gap-1">
