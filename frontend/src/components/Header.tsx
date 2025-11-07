@@ -13,21 +13,28 @@ interface FactData {
     tag_ids: number[];
 }
 
+interface Language {
+    code: string;
+    flag: string;
+    id: number;
+    name: string;
+}
+
 const Header = () => {
     // var { user, userLogout } = useAuth();
     // const navigate = useNavigate();
 
     const [showAddFactInputForm, setShowAddFactInputForm] = useState(false);
+    const [languages, setLanguages] = useState<Language[]>([]);
     let axiosInstance = useAxios();
 
     // const languages = axiosInstance.get(`${import.meta.env.VITE_API_ENDPOINT}/api/language/`)
 
     useEffect(() => {
         axiosInstance.get(`/api/language`).then(function (axiosResponse) {
-            console.log("languages: ", axiosResponse);
+            setLanguages(axiosResponse.data);
         });
     }, []);
-    // CONTINUE save languages to variable and show them into the "new fact" modal
 
     const publishFact = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -35,8 +42,8 @@ const Header = () => {
         const formData = new FormData(event.currentTarget);
         const content = formData.get("content") as string;
         const source = formData.get("source") as string;
-        const language = 1;
-        const visibility = "public";
+        const language = Number(formData.get("language") as string);
+        const visibility = formData.get("visibility") as string;
         const tag_ids = formData.getAll("tags").map((v) => Number(v));
 
         axiosInstance.post(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`, {
@@ -106,6 +113,7 @@ const Header = () => {
                             </div>
                         </div>
                         <form action="" className="flex flex-col" onSubmit={publishFact}>
+                            {/* add validation */}
                             <label htmlFor="content" className="mb-1">
                                 Interesting fact
                             </label>
@@ -137,9 +145,14 @@ const Header = () => {
                                 name="language"
                                 className="w-full px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3"
                             /> */}
-                            <select name="" id="" className="px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3">
-                                <option value="EN">English</option>
-                                <option value="SI">Slovenian</option>
+                            <select name="language" className="px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3">
+                                {languages &&
+                                    languages.map((language) => (
+                                        <option value={language.id} key={language.id}>
+                                            {`${language.flag} ${language.name}`}
+                                            {/* flags are not sown in chrome - google's political decision */}
+                                        </option>
+                                    ))}
                             </select>
 
                             <label className="mb-1">Visibility</label>
@@ -177,7 +190,7 @@ const Header = () => {
                                         type="checkbox"
                                         id="horns1"
                                         name="tags"
-                                        value={5}
+                                        value={10}
                                         className="w-3 h-3 accent-yellow-400"
                                     />
                                     <label htmlFor="horns1">admin's tag</label>

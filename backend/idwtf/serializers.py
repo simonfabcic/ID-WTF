@@ -38,19 +38,10 @@ class LanguageSerializer(ModelSerializer):
 
 class FactSerializer(ModelSerializer):
     username = CharField(source="profile.user.username", read_only=True)
-
-    # For reading: nested serializer
     profile = ProfileSerializer(read_only=True)
-    # For writing: just tag IDs
-    profile_id = PrimaryKeyRelatedField(
-        queryset=Profile.objects.all(),  # Validates that the ID exists in the database
-        write_only=True,
-        source="profile",
-    )
 
-    # For reading: nested serializer
+    # tags: for reading whole object / for writing: just tag IDs
     tags = TagSerializer(read_only=True, many=True)
-    # For writing: just tag IDs
     tag_ids = PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),  # Validates that the ID exists in the database
         write_only=True,
@@ -64,7 +55,6 @@ class FactSerializer(ModelSerializer):
             "id",
             "username",
             "profile",  # For reading
-            "profile_id",  # For writing
             "content",
             "source",
             "tags",  # For reading
