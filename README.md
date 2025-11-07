@@ -38,7 +38,7 @@ pipenv install --dev
 # prepare data:
 py manage.py migrate
 py manage.py init_db
-py manage.py seed_realistic
+py manage.py seed_realistic_llm
 # run server:
 py manage.py runserver
 ```
