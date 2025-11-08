@@ -20,7 +20,7 @@
 
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import viewsets
+from rest_framework import permissions, viewsets
 
 from .models import Fact, Language, Profile, Tag
 from .serializers import FactSerializer, LanguageSerializer, ProfileSerializer, TagSerializer, UserSerializer
@@ -43,8 +43,14 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class TagViewSet(viewsets.ModelViewSet):
     """CRUD for Tags."""
 
-    queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Tag.objects.filter(profile=self.request.user.profile)
+
+    def perform_create(self, serializer):
+        serializer.save(profile=self.request.user.profile)
 
 
 class LanguageViewSet(viewsets.ModelViewSet):

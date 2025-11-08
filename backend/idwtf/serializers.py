@@ -27,7 +27,8 @@ class ProfileSerializer(HyperlinkedModelSerializer):
 class TagSerializer(ModelSerializer):
     class Meta:
         model = Tag
-        fields = ["id", "profile", "tag_name"]
+        fields = ["id", "tag_name"]
+        read_only_fields = ["id"]
 
 
 class LanguageSerializer(ModelSerializer):

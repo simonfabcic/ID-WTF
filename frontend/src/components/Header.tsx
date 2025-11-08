@@ -3,6 +3,7 @@
 import { Search, Plus, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useAxios } from "../utils/useAxios";
+import { useAuth } from "../context/authContext";
 
 interface FactData {
     profile_id: number;
@@ -20,21 +21,36 @@ interface Language {
     name: string;
 }
 
+interface Tag {
+    tag_name: string;
+    id: number;
+}
+
 const Header = () => {
     // var { user, userLogout } = useAuth();
     // const navigate = useNavigate();
 
     const [showAddFactInputForm, setShowAddFactInputForm] = useState(false);
     const [languages, setLanguages] = useState<Language[]>([]);
+    const [tags, setTags] = useState<Tag[]>([]);
+    const { loading } = useAuth();
     let axiosInstance = useAxios();
 
     // const languages = axiosInstance.get(`${import.meta.env.VITE_API_ENDPOINT}/api/language/`)
 
     useEffect(() => {
+        if (loading) return;
+
+        // get `languages` for fact posting
         axiosInstance.get(`/api/language`).then(function (axiosResponse) {
             setLanguages(axiosResponse.data);
         });
-    }, []);
+        // get `tags` for fact posting
+        axiosInstance.get(`/api/tag`).then(function (axiosResponse) {
+            console.log("axiosResponse on get `tags`: ", axiosResponse);
+            setTags(axiosResponse.data);
+        });
+    }, [loading]);
 
     const publishFact = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -185,36 +201,20 @@ const Header = () => {
 
                             <span className="mb-1">Tags</span>
                             <div className="flex gap-4 border border-gray-400 rounded-lg px-2.5 py-1.5 mb-4">
-                                <div className="flex items-center gap-1">
-                                    <input
-                                        type="checkbox"
-                                        id="horns1"
-                                        name="tags"
-                                        value={10}
-                                        className="w-3 h-3 accent-yellow-400"
-                                    />
-                                    <label htmlFor="horns1">admin's tag</label>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <input
-                                        type="checkbox"
-                                        id="horns2"
-                                        name="tags"
-                                        value={2}
-                                        className="w-3 h-3 accent-yellow-400"
-                                    />
-                                    <label htmlFor="horns2">Horns2</label>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <input
-                                        type="checkbox"
-                                        id="horns3"
-                                        name="tags"
-                                        value={3}
-                                        className="w-3 h-3 accent-yellow-400"
-                                    />
-                                    <label htmlFor="horns3">Horns3</label>
-                                </div>
+                                {tags &&
+                                    tags.map((tag) => (
+                                        <div className="flex items-center gap-1" key={tag.id}>
+                                            {/* style the select options to click on the card */}
+                                            <input
+                                                type="checkbox"
+                                                id="horns3"
+                                                name="tags"
+                                                value={tag.id}
+                                                className="w-3 h-3 accent-yellow-400"
+                                            />
+                                            <label htmlFor="horns3">{tag.tag_name}</label>
+                                        </div>
+                                    ))}
                             </div>
 
                             <div className="flex justify-between gap-3 ">
