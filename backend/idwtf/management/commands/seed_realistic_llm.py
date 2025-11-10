@@ -21,7 +21,7 @@ class Command(BaseCommand):
         # create profile for superuser
         superuser = User.objects.get(username="admin")
         try:
-            ProfileFactory(user=superuser)
+            profile_adm = ProfileFactory(user=superuser)
             self.stdout.write(self.style.SUCCESS("✅  Profile 'admin' created successfully!"))
         except IntegrityError:
             self.stdout.write(self.style.WARNING("⚠️  Skipped due to UNIQUE constraint"))
@@ -59,6 +59,11 @@ class Command(BaseCommand):
         ger_geschichte = TagFactory(tag_name="Geschichte", profile=profile_ger, language=german)
         ger_naturwissenschaft = TagFactory(tag_name="Naturwissenschaft", profile=profile_ger, language=german)
         ger_kunst = TagFactory(tag_name="Kunst", profile=profile_ger, language=german)
+
+        # Admin's tags
+        TagFactory(tag_name="adm_tag_1", profile=profile_adm)
+        TagFactory(tag_name="adm_tag_2", profile=profile_adm)
+        TagFactory(tag_name="adm_tag_3", profile=profile_adm)
 
         self.stdout.write(self.style.SUCCESS("✅  Tags created successfully!"))
 
