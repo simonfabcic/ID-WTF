@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from idwtf.models import Fact, Language, Profile  # Adjust imports
+from idwtf.models import Fact, Language, Profile, Tag  # Adjust imports
 
 # ruff: noqa: F401 - ignore unused imports
 from idwtf.test.factories import (
@@ -142,10 +142,9 @@ class FactEndpointTestCase(APITestCase):
         }
 
         response = self.client.post(url, data, format="json")
-
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("tags", response.data)
-        self.assertIn("don't belong to the selected profile", str(response.data["tags"]))
+
+        self.assertIn("Cannot add tags from other profiles:", str(response.data["tags"]))
 
     def test_unauthorized_access(self):
         """Test that unauthorized users can't create/update/delete facts."""
@@ -203,6 +202,85 @@ class LanguageEndpointTestCase(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class TagEndpointTestCase(APITestCase):
+    """Test Tag ViewSet endpoints."""
+
+    def setUp(self):
+        self.profile1 = ProfileFactory()
+        self.profile2 = ProfileFactory()
+
+        self.tag_profile1 = TagFactory(tag_name="profile1_tag1", profile=self.profile1)
+        self.tag_profile2 = TagFactory(tag_name="profile2_tag1", profile=self.profile2)
+
+    def test_create_tag_endpoint(self):
+        """Test POST /tag/ endpoint."""
+        self.client.force_authenticate(user=self.profile1.user)
+
+        url = reverse("tag-list")
+        data = {"tag_name": "tag from user 1"}
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_retrieve_tags_list_endpoint(self):
+        """
+        Test GET /tag/ endpoint.
+
+        It must return only tags from the logged in user
+        """
+        self.tmp_profile = ProfileFactory()
+        self.client.force_authenticate(user=self.tmp_profile.user)
+        self.tag = TagFactory(tag_name="tmp_tag", profile=self.tmp_profile)
+
+        url = reverse("tag-list")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # returned tags
+        returned_tag_names = [t["tag_name"] for t in response.data]
+        self.assertIn("tmp_tag", returned_tag_names)
+        self.assertNotIn("profile1_tag1", returned_tag_names)
+        self.assertNotIn("profile2_tag1", returned_tag_names)
+
+    def test_update_tag_entirely_endpoint(self):
+        """Test PUT /tag/{id}/ endpoint."""
+        self.client.force_authenticate(user=self.profile1.user)
+
+        # user update his own tag
+        url = reverse("tag-detail", args=[self.tag_profile1.id])
+        data = {"tag_name": "updated_tag_my"}
+        response = self.client.put(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        tag_in_db = Tag.objects.get(id=self.tag_profile1.id)
+        self.assertEqual("updated_tag_my", tag_in_db.tag_name)
+
+        # user can not update some ones else tag
+        url = reverse("tag-detail", args=[self.tag_profile2.id])
+        data = {"tag_name": "updated_tag_foreign"}
+        response = self.client.put(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        tag_in_db = Tag.objects.get(id=self.tag_profile1.id)
+        self.assertNotEqual("updated_tag_foreign", tag_in_db.tag_name)
+
+    def test_update_tag_partial_endpoint(self):
+        pass
+        # CONTINUE (first add the language attribute to the `Tag` model)
+
+    def test_delete_tag_endpoint(self):
+        self.client.force_authenticate(user=self.profile1.user)
+
+        url = reverse("tag-detail", args=[self.tag_profile1.id])
+
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        with self.assertRaises(Tag.DoesNotExist):
+            Tag.objects.get(id=self.tag_profile1.id)
 
 
 # Testing with Authentication Tokens

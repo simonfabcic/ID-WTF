@@ -19,8 +19,10 @@
 #     serializer_class = FactSerializer
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
 from rest_framework import permissions, viewsets
+from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from .models import Fact, Language, Profile, Tag
 from .serializers import FactSerializer, LanguageSerializer, ProfileSerializer, TagSerializer, UserSerializer
@@ -146,4 +148,7 @@ class FactViewSet(viewsets.ModelViewSet):
             return Fact.objects.filter(visibility="public").order_by("?")[:10]
 
     def perform_create(self, serializer):
-        serializer.save(profile_id=self.request.user.id)
+        try:
+            serializer.save(profile_id=self.request.user.id)
+        except DjangoValidationError as err:
+            raise DRFValidationError({"tags": err.message}) from err

@@ -30,25 +30,6 @@ class Profile(models.Model):
         return f"User: {self.user.username}"
 
 
-class Tag(models.Model):
-    """
-    Specifications for `tag`.
-
-    Profile creates the tags in user interface.
-    Each `profile` can have multiple tags.
-    Each `fact` can have multiple tags, but just those defined by profile.
-    """
-
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="tags")
-    tag_name = models.CharField(max_length=50)
-
-    class Meta:
-        unique_together = ["profile", "tag_name"]
-
-    def __str__(self):
-        return self.tag_name
-
-
 class Language(models.Model):
     # for adding the flag emoji, visit:
     # https://apps.timwhitlock.info/emoji/tables/iso3166
@@ -61,6 +42,27 @@ class Language(models.Model):
 
     # Usage:
     # Language.objects.create(code="en", name="English", flag="🇬🇧")
+
+
+class Tag(models.Model):
+    """
+    Specifications for `tag`.
+
+    Profile creates the tags in user interface.
+    Each `profile` can have multiple tags.
+    Each `fact` can have multiple tags, but just those defined by profile.
+    """
+
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="tags")
+    tag_name = models.CharField(max_length=50)
+    # language = models.ForeignKey(Language, on_delete=models.PROTECT)
+    # CONTINUE
+
+    class Meta:
+        unique_together = ["profile", "tag_name"]
+
+    def __str__(self):
+        return self.tag_name
 
 
 class Fact(models.Model):
