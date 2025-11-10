@@ -218,8 +218,10 @@ class TagEndpointTestCase(APITestCase):
         """Test POST /tag/ endpoint."""
         self.client.force_authenticate(user=self.profile1.user)
 
+        language = LanguageFactory()
+
         url = reverse("tag-list")
-        data = {"tag_name": "tag from user 1"}
+        data = {"tag_name": "tag from user 1", "language": language.id}
         response = self.client.post(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -248,9 +250,11 @@ class TagEndpointTestCase(APITestCase):
         """Test PUT /tag/{id}/ endpoint."""
         self.client.force_authenticate(user=self.profile1.user)
 
+        language = LanguageFactory()
+
         # user update his own tag
         url = reverse("tag-detail", args=[self.tag_profile1.id])
-        data = {"tag_name": "updated_tag_my"}
+        data = {"tag_name": "updated_tag_my", "language": language.id}
         response = self.client.put(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -268,8 +272,18 @@ class TagEndpointTestCase(APITestCase):
         self.assertNotEqual("updated_tag_foreign", tag_in_db.tag_name)
 
     def test_update_tag_partial_endpoint(self):
-        pass
-        # CONTINUE (first add the language attribute to the `Tag` model)
+        """Test PATCH /tag/{id}/ endpoint."""
+        self.client.force_authenticate(user=self.profile1.user)
+
+        tag_before_update = self.tag_profile1
+
+        url = reverse("tag-detail", args=[self.tag_profile1.id])
+        data = {"tag_name": "updated_tag_my"}
+        self.client.patch(url, data, format="json")
+
+        tag_in_db = Tag.objects.get(id=self.tag_profile1.id)
+        self.assertEqual("updated_tag_my", tag_in_db.tag_name)
+        self.assertEqual(tag_before_update.language, tag_in_db.language)
 
     def test_delete_tag_endpoint(self):
         self.client.force_authenticate(user=self.profile1.user)

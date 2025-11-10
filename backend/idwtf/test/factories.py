@@ -87,6 +87,7 @@ class TagFactory(factory.django.DjangoModelFactory):
 
     profile = factory.SubFactory(ProfileFactory)
     tag_name = factory.Faker("word")
+    language = factory.SubFactory(LanguageFactory)
 
 
 class FactFactory(factory.django.DjangoModelFactory):

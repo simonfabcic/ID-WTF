@@ -55,8 +55,7 @@ class Tag(models.Model):
 
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="tags")
     tag_name = models.CharField(max_length=50)
-    # language = models.ForeignKey(Language, on_delete=models.PROTECT)
-    # CONTINUE
+    language = models.ForeignKey(Language, on_delete=models.PROTECT)
 
     class Meta:
         unique_together = ["profile", "tag_name"]

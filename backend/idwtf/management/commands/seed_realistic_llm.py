@@ -1,5 +1,7 @@
 # idwtf/management/commands/seed_realistic.py
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
+from django.db.utils import IntegrityError
 
 from idwtf.test.factories import FactFactory, LanguageFactory, ProfileFactory, TagFactory, UserFactory
 
@@ -8,6 +10,22 @@ class Command(BaseCommand):
     help = "Seed the database with realistic multilingual data using factory-boy."
 
     def handle(self, *args, **kwargs):
+        # --- ADMIN USER AND PROFILE ---
+        # create the super user
+        if not User.objects.filter(username="admin").exists():
+            User.objects.create_superuser(username="admin", email="admin@email.com", password="asdfggfdsa")
+            self.stdout.write(self.style.SUCCESS("✅  Superuser 'admin' created successfully!"))
+        else:
+            self.stdout.write(self.style.WARNING("⚠️  Superuser 'admin' already exists."))
+
+        # create profile for superuser
+        superuser = User.objects.get(username="admin")
+        try:
+            ProfileFactory(user=superuser)
+            self.stdout.write(self.style.SUCCESS("✅  Profile 'admin' created successfully!"))
+        except IntegrityError:
+            self.stdout.write(self.style.WARNING("⚠️  Skipped due to UNIQUE constraint"))
+
         # --- USERS ---
         user_slo = UserFactory(username="iAmSlovene")
         user_eng = UserFactory(username="iAmEnglish")
@@ -28,19 +46,20 @@ class Command(BaseCommand):
 
         # --- TAGS ---
         # Slovenian tags
-        slo_science = TagFactory(tag_name="znanost", profile=profile_slo)
-        slo_history = TagFactory(tag_name="zgodovina", profile=profile_slo)
-        slo_nature = TagFactory(tag_name="narava", profile=profile_slo)
+        slo_science = TagFactory(tag_name="znanost", profile=profile_slo, language=slovenian)
+        slo_history = TagFactory(tag_name="zgodovina", profile=profile_slo, language=slovenian)
+        slo_nature = TagFactory(tag_name="narava", profile=profile_slo, language=slovenian)
 
         # English tags
-        eng_technology = TagFactory(tag_name="technology", profile=profile_eng)
-        eng_space = TagFactory(tag_name="space", profile=profile_eng)
-        eng_music = TagFactory(tag_name="music", profile=profile_eng)
+        eng_technology = TagFactory(tag_name="technology", profile=profile_eng, language=english)
+        eng_space = TagFactory(tag_name="space", profile=profile_eng, language=english)
+        eng_music = TagFactory(tag_name="music", profile=profile_eng, language=english)
 
         # German tags
-        ger_geschichte = TagFactory(tag_name="Geschichte", profile=profile_ger)
-        ger_naturwissenschaft = TagFactory(tag_name="Naturwissenschaft", profile=profile_ger)
-        ger_kunst = TagFactory(tag_name="Kunst", profile=profile_ger)
+        ger_geschichte = TagFactory(tag_name="Geschichte", profile=profile_ger, language=german)
+        ger_naturwissenschaft = TagFactory(tag_name="Naturwissenschaft", profile=profile_ger, language=german)
+        ger_kunst = TagFactory(tag_name="Kunst", profile=profile_ger, language=german)
+
         self.stdout.write(self.style.SUCCESS("✅  Tags created successfully!"))
 
         # --- FACTS ---
