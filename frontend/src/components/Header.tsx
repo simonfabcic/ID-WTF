@@ -170,6 +170,7 @@ const Header = () => {
                                         </option>
                                     ))}
                             </select>
+                            {/* CONTINUE - change the language selection from the dropdown to the card selection */}
 
                             <label className="mb-1">Visibility</label>
                             <div className="flex gap-2">
