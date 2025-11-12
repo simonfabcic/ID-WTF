@@ -161,16 +161,31 @@ const Header = () => {
                                 name="language"
                                 className="w-full px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3"
                             /> */}
-                            <select name="language" className="px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3">
+                            {/* <select name="language" className="px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3">
                                 {languages &&
                                     languages.map((language) => (
                                         <option value={language.id} key={language.id}>
                                             {`${language.flag} ${language.name}`}
-                                            {/* flags are not sown in chrome - google's political decision */}
                                         </option>
                                     ))}
-                            </select>
-                            {/* CONTINUE - change the language selection from the dropdown to the card selection */}
+                            </select> */}
+                            <div className="flex gap-2">
+                                {languages &&
+                                    languages.map((language) => (
+                                        <label className="w-full">
+                                            <input
+                                                type="radio"
+                                                name="language"
+                                                value={language.id}
+                                                className="sr-only peer"
+                                            />
+                                            <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
+                                                {`${language.flag} ${language.name}`}
+                                                {/* flags are not sown in chrome - google's political decision */}
+                                            </div>
+                                        </label>
+                                    ))}
+                            </div>
 
                             <label className="mb-1">Visibility</label>
                             <div className="flex gap-2">
