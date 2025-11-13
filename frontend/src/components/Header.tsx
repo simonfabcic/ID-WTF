@@ -24,6 +24,7 @@ interface Language {
 interface Tag {
     tag_name: string;
     id: number;
+    language: number;
 }
 
 const Header = () => {
@@ -33,6 +34,7 @@ const Header = () => {
     const [showAddFactInputForm, setShowAddFactInputForm] = useState(false);
     const [languages, setLanguages] = useState<Language[]>([]);
     const [tags, setTags] = useState<Tag[]>([]);
+    const [language, setLanguage] = useState<number>();
     const { loading } = useAuth();
     let axiosInstance = useAxios();
 
@@ -47,7 +49,6 @@ const Header = () => {
         });
         // get `tags` for fact posting
         axiosInstance.get(`/api/tag`).then(function (axiosResponse) {
-            console.log("axiosResponse on get `tags`: ", axiosResponse);
             setTags(axiosResponse.data);
         });
     }, [loading]);
@@ -62,13 +63,17 @@ const Header = () => {
         const visibility = formData.get("visibility") as string;
         const tag_ids = formData.getAll("tags").map((v) => Number(v));
 
-        axiosInstance.post(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`, {
-            content,
-            source,
-            language,
-            visibility,
-            tag_ids,
-        });
+        axiosInstance
+            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`, {
+                content,
+                source,
+                language,
+                visibility,
+                tag_ids,
+            })
+            .catch(function (error) {
+                console.error("During posting the facts, error occurred: ", error);
+            });
 
         setShowAddFactInputForm(false);
     };
@@ -152,41 +157,6 @@ const Header = () => {
                                 placeholder="e.g.: www.fact-source.com; friend of mine, employed at Jonson & Jonson"
                             />
 
-                            <label htmlFor="language" className="mb-1">
-                                Language
-                            </label>
-                            {/* <input
-                                type="text"
-                                id="language"
-                                name="language"
-                                className="w-full px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3"
-                            /> */}
-                            {/* <select name="language" className="px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3">
-                                {languages &&
-                                    languages.map((language) => (
-                                        <option value={language.id} key={language.id}>
-                                            {`${language.flag} ${language.name}`}
-                                        </option>
-                                    ))}
-                            </select> */}
-                            <div className="flex gap-2">
-                                {languages &&
-                                    languages.map((language) => (
-                                        <label className="w-full">
-                                            <input
-                                                type="radio"
-                                                name="language"
-                                                value={language.id}
-                                                className="sr-only peer"
-                                            />
-                                            <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
-                                                {`${language.flag} ${language.name}`}
-                                                {/* flags are not sown in chrome - google's political decision */}
-                                            </div>
-                                        </label>
-                                    ))}
-                            </div>
-
                             <label className="mb-1">Visibility</label>
                             <div className="flex gap-2">
                                 <label className="w-full">
@@ -215,25 +185,58 @@ const Header = () => {
                                 </label>
                             </div>
 
-                            <span className="mb-1">Tags</span>
-                            <div className="flex gap-4 border border-gray-400 rounded-lg px-2.5 py-1.5 mb-4">
-                                {tags &&
-                                    tags.map((tag) => (
-                                        <div className="flex items-center gap-1" key={tag.id}>
-                                            {/* style the select options to click on the card */}
+                            <label htmlFor="language" className="mb-1">
+                                Language
+                            </label>
+                            <div className="flex gap-2">
+                                {languages &&
+                                    languages.map((language) => (
+                                        <label
+                                            className="w-full"
+                                            key={language.id}
+                                            onClick={() => setLanguage(language.id)}
+                                        >
                                             <input
-                                                type="checkbox"
-                                                id="horns3"
-                                                name="tags"
-                                                value={tag.id}
-                                                className="w-3 h-3 accent-yellow-400"
+                                                type="radio"
+                                                name="language"
+                                                value={language.id}
+                                                className="sr-only peer"
                                             />
-                                            <label htmlFor="horns3">{tag.tag_name}</label>
-                                        </div>
+                                            <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
+                                                {`${language.flag} ${language.name}`}
+                                                {/* flags are not sown in chrome - google's political decision */}
+                                            </div>
+                                        </label>
                                     ))}
                             </div>
+                            {language && (
+                                <div>
+                                    <span className="mb-1">Tags</span>
+                                    <div className="flex gap-4 border border-gray-400 rounded-lg px-2.5 py-1.5">
+                                        {tags &&
+                                            tags.map(
+                                                (tag) =>
+                                                    tag.language === language && (
+                                                        <div>
+                                                            <label>
+                                                                <input
+                                                                    type="checkbox"
+                                                                    name="tags"
+                                                                    value={tag.id}
+                                                                    className="sr-only peer"
+                                                                />
+                                                                <div className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
+                                                                    {tag.tag_name}
+                                                                </div>
+                                                            </label>
+                                                        </div>
+                                                    )
+                                            )}
+                                    </div>
+                                </div>
+                            )}
 
-                            <div className="flex justify-between gap-3 ">
+                            <div className="flex justify-between gap-3 mt-4">
                                 <button
                                     className="cursor-pointer border border-gray-400 rounded-lg w-full py-2.5"
                                     onClick={() => setShowAddFactInputForm(false)}

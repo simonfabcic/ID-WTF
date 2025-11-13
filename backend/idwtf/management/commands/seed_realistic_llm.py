@@ -61,9 +61,9 @@ class Command(BaseCommand):
         ger_kunst = TagFactory(tag_name="Kunst", profile=profile_ger, language=german)
 
         # Admin's tags
-        TagFactory(tag_name="adm_tag_1", profile=profile_adm, language=english)
-        TagFactory(tag_name="adm_tag_2", profile=profile_adm, language=english)
-        TagFactory(tag_name="adm_tag_3", profile=profile_adm, language=english)
+        TagFactory(tag_name="adm_tag_1_en", profile=profile_adm, language=english)
+        TagFactory(tag_name="adm_tag_2_en", profile=profile_adm, language=english)
+        TagFactory(tag_name="adm_tag_3_de", profile=profile_adm, language=german)
 
         self.stdout.write(self.style.SUCCESS("✅  Tags created successfully!"))
 
