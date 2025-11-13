@@ -1,6 +1,6 @@
 // import { useAuth } from "../context/authContext";
 // import { useNavigate } from "react-router-dom";
-import { Search, Plus, X } from "lucide-react";
+import { Search, Plus, X, Check } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useAxios } from "../utils/useAxios";
 import { useAuth } from "../context/authContext";
@@ -34,7 +34,9 @@ const Header = () => {
     const [showAddFactInputForm, setShowAddFactInputForm] = useState(false);
     const [languages, setLanguages] = useState<Language[]>([]);
     const [tags, setTags] = useState<Tag[]>([]);
-    const [language, setLanguage] = useState<number>();
+    const [languageId, setLanguageId] = useState<number>();
+    const [isAddingTag, setIsAddingTag] = useState(false);
+    const [newTagName, setNewTagName] = useState("");
     const { loading } = useAuth();
     let axiosInstance = useAxios();
 
@@ -76,6 +78,20 @@ const Header = () => {
             });
 
         setShowAddFactInputForm(false);
+    };
+
+    const addTag = () => {
+        console.log("newTagValue: ", newTagName);
+        axiosInstance.post(`${import.meta.env.VITE_API_ENDPOINT}/api/tag/`, {
+            language: languageId,
+            tag_name: newTagName,
+        });
+        setNewTagName("");
+        setIsAddingTag(false);
+        // CONTINUE
+        // mark added tag as selected
+        // add added tag to the tag list
+        // TODO when tag added to list, it should be italic, until backend confirm success adding
     };
 
     return (
@@ -194,7 +210,7 @@ const Header = () => {
                                         <label
                                             className="w-full"
                                             key={language.id}
-                                            onClick={() => setLanguage(language.id)}
+                                            onClick={() => setLanguageId(language.id)}
                                         >
                                             <input
                                                 type="radio"
@@ -209,15 +225,15 @@ const Header = () => {
                                         </label>
                                     ))}
                             </div>
-                            {language && (
+                            {languageId && (
                                 <div>
                                     <span className="mb-1">Tags</span>
                                     <div className="flex gap-4 border border-gray-400 rounded-lg px-2.5 py-1.5">
                                         {tags &&
                                             tags.map(
                                                 (tag) =>
-                                                    tag.language === language && (
-                                                        <div>
+                                                    tag.language === languageId && (
+                                                        <div key={tag.id}>
                                                             <label>
                                                                 <input
                                                                     type="checkbox"
@@ -225,13 +241,46 @@ const Header = () => {
                                                                     value={tag.id}
                                                                     className="sr-only peer"
                                                                 />
-                                                                <div className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
+                                                                <div className="bg-yellow-100 rounded-full px-3 whitespace-nowrap peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
                                                                     {tag.tag_name}
                                                                 </div>
                                                             </label>
                                                         </div>
                                                     )
                                             )}
+                                        {isAddingTag ? (
+                                            <div className="flex">
+                                                <input
+                                                    className="bg-yellow-100 rounded-l-full px-3 focus:outline-none"
+                                                    type="text"
+                                                    placeholder="Tag name"
+                                                    onChange={(e) => setNewTagName(e.target.value)}
+                                                    value={newTagName}
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsAddingTag(false)}
+                                                    className="bg-gray-300 cursor-pointer border-l-2 border-white"
+                                                >
+                                                    <X />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="bg-gray-300 cursor-pointer rounded-r-full border-l-2 border-white"
+                                                    onClick={addTag}
+                                                >
+                                                    <Check />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div
+                                                className="bg-gray-300 rounded-full px-2"
+                                                onClick={() => setIsAddingTag(true)}
+                                            >
+                                                <Plus />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}
