@@ -81,6 +81,7 @@ const Header = () => {
     };
 
     const addTag = () => {
+        // CONTINUE data validation
         console.log("newTagValue: ", newTagName);
         axiosInstance.post(`${import.meta.env.VITE_API_ENDPOINT}/api/tag/`, {
             language: languageId,
@@ -248,39 +249,37 @@ const Header = () => {
                                                         </div>
                                                     )
                                             )}
-                                        {isAddingTag ? (
-                                            <div className="flex">
-                                                <input
-                                                    className="bg-yellow-100 rounded-l-full px-3 focus:outline-none"
-                                                    type="text"
-                                                    placeholder="Tag name"
-                                                    onChange={(e) => setNewTagName(e.target.value)}
-                                                    value={newTagName}
-                                                    autoFocus
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setIsAddingTag(false)}
-                                                    className="bg-gray-300 cursor-pointer border-l-2 border-white"
-                                                >
-                                                    <X />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="bg-gray-300 cursor-pointer rounded-r-full border-l-2 border-white"
-                                                    onClick={addTag}
-                                                >
-                                                    <Check />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div
-                                                className="bg-gray-300 rounded-full px-2"
-                                                onClick={() => setIsAddingTag(true)}
+
+                                        {/* TODO if no tags -> setIsAddingTag(true) */}
+
+                                        <div className="flex bg-gray-300 rounded-full overflow-hidden">
+                                            <input
+                                                type="text"
+                                                className={`bg-yellow-100 focus:outline-none border-white transition-all duration-500 ${
+                                                    isAddingTag ? "px-3 w-32 border-r-2" : "px-0 w-0 border-0"
+                                                }`}
+                                                placeholder="Tag name"
+                                                onChange={(e) => setNewTagName(e.target.value)}
+                                                value={newTagName}
+                                                autoFocus={isAddingTag}
+                                            />
+                                            <button
+                                                type="button"
+                                                className={`px-1 ${isAddingTag ? "rotate-45" : ""}`}
+                                                onClick={() => setIsAddingTag(!isAddingTag)}
                                             >
                                                 <Plus />
-                                            </div>
-                                        )}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`border-l-2 border-white transition-all duration-1000 ${
+                                                    !isAddingTag && "hidden"
+                                                }`}
+                                                onClick={addTag}
+                                            >
+                                                <Check />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -293,6 +292,7 @@ const Header = () => {
                                     Cancel
                                 </button>
                                 <button className="cursor-pointer rounded-lg w-full bg-yellow-400" type="submit">
+                                    {/* CONTINUE data validation */}
                                     Share Fact
                                 </button>
                             </div>
