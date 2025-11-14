@@ -37,6 +37,7 @@ const Header = () => {
     const [languageId, setLanguageId] = useState<number>();
     const [isAddingTag, setIsAddingTag] = useState(false);
     const [newTagName, setNewTagName] = useState("");
+    const [addingNewTagNoInputError, setAddingNewTagNoInputError] = useState(false);
     const { loading } = useAuth();
     let axiosInstance = useAxios();
 
@@ -81,8 +82,11 @@ const Header = () => {
     };
 
     const addTag = () => {
-        // CONTINUE data validation
-        console.log("newTagValue: ", newTagName);
+        if (newTagName.trim() === "") {
+            setAddingNewTagNoInputError(true);
+            setNewTagName("");
+            return;
+        }
         axiosInstance.post(`${import.meta.env.VITE_API_ENDPOINT}/api/tag/`, {
             language: languageId,
             tag_name: newTagName,
@@ -257,22 +261,30 @@ const Header = () => {
                                                 type="text"
                                                 className={`bg-yellow-100 focus:outline-none border-white transition-all duration-500 ${
                                                     isAddingTag ? "px-3 w-32 border-r-2" : "px-0 w-0 border-0"
+                                                } ${addingNewTagNoInputError && "placeholder:text-red-500"}`}
+                                                placeholder={`${
+                                                    addingNewTagNoInputError ? "Enter tag..." : "Tag name"
                                                 }`}
-                                                placeholder="Tag name"
                                                 onChange={(e) => setNewTagName(e.target.value)}
                                                 value={newTagName}
                                                 autoFocus={isAddingTag}
                                             />
                                             <button
                                                 type="button"
-                                                className={`px-1 ${isAddingTag ? "rotate-45" : ""}`}
-                                                onClick={() => setIsAddingTag(!isAddingTag)}
+                                                className={`px-1 cursor-pointer ${isAddingTag && "rotate-45"}`}
+                                                onClick={() => {
+                                                    if (isAddingTag) {
+                                                        setNewTagName("");
+                                                        setAddingNewTagNoInputError(false);
+                                                    }
+                                                    setIsAddingTag(!isAddingTag);
+                                                }}
                                             >
                                                 <Plus />
                                             </button>
                                             <button
                                                 type="button"
-                                                className={`border-l-2 border-white transition-all duration-1000 ${
+                                                className={`border-l-2 cursor-pointer border-white transition-all duration-1000 ${
                                                     !isAddingTag && "hidden"
                                                 }`}
                                                 onClick={addTag}
