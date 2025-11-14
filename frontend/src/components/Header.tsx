@@ -6,7 +6,6 @@ import { useAxios } from "../utils/useAxios";
 import { useAuth } from "../context/authContext";
 
 interface FactData {
-    profile_id: number;
     content: string;
     source: string;
     language: number;
@@ -49,6 +48,8 @@ const Header = () => {
         // get `languages` for fact posting
         axiosInstance.get(`/api/language`).then(function (axiosResponse) {
             setLanguages(axiosResponse.data);
+            setLanguageId(axiosResponse.data[0].id);
+            // TODO check what happens if no languages
         });
         // get `tags` for fact posting
         axiosInstance.get(`/api/tag`).then(function (axiosResponse) {
@@ -63,16 +64,20 @@ const Header = () => {
         const content = formData.get("content") as string;
         const source = formData.get("source") as string;
         const language = Number(formData.get("language") as string);
-        const visibility = formData.get("visibility") as string;
+        const visibility = formData.get("visibility") as "public" | "private" | "followers";
         const tag_ids = formData.getAll("tags").map((v) => Number(v));
+
+        const factDataToSend = {
+            content,
+            source,
+            language,
+            visibility,
+            tag_ids,
+        } satisfies FactData;
 
         axiosInstance
             .post(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`, {
-                content,
-                source,
-                language,
-                visibility,
-                tag_ids,
+                factDataToSend,
             })
             .catch(function (error) {
                 console.error("During posting the facts, error occurred: ", error);
@@ -221,6 +226,7 @@ const Header = () => {
                                                 type="radio"
                                                 name="language"
                                                 value={language.id}
+                                                defaultChecked={languageId === language.id}
                                                 className="sr-only peer"
                                             />
                                             <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
