@@ -294,6 +294,7 @@ const Header = () => {
                                             >
                                                 <Plus />
                                             </button>
+                                            {/* CONTINUE change to two buttons: `+` and `X` */}
                                             <button
                                                 type="button"
                                                 className={`border-l-2 cursor-pointer border-white transition-all duration-1000 ${
