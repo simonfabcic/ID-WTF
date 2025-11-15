@@ -40,21 +40,28 @@ const Header = () => {
     const { loading } = useAuth();
     let axiosInstance = useAxios();
 
-    // const languages = axiosInstance.get(`${import.meta.env.VITE_API_ENDPOINT}/api/language/`)
-
-    useEffect(() => {
-        if (loading) return;
-
-        // get `languages` for fact posting
+    let getLanguages = () => {
         axiosInstance.get(`/api/language`).then(function (axiosResponse) {
             setLanguages(axiosResponse.data);
             setLanguageId(axiosResponse.data[0].id);
             // TODO check what happens if no languages
         });
-        // get `tags` for fact posting
+    };
+
+    let getTags = () => {
         axiosInstance.get(`/api/tag`).then(function (axiosResponse) {
             setTags(axiosResponse.data);
         });
+    };
+
+    useEffect(() => {
+        if (loading) return;
+
+        // get `languages` for fact posting
+        getLanguages();
+
+        // get `tags` for fact posting
+        getTags();
     }, [loading]);
 
     const publishFact = (event: React.FormEvent<HTMLFormElement>) => {
@@ -98,9 +105,10 @@ const Header = () => {
         });
         setNewTagName("");
         setIsAddingTag(false);
+        getTags();
         // CONTINUE
         // mark added tag as selected
-        // add added tag to the tag list
+        // add added tag to the tag list (currently is added when `getTags` updates the `tags`)
         // TODO when tag added to list, it should be italic, until backend confirm success adding
     };
 
@@ -217,16 +225,13 @@ const Header = () => {
                             <div className="flex gap-2">
                                 {languages &&
                                     languages.map((language) => (
-                                        <label
-                                            className="w-full"
-                                            key={language.id}
-                                            onClick={() => setLanguageId(language.id)}
-                                        >
+                                        <label className="w-full" key={language.id}>
                                             <input
                                                 type="radio"
                                                 name="language"
                                                 value={language.id}
-                                                defaultChecked={languageId === language.id}
+                                                checked={languageId === language.id}
+                                                onChange={() => setLanguageId(language.id)}
                                                 className="sr-only peer"
                                             />
                                             <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
@@ -251,6 +256,7 @@ const Header = () => {
                                                                     name="tags"
                                                                     value={tag.id}
                                                                     className="sr-only peer"
+                                                                    // checked={tag.tag_name === newTagName}
                                                                 />
                                                                 <div className="bg-yellow-100 rounded-full px-3 whitespace-nowrap peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
                                                                     {tag.tag_name}
