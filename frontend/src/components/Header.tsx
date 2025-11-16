@@ -13,6 +13,12 @@ interface FactData {
     tag_ids: number[];
 }
 
+interface FactErrorsMissingData {
+    factContent: boolean;
+    source: boolean;
+    tags: boolean;
+}
+
 interface Language {
     code: string;
     flag: string;
@@ -43,6 +49,11 @@ const Header = () => {
         language: -1,
         tag_ids: [],
     });
+    const [addFactFormDataErrors, setAddFactFormDataErrors] = useState<FactErrorsMissingData>({
+        factContent: false,
+        source: false,
+        tags: false,
+    });
     const { loading } = useAuth();
     let axiosInstance = useAxios();
 
@@ -72,6 +83,30 @@ const Header = () => {
 
     const publishFact = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+
+        // data validation
+        let err = false;
+        if (addFactFormData.content.length <= 0) {
+            setAddFactFormDataErrors((prev) => ({ ...prev, factContent: true }));
+            err = true;
+        } else {
+            setAddFactFormDataErrors((prev) => ({ ...prev, factContent: false }));
+        }
+        if (addFactFormData.source.length <= 0) {
+            setAddFactFormDataErrors((prev) => ({ ...prev, source: true }));
+            err = true;
+        } else {
+            setAddFactFormDataErrors((prev) => ({ ...prev, source: false }));
+        }
+        if (addFactFormData.tag_ids.length <= 0) {
+            setAddFactFormDataErrors((prev) => ({ ...prev, tags: true }));
+            err = true;
+        } else {
+            setAddFactFormDataErrors((prev) => ({ ...prev, tags: false }));
+        }
+        if (err) {
+            return;
+        }
 
         axiosInstance
             .post(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`, addFactFormData)
@@ -169,7 +204,9 @@ const Header = () => {
                             </label>
                             <textarea
                                 id="content"
-                                className="w-full px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3"
+                                className={`w-full px-2.5 py-1.5 rounded-lg border ${
+                                    addFactFormDataErrors.factContent ? "border-red-500" : "border-gray-400"
+                                } mb-3`}
                                 placeholder="What's the fascinating fact you want to share?"
                                 rows={2}
                                 value={addFactFormData.content}
@@ -182,7 +219,9 @@ const Header = () => {
                             <input
                                 type="text"
                                 id="source"
-                                className="w-full px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3"
+                                className={`w-full px-2.5 py-1.5 rounded-lg border ${
+                                    addFactFormDataErrors.source ? "border-red-500" : "border-gray-400"
+                                } mb-3`}
                                 placeholder="e.g.: www.fact-source.com; friend of mine, employed at Jonson & Jonson"
                                 value={addFactFormData.source}
                                 onChange={(e) => setAddFactFormData((prev) => ({ ...prev, source: e.target.value }))}
@@ -193,6 +232,7 @@ const Header = () => {
                                 <label className="w-full">
                                     <input
                                         type="radio"
+                                        name="visibility"
                                         value="public"
                                         className="sr-only peer"
                                         checked={addFactFormData.visibility === "public"}
@@ -266,8 +306,12 @@ const Header = () => {
                             </div>
                             {addFactFormData.language >= 0 && (
                                 <div>
-                                    <span className="mb-1">Tags</span>
-                                    <div className="flex gap-4 border border-gray-400 rounded-lg px-2.5 py-1.5">
+                                    <label htmlFor="tags">Tags</label>
+                                    <div
+                                        className={`flex gap-4 border ${
+                                            addFactFormDataErrors.tags ? "border-red-500" : "border-gray-400"
+                                        } rounded-lg px-2.5 py-1.5 mt-1`}
+                                    >
                                         {tags &&
                                             tags.map(
                                                 (tag) =>
@@ -355,7 +399,6 @@ const Header = () => {
                                     Cancel
                                 </button>
                                 <button className="cursor-pointer rounded-lg w-full bg-yellow-400" type="submit">
-                                    {/* CONTINUE data validation */}
                                     Share Fact
                                 </button>
                             </div>
