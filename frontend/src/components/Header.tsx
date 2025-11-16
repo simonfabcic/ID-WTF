@@ -8,8 +8,8 @@ import { useAuth } from "../context/authContext";
 interface FactData {
     content: string;
     source: string;
-    language: number;
     visibility: "public" | "private" | "followers";
+    language: number;
     tag_ids: number[];
 }
 
@@ -33,17 +33,23 @@ const Header = () => {
     const [showAddFactInputForm, setShowAddFactInputForm] = useState(false);
     const [languages, setLanguages] = useState<Language[]>([]);
     const [tags, setTags] = useState<Tag[]>([]);
-    const [languageId, setLanguageId] = useState<number>();
     const [isAddingTag, setIsAddingTag] = useState(false);
     const [newTagName, setNewTagName] = useState("");
     const [addingNewTagNoInputError, setAddingNewTagNoInputError] = useState(false);
+    const [addFactFormData, setAddFactFormData] = useState<FactData>({
+        content: "",
+        source: "",
+        visibility: "public",
+        language: -1,
+        tag_ids: [],
+    });
     const { loading } = useAuth();
     let axiosInstance = useAxios();
 
     let getLanguages = () => {
         axiosInstance.get(`/api/language`).then(function (axiosResponse) {
             setLanguages(axiosResponse.data);
-            setLanguageId(axiosResponse.data[0].id);
+            setAddFactFormData((prev) => ({ ...prev, language: axiosResponse.data[0].id }));
             // TODO check what happens if no languages
         });
     };
@@ -67,30 +73,21 @@ const Header = () => {
     const publishFact = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        const formData = new FormData(event.currentTarget);
-        const content = formData.get("content") as string;
-        const source = formData.get("source") as string;
-        const language = Number(formData.get("language") as string);
-        const visibility = formData.get("visibility") as "public" | "private" | "followers";
-        const tag_ids = formData.getAll("tags").map((v) => Number(v));
-
-        const factDataToSend = {
-            content,
-            source,
-            language,
-            visibility,
-            tag_ids,
-        } satisfies FactData;
-
         axiosInstance
-            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`, {
-                factDataToSend,
+            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`, addFactFormData)
+            .then(() => {
+                setShowAddFactInputForm(false);
+                setAddFactFormData({
+                    content: "",
+                    source: "",
+                    visibility: "public",
+                    language: -1,
+                    tag_ids: [],
+                });
             })
             .catch(function (error) {
                 console.error("During posting the facts, error occurred: ", error);
             });
-
-        setShowAddFactInputForm(false);
     };
 
     const addTag = () => {
@@ -100,7 +97,7 @@ const Header = () => {
             return;
         }
         axiosInstance.post(`${import.meta.env.VITE_API_ENDPOINT}/api/tag/`, {
-            language: languageId,
+            language: addFactFormData.language,
             tag_name: newTagName,
         });
         setNewTagName("");
@@ -153,8 +150,6 @@ const Header = () => {
             </header>
 
             {showAddFactInputForm && (
-                // TODO save input data into the useState() to keep them in case of reopen the input modal
-                // const [addFactInputData, setAddFactInputData] = useState({fact_content:"", source:"", language:"", tags:""})
                 <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center p-6">
                     {/* TODO If click outside of the modal, close the modal */}
                     <div className="bg-white rounded-lg max-w-2xl w-full p-6 shadow-xl">
@@ -174,10 +169,11 @@ const Header = () => {
                             </label>
                             <textarea
                                 id="content"
-                                name="content"
                                 className="w-full px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3"
                                 placeholder="What's the fascinating fact you want to share?"
                                 rows={2}
+                                value={addFactFormData.content}
+                                onChange={(e) => setAddFactFormData((prev) => ({ ...prev, content: e.target.value }))}
                             />
 
                             <label htmlFor="source" className="mb-1">
@@ -186,9 +182,10 @@ const Header = () => {
                             <input
                                 type="text"
                                 id="source"
-                                name="source"
                                 className="w-full px-2.5 py-1.5 rounded-lg border border-gray-400 mb-3"
                                 placeholder="e.g.: www.fact-source.com; friend of mine, employed at Jonson & Jonson"
+                                value={addFactFormData.source}
+                                onChange={(e) => setAddFactFormData((prev) => ({ ...prev, source: e.target.value }))}
                             />
 
                             <label className="mb-1">Visibility</label>
@@ -196,23 +193,43 @@ const Header = () => {
                                 <label className="w-full">
                                     <input
                                         type="radio"
-                                        name="visibility"
                                         value="public"
-                                        defaultChecked
                                         className="sr-only peer"
+                                        checked={addFactFormData.visibility === "public"}
+                                        onChange={() =>
+                                            setAddFactFormData((prev) => ({ ...prev, visibility: "public" }))
+                                        }
                                     />
                                     <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
                                         🌍 Public
                                     </div>
                                 </label>
                                 <label className="w-full">
-                                    <input type="radio" name="visibility" value="followers" className="sr-only peer" />
+                                    <input
+                                        type="radio"
+                                        name="visibility"
+                                        value="followers"
+                                        className="sr-only peer"
+                                        checked={addFactFormData.visibility === "followers"}
+                                        onChange={() =>
+                                            setAddFactFormData((prev) => ({ ...prev, visibility: "followers" }))
+                                        }
+                                    />
                                     <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
                                         👥 Followers
                                     </div>
                                 </label>
                                 <label className="w-full">
-                                    <input type="radio" name="visibility" value="private" className="sr-only peer" />
+                                    <input
+                                        type="radio"
+                                        name="visibility"
+                                        value="private"
+                                        className="sr-only peer"
+                                        checked={addFactFormData.visibility === "private"}
+                                        onChange={() =>
+                                            setAddFactFormData((prev) => ({ ...prev, visibility: "private" }))
+                                        }
+                                    />
                                     <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
                                         🔒 Private
                                     </div>
@@ -230,8 +247,14 @@ const Header = () => {
                                                 type="radio"
                                                 name="language"
                                                 value={language.id}
-                                                checked={languageId === language.id}
-                                                onChange={() => setLanguageId(language.id)}
+                                                checked={addFactFormData.language === language.id}
+                                                onChange={() =>
+                                                    setAddFactFormData((prev) => ({
+                                                        ...prev,
+                                                        language: language.id,
+                                                        tag_ids: [],
+                                                    }))
+                                                }
                                                 className="sr-only peer"
                                             />
                                             <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
@@ -241,14 +264,14 @@ const Header = () => {
                                         </label>
                                     ))}
                             </div>
-                            {languageId && (
+                            {addFactFormData.language >= 0 && (
                                 <div>
                                     <span className="mb-1">Tags</span>
                                     <div className="flex gap-4 border border-gray-400 rounded-lg px-2.5 py-1.5">
                                         {tags &&
                                             tags.map(
                                                 (tag) =>
-                                                    tag.language === languageId && (
+                                                    tag.language === addFactFormData.language && (
                                                         <div key={tag.id}>
                                                             <label>
                                                                 <input
@@ -256,7 +279,22 @@ const Header = () => {
                                                                     name="tags"
                                                                     value={tag.id}
                                                                     className="sr-only peer"
-                                                                    // checked={tag.tag_name === newTagName}
+                                                                    checked={addFactFormData.tag_ids.includes(tag.id)}
+                                                                    onChange={(e) => {
+                                                                        if (e.target.checked) {
+                                                                            setAddFactFormData((prev) => ({
+                                                                                ...prev,
+                                                                                tag_ids: [...prev.tag_ids, tag.id],
+                                                                            }));
+                                                                        } else {
+                                                                            setAddFactFormData((prev) => ({
+                                                                                ...prev,
+                                                                                tag_ids: prev.tag_ids.filter(
+                                                                                    (id) => id != tag.id
+                                                                                ),
+                                                                            }));
+                                                                        }
+                                                                    }}
                                                                 />
                                                                 <div className="bg-yellow-100 rounded-full px-3 whitespace-nowrap peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
                                                                     {tag.tag_name}
