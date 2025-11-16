@@ -1,7 +1,7 @@
 // import { useAuth } from "../context/authContext";
 // import { useNavigate } from "react-router-dom";
 import { Search, Plus, X, Check } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useAxios } from "../utils/useAxios";
 import { useAuth } from "../context/authContext";
 
@@ -55,6 +55,7 @@ const Header = () => {
         tags: false,
     });
     const { loading } = useAuth();
+    const newTagInputRef = useRef<HTMLInputElement>(null);
     let axiosInstance = useAxios();
 
     let getLanguages = () => {
@@ -80,6 +81,12 @@ const Header = () => {
         // get `tags` for fact posting
         getTags();
     }, [loading]);
+
+    useEffect(() => {
+        if (isAddingTag) {
+            newTagInputRef.current?.focus();
+        }
+    }, [isAddingTag]);
 
     const publishFact = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -371,6 +378,7 @@ const Header = () => {
 
                                         <div className="flex bg-gray-300 rounded-full overflow-hidden">
                                             <input
+                                                ref={newTagInputRef}
                                                 type="text"
                                                 className={`bg-yellow-100 focus:outline-none border-white transition-all duration-500 ${
                                                     isAddingTag ? "px-3 w-32 border-r-2" : "px-0 w-0 border-0"
@@ -380,7 +388,7 @@ const Header = () => {
                                                 }`}
                                                 onChange={(e) => setNewTagName(e.target.value)}
                                                 value={newTagName}
-                                                autoFocus={isAddingTag}
+                                                autoFocus={true}
                                             />
                                             <button
                                                 type="button"
