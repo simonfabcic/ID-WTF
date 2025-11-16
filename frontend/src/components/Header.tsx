@@ -131,16 +131,18 @@ const Header = () => {
             setNewTagName("");
             return;
         }
-        axiosInstance.post(`${import.meta.env.VITE_API_ENDPOINT}/api/tag/`, {
-            language: addFactFormData.language,
-            tag_name: newTagName,
-        });
+        axiosInstance
+            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/tag/`, {
+                language: addFactFormData.language,
+                tag_name: newTagName,
+            })
+            .then((response) => {
+                console.log(response);
+                setAddFactFormData((prev) => ({ ...prev, tag_ids: [...prev.tag_ids, response.data.id] }));
+            });
         setNewTagName("");
         setIsAddingTag(false);
         getTags();
-        // CONTINUE
-        // mark added tag as selected
-        // add added tag to the tag list (currently is added when `getTags` updates the `tags`)
         // TODO when tag added to list, it should be italic, until backend confirm success adding
     };
 
