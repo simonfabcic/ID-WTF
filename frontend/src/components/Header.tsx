@@ -194,7 +194,14 @@ const Header = () => {
                             <div className="font-bold text-2xl text-gray-900">Share a Fact</div>
                             <div
                                 className="cursor-pointer text-gray-400 hover:text-gray-900 transition-colors"
-                                onClick={() => setShowAddFactInputForm(false)}
+                                onClick={() => {
+                                    setShowAddFactInputForm(false);
+                                    setAddFactFormDataErrors({
+                                        factContent: false,
+                                        source: false,
+                                        tags: false,
+                                    });
+                                }}
                             >
                                 <X />
                             </div>
