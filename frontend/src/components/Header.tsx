@@ -137,8 +137,8 @@ const Header = () => {
                 tag_name: newTagName,
             })
             .then((response) => {
-                console.log(response);
                 setAddFactFormData((prev) => ({ ...prev, tag_ids: [...prev.tag_ids, response.data.id] }));
+                setAddFactFormDataErrors((prev) => ({ ...prev, tags: false }));
             });
         setNewTagName("");
         setIsAddingTag(false);
@@ -212,7 +212,10 @@ const Header = () => {
                                 placeholder="What's the fascinating fact you want to share?"
                                 rows={2}
                                 value={addFactFormData.content}
-                                onChange={(e) => setAddFactFormData((prev) => ({ ...prev, content: e.target.value }))}
+                                onChange={(e) => {
+                                    setAddFactFormDataErrors((prev) => ({ ...prev, factContent: false }));
+                                    setAddFactFormData((prev) => ({ ...prev, content: e.target.value }));
+                                }}
                             />
 
                             <label htmlFor="source" className="mb-1">
@@ -226,7 +229,10 @@ const Header = () => {
                                 } mb-3`}
                                 placeholder="e.g.: www.fact-source.com; friend of mine, employed at Jonson & Jonson"
                                 value={addFactFormData.source}
-                                onChange={(e) => setAddFactFormData((prev) => ({ ...prev, source: e.target.value }))}
+                                onChange={(e) => {
+                                    setAddFactFormDataErrors((prev) => ({ ...prev, source: false }));
+                                    setAddFactFormData((prev) => ({ ...prev, source: e.target.value }));
+                                }}
                             />
 
                             <label className="mb-1">Visibility</label>
@@ -327,6 +333,10 @@ const Header = () => {
                                                                     className="sr-only peer"
                                                                     checked={addFactFormData.tag_ids.includes(tag.id)}
                                                                     onChange={(e) => {
+                                                                        setAddFactFormDataErrors((prev) => ({
+                                                                            ...prev,
+                                                                            tags: false,
+                                                                        }));
                                                                         if (e.target.checked) {
                                                                             setAddFactFormData((prev) => ({
                                                                                 ...prev,
