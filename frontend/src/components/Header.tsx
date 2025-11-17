@@ -337,7 +337,7 @@ const Header = () => {
                                 <div>
                                     <label htmlFor="tags">Tags</label>
                                     <div
-                                        className={`flex gap-4 border ${
+                                        className={`flex flex-wrap gap-4 border ${
                                             addFactFormDataErrors.tags ? "border-red-500" : "border-gray-400"
                                         } rounded-lg px-2.5 py-1.5 mt-1`}
                                     >
@@ -424,6 +424,7 @@ const Header = () => {
                                                     !isAddingTag && "hidden"
                                                 }`}
                                                 onClick={addTag}
+                                                // TODO on add, focus on the plus sign (to add new tag)
                                             >
                                                 <Check />
                                             </button>
