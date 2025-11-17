@@ -1,7 +1,34 @@
-import { AtSign, FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
+import { FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
+import { useAuth } from "../../context/authContext";
+import { useAxios } from "../../utils/useAxios";
+import { useEffect, useState } from "react";
+
+interface UserProfileData {
+    username: string;
+    user_id: number;
+    email: string;
+    created_at: string;
+}
 
 const FeedProfileUser = () => {
     // Component for viewing the logged in user profile
+
+    const [userProfileData, setUserProfileData] = useState<UserProfileData>();
+    const { user, loading } = useAuth();
+    let axiosInstance = useAxios();
+
+    useEffect(() => {
+        if (!loading) {
+            axiosInstance
+                .get(`${import.meta.env.VITE_API_ENDPOINT}/api/profile/${user?.user_id}/`)
+                .then((responseAxios) => {
+                    setUserProfileData(responseAxios.data);
+                    console.log("responseAxios.data: ", responseAxios.data);
+                });
+        }
+    }, [loading]);
+
+    console.log("user: ", user);
     return (
         <div className="flex flex-col gap-6">
             <div className="flex  bg-white rounded-lg p-4 gap-6">
@@ -13,10 +40,10 @@ const FeedProfileUser = () => {
                     />
                 </div>
                 <div className="flex flex-col flex-1">
-                    <h2 className="font-bold text-xl">IAmFactCreator</h2>
+                    <h2 className="font-bold text-xl">{userProfileData?.username}</h2>
                     <div className="flex items-center text-sm gap-1 text-gray-600">
                         <Mail className="w-3 h-3" />
-                        <span>fact.creator@deun.eu</span>
+                        <span>{userProfileData?.email}</span>
                     </div>
                     <p className="text-gray-600 mt-3">
                         I am creator of the app. I hope many people will find this useful! My main college in the
@@ -40,7 +67,13 @@ const FeedProfileUser = () => {
                     <div className="flex flex-col gap-2">
                         <span className="text-2xl">📅</span>
                         <span className="text-sm">Member since</span>
-                        <span className="text-xs font-semibold">Jan 2025</span>
+                        <span className="text-xs font-semibold">
+                            {userProfileData?.created_at &&
+                                new Date(userProfileData.created_at).toLocaleString("en-US", {
+                                    month: "long",
+                                    year: "numeric",
+                                })}
+                        </span>
                     </div>
                     <div className="flex flex-col gap-2">
                         <span className="text-2xl">🔖</span>

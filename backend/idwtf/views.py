@@ -21,11 +21,18 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, response, viewsets
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from .models import Fact, Language, Profile, Tag
-from .serializers import FactSerializer, LanguageSerializer, ProfileSerializer, TagSerializer, UserSerializer
+from .serializers import (
+    FactSerializer,
+    LanguageSerializer,
+    PrivateProfileSerializer,
+    PublicProfileSerializer,
+    TagSerializer,
+    UserSerializer,
+)
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -39,7 +46,25 @@ class ProfileViewSet(viewsets.ModelViewSet):
     """CRUD for Profiles."""
 
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = PrivateProfileSerializer
+
+    # CONTINUE
+    # only owner can change the profile
+    # disable GET list of users
+
+    def retrieve(self, request, *args, **kwargs):
+        """Retrieve a profile - return pubic data if viewing someone else's profile."""
+        instance = self.get_object()
+
+        print("instance.user.id: ", instance.user.id)
+        print("request.user.id: ", request.user.id)
+        if request.user.is_authenticated and instance.user.id == request.user.id:
+            serializer = PrivateProfileSerializer(instance, context={"request": request})
+        else:
+            serializer = PublicProfileSerializer(instance, context={"request": request})
+
+        return response.Response(serializer.data)
 
 
 class TagViewSet(viewsets.ModelViewSet):

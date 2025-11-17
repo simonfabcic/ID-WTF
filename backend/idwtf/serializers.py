@@ -16,12 +16,28 @@ class UserSerializer(ModelSerializer):
         fields = ["id", "username", "email", "first_name", "last_name", "date_joined"]
 
 
-class ProfileSerializer(HyperlinkedModelSerializer):
+class PublicProfileSerializer(HyperlinkedModelSerializer):
     # facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
+    class Meta:
+        model = Profile
+        fields = ["id"]
+
+
+class PrivateProfileSerializer(HyperlinkedModelSerializer):
+    # facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
+    username = CharField(source="user.username", read_only=True)
+    email = CharField(source="user.email", read_only=True)
+    created_at = CharField(source="user.created_at", read_only=True)
 
     class Meta:
         model = Profile
-        fields = ["id", "user"]
+        fields = [
+            "id",
+            "user",
+            "username",
+            "email",
+            "created_at",
+        ]
 
 
 class TagSerializer(ModelSerializer):
@@ -39,7 +55,7 @@ class LanguageSerializer(ModelSerializer):
 
 class FactSerializer(ModelSerializer):
     username = CharField(source="profile.user.username", read_only=True)
-    profile = ProfileSerializer(read_only=True)
+    profile = PublicProfileSerializer(read_only=True)
 
     # tags: for reading whole object / for writing: just tag IDs
     tags = TagSerializer(read_only=True, many=True)

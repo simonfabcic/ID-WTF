@@ -11,6 +11,7 @@ router.register(r"users", views.UserViewSet, basename="user")
 router.register(r"facts", views.FactViewSet, basename="fact")
 router.register(r"language", views.LanguageViewSet, basename="language")
 router.register(r"tag", views.TagViewSet, basename="tag")
+router.register(r"profile", views.ProfileViewSet, basename="profile")
 
 # TODO change `user` to `profile`
 urlpatterns = [
