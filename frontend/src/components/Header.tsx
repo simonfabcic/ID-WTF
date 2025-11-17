@@ -138,6 +138,11 @@ const Header = () => {
             setNewTagName("");
             return;
         }
+        if (tags.find((tag) => tag.language === addFactFormData.language && tag.tag_name === newTagName)) {
+            window.alert(`Tag with name "${newTagName}" already exist.`);
+            return;
+            // TODO create nicer popup
+        }
         axiosInstance
             .post(`${import.meta.env.VITE_API_ENDPOINT}/api/tag/`, {
                 language: addFactFormData.language,
@@ -310,13 +315,15 @@ const Header = () => {
                                                 name="language"
                                                 value={language.id}
                                                 checked={addFactFormData.language === language.id}
-                                                onChange={() =>
+                                                onChange={() => {
                                                     setAddFactFormData((prev) => ({
                                                         ...prev,
                                                         language: language.id,
                                                         tag_ids: [],
-                                                    }))
-                                                }
+                                                    }));
+                                                    setIsAddingTag(false);
+                                                    setNewTagName("");
+                                                }}
                                                 className="sr-only peer"
                                             />
                                             <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
@@ -390,20 +397,27 @@ const Header = () => {
                                                 value={newTagName}
                                                 autoFocus={true}
                                             />
-                                            <button
-                                                type="button"
-                                                className={`px-1 cursor-pointer ${isAddingTag && "rotate-45"}`}
-                                                onClick={() => {
-                                                    if (isAddingTag) {
+                                            {isAddingTag ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setIsAddingTag(false);
                                                         setNewTagName("");
                                                         setAddingNewTagNoInputError(false);
-                                                    }
-                                                    setIsAddingTag(!isAddingTag);
-                                                }}
-                                            >
-                                                <Plus />
-                                            </button>
-                                            {/* CONTINUE change to two buttons: `+` and `X` */}
+                                                    }}
+                                                    className="cursor-pointer px-1"
+                                                >
+                                                    <X />
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsAddingTag(true)}
+                                                    className="cursor-pointer px-1"
+                                                >
+                                                    <Plus />
+                                                </button>
+                                            )}
                                             <button
                                                 type="button"
                                                 className={`border-l-2 cursor-pointer border-white transition-all duration-1000 ${
@@ -429,6 +443,12 @@ const Header = () => {
                                     Share Fact
                                 </button>
                             </div>
+                            {/*
+                                TODO take a look how is with navigation with keyboard
+                                Issues:
+                                    - fields are not indicated when in focus
+                                    - when tab-ing to the end od the form, the focus goes to the background
+                            */}
                         </form>
                     </div>
                 </div>
