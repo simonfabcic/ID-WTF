@@ -1,9 +1,12 @@
+from collections import Counter
+
 from django.contrib.auth.models import User
 from rest_framework.serializers import (
     CharField,
     HyperlinkedModelSerializer,
     ModelSerializer,
     PrimaryKeyRelatedField,
+    SerializerMethodField,
     ValidationError,
 )
 
@@ -27,7 +30,9 @@ class PrivateProfileSerializer(HyperlinkedModelSerializer):
     # facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
     username = CharField(source="user.username", read_only=True)
     email = CharField(source="user.email", read_only=True)
-    created_at = CharField(source="user.created_at", read_only=True)
+    tag_most_posted = SerializerMethodField()
+    fact_most_likes = SerializerMethodField()
+    fact_total_likes = SerializerMethodField()
 
     class Meta:
         model = Profile
@@ -37,7 +42,37 @@ class PrivateProfileSerializer(HyperlinkedModelSerializer):
             "username",
             "email",
             "created_at",
+            "updated_at",
+            "tag_most_posted",
+            "fact_most_likes",
+            "fact_total_likes",
         ]
+
+    def get_tag_most_posted(self, obj):
+        """Return the most used tag."""
+        facts = self.instance.facts.all()
+        if not facts:
+            return "No facts"
+        # Flatten tags and count occurrences
+        tag_count = Counter()
+        for fact in facts:
+            for tag in fact.tags.all():
+                tag_count[tag.tag_name] += 1
+        if not tag_count:
+            return "No tags"
+        # Return the tag with max count
+        return max(tag_count, key=tag_count.get)
+
+    def get_fact_most_likes(self, obj):
+        """Return the fact with the most upvotes."""
+        facts = self.instance.facts.all()
+        if not facts:
+            return 0
+        return max(fact.upvotes for fact in facts)
+
+    def get_fact_total_likes(self, obj):
+        """Return sum of all user's received likes."""
+        return sum(fact.upvotes for fact in self.instance.facts.all())
 
 
 class TagSerializer(ModelSerializer):

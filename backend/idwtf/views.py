@@ -21,7 +21,7 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
-from rest_framework import permissions, response, viewsets
+from rest_framework import permissions, response, status, viewsets
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from .models import Fact, Language, Profile, Tag
@@ -42,23 +42,39 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
 
 
+class IsProfileOwnerOrReadOnly(permissions.BasePermission):
+    """Custom permission to only allow owners of a profile to edit it.."""
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return obj.user == request.user
+
+
 class ProfileViewSet(viewsets.ModelViewSet):
     """CRUD for Profiles."""
 
     queryset = Profile.objects.all()
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsProfileOwnerOrReadOnly]
     serializer_class = PrivateProfileSerializer
 
-    # CONTINUE
-    # only owner can change the profile
-    # disable GET list of users
+    def list(self, request, *args, **kwargs):
+        """Disable list option for the getting the all private profiles."""
+        return response.Response(
+            {"detail": "Getting all profiles not allowed."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
     def retrieve(self, request, *args, **kwargs):
-        """Retrieve a profile - return pubic data if viewing someone else's profile."""
+        """
+        Retrieve a profile and return either public or private data.
+
+        If the requested profile belongs to the authenticated user, return the
+        private version of the profile. Otherwise, return the public version.
+        """
         instance = self.get_object()
 
-        print("instance.user.id: ", instance.user.id)
-        print("request.user.id: ", request.user.id)
         if request.user.is_authenticated and instance.user.id == request.user.id:
             serializer = PrivateProfileSerializer(instance, context={"request": request})
         else:
