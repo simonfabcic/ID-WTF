@@ -2,12 +2,17 @@ import { FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
 import { useAuth } from "../../context/authContext";
 import { useAxios } from "../../utils/useAxios";
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 
 interface UserProfileData {
     username: string;
-    user_id: number;
+    id: number;
     email: string;
     created_at: string;
+    updated_at: string;
+    fact_most_likes: number;
+    fact_total_likes: number;
+    tag_most_posted: string;
 }
 
 const FeedProfileUser = () => {
@@ -28,7 +33,6 @@ const FeedProfileUser = () => {
         }
     }, [loading]);
 
-    console.log("user: ", user);
     return (
         <div className="flex flex-col gap-6">
             <div className="flex  bg-white rounded-lg p-4 gap-6">
@@ -52,7 +56,7 @@ const FeedProfileUser = () => {
                     <div className="flex items-center justify-between pt-3">
                         <div className="flex flex-col">
                             <span className="font-semibold">Last profile update:</span>
-                            <span className="text-sm">5 days ago</span>
+                            <span className="text-sm">{dayjs(userProfileData?.updated_at).fromNow()}</span>
                         </div>
                         <div className="flex gap-3">
                             <UserPen className="w-5 h-5" />
@@ -78,17 +82,17 @@ const FeedProfileUser = () => {
                     <div className="flex flex-col gap-2">
                         <span className="text-2xl">🔖</span>
                         <span className="text-sm">Most posted</span>
-                        <span className="text-xs font-semibold">#health</span>
+                        <span className="text-xs font-semibold">#{userProfileData?.tag_most_posted}</span>
                     </div>
                     <div className="flex flex-col gap-2">
                         <span className="text-2xl">🔥</span>
                         <span className="text-sm">Top fact</span>
-                        <span className="text-xs font-semibold">512 Likes</span>
+                        <span className="text-xs font-semibold">{userProfileData?.fact_most_likes} Likes</span>
                     </div>
                     <div className="flex flex-col gap-2">
                         <span className="text-2xl">💛</span>
                         <span className="text-sm">Total likes</span>
-                        <span className="text-xs font-semibold">5588</span>
+                        <span className="text-xs font-semibold">{userProfileData?.fact_total_likes}</span>
                     </div>
                 </div>
             </div>
