@@ -151,12 +151,24 @@ const FeedProfileUser = () => {
                                             <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
                                                 {tag.tag_name}
                                             </span>
-                                            <div className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer">
+                                            <button
+                                                type="button"
+                                                className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer"
+                                                onClick={() => {
+                                                    // CONTINUE
+                                                }}
+                                            >
                                                 <Trash2 className="h-3 w-3" />
-                                            </div>
-                                            <div className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer">
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer"
+                                                onClick={() => {
+                                                    // CONTINUE
+                                                }}
+                                            >
                                                 <Pencil className="h-3 w-3" />
-                                            </div>
+                                            </button>
                                         </div>
                                     ))}
                                 </div>
