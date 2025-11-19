@@ -1,4 +1,4 @@
-import { FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
+import { Divide, FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
 import { useAuth } from "../../context/authContext";
 import { useAxios } from "../../utils/useAxios";
 import { useEffect, useState } from "react";
@@ -15,12 +15,29 @@ interface UserProfileData {
     tag_most_posted: string;
 }
 
+interface Tag {
+    tag_name: string;
+    id: number;
+    language: number;
+}
+
+interface Language {
+    code: string;
+    flag: string;
+    id: number;
+    name: string;
+}
+
 const FeedProfileUser = () => {
     // Component for viewing the logged in user profile
 
     const [userProfileData, setUserProfileData] = useState<UserProfileData>();
     const { user, loading } = useAuth();
+    const [tags, setTags] = useState<Tag[]>([]);
+    const [languages, setLanguages] = useState<Language[]>([]);
+    const [presentedLanguagesInTags, setPresentedLanguagesInTags] = useState<number[]>([]);
     let axiosInstance = useAxios();
+    // let presentedLanguagesInTags: Set<number> = new Set();
 
     useEffect(() => {
         if (!loading) {
@@ -28,8 +45,25 @@ const FeedProfileUser = () => {
                 .get(`${import.meta.env.VITE_API_ENDPOINT}/api/profile/${user?.user_id}/`)
                 .then((responseAxios) => {
                     setUserProfileData(responseAxios.data);
-                    console.log("responseAxios.data: ", responseAxios.data);
                 });
+            Promise.all([axiosInstance.get(`/api/language`), axiosInstance.get(`/api/tag`)]).then(
+                ([languageResponse, tagResponse]) => {
+                    setLanguages(languageResponse.data);
+                    setTags(tagResponse.data);
+                    // Extract unique language IDs
+                    const languageIds: number[] = tagResponse.data.map((tag: Tag) => tag.language);
+                    const uniqueLanguageIds: number[] = [...new Set(languageIds)];
+                    setPresentedLanguagesInTags(uniqueLanguageIds);
+                }
+            );
+            // axiosInstance.get(`/api/language`).then(function (axiosResponse) {
+            //     setLanguages(axiosResponse.data);
+            //     // console.log(axiosResponse.data);
+            // });
+            // axiosInstance.get(`/api/tag`).then(function (axiosResponse) {
+            //     setTags(axiosResponse.data);
+            //     console.log(axiosResponse.data);
+            // });
         }
     }, [loading]);
 
@@ -96,49 +130,39 @@ const FeedProfileUser = () => {
                     </div>
                 </div>
             </div>
+
             <div className="flex flex-col bg-white rounded-lg p-4 gap-4">
                 <div className="flex gap-1.5 items-center">
                     <Tag className="h-5 w-5" />
-                    <h3>My tags</h3>
+                    <h3>My tagss</h3>
                 </div>
-                <div>
-                    {/* <span>🇺🇸 English</span> */}
-                    <span>English</span>
-                    <div className="flex gap-1.5 p-2">
-                        {[...Array(3)].map((_, index) => (
-                            <div key={index} className="flex content-center">
-                                <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
-                                    #tag1
-                                </span>
-                                <div className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer">
-                                    <Trash2 className="h-3 w-3" />
-                                </div>
-                                <div className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer">
-                                    <Pencil className="h-3 w-3" />
+
+                {presentedLanguagesInTags &&
+                    presentedLanguagesInTags.map((language_id: number) => {
+                        const language = languages.find((language) => language.id === language_id);
+                        const languageTags = tags.filter((tag) => tag.language === language_id);
+                        return (
+                            <div key={language_id}>
+                                <span>{`${language?.flag} ${language?.name}`}</span>
+                                {/* TODO handle not shown flag on the windows/chrome */}
+                                <div className="flex flex-wrap gap-1.5 p-2">
+                                    {languageTags.map((tag) => (
+                                        <div key={tag.id} className="flex content-center">
+                                            <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
+                                                {tag.tag_name}
+                                            </span>
+                                            <div className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer">
+                                                <Trash2 className="h-3 w-3" />
+                                            </div>
+                                            <div className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer">
+                                                <Pencil className="h-3 w-3" />
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </div>
-                <div>
-                    {/* <span>🇪🇸 Spanish</span> */}
-                    <span>Spanish</span>
-                    <div className="flex gap-1.5 p-2">
-                        {[...Array(3)].map((_, index) => (
-                            <div key={index} className="flex content-center">
-                                <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
-                                    #tag1
-                                </span>
-                                <div className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer">
-                                    <Trash2 className="h-3 w-3" />
-                                </div>
-                                <div className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer">
-                                    <Pencil className="h-3 w-3" />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                        );
+                    })}
             </div>
         </div>
     );
