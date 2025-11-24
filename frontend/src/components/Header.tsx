@@ -1,9 +1,12 @@
 // import { useAuth } from "../context/authContext";
 // import { useNavigate } from "react-router-dom";
-import { Search, Plus, X, Check } from "lucide-react";
+import { Search, Plus, X, Check, Tag } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
 import { useAxios } from "../utils/useAxios";
-import { useAuth } from "../context/authContext";
+// import { useAuth } from "../context/authContext";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../app/store";
+import { getTagsAsync } from "../app/features/user/userDataSlice";
 
 interface FactData {
     content: string;
@@ -19,26 +22,9 @@ interface FactErrorsMissingData {
     tags: boolean;
 }
 
-interface Language {
-    code: string;
-    flag: string;
-    id: number;
-    name: string;
-}
-
-interface Tag {
-    tag_name: string;
-    id: number;
-    language: number;
-}
-
 const Header = () => {
-    // var { user, userLogout } = useAuth();
-    // const navigate = useNavigate();
-
     const [showAddFactInputForm, setShowAddFactInputForm] = useState(false);
-    const [languages, setLanguages] = useState<Language[]>([]);
-    const [tags, setTags] = useState<Tag[]>([]);
+    const { languages, tags } = useSelector((state: RootState) => state.userData);
     const [isAddingTag, setIsAddingTag] = useState(false);
     const [newTagName, setNewTagName] = useState("");
     const [addingNewTagNoInputError, setAddingNewTagNoInputError] = useState(false);
@@ -54,33 +40,9 @@ const Header = () => {
         source: false,
         tags: false,
     });
-    const { loading } = useAuth();
     const newTagInputRef = useRef<HTMLInputElement>(null);
     let axiosInstance = useAxios();
-
-    let getLanguages = () => {
-        axiosInstance.get(`/api/language`).then(function (axiosResponse) {
-            setLanguages(axiosResponse.data);
-            setAddFactFormData((prev) => ({ ...prev, language: axiosResponse.data[0].id }));
-            // TODO check what happens if no languages
-        });
-    };
-
-    let getTags = () => {
-        axiosInstance.get(`/api/tag`).then(function (axiosResponse) {
-            setTags(axiosResponse.data);
-        });
-    };
-
-    useEffect(() => {
-        if (loading) return;
-
-        // get `languages` for fact posting
-        getLanguages();
-
-        // get `tags` for fact posting
-        getTags();
-    }, [loading]);
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         if (isAddingTag) {
@@ -154,7 +116,8 @@ const Header = () => {
             });
         setNewTagName("");
         setIsAddingTag(false);
-        getTags();
+        dispatch(getTagsAsync(axiosInstance));
+        // getTags();
         // TODO when tag added to list, it should be italic, until backend confirm success adding
     };
 
@@ -307,31 +270,30 @@ const Header = () => {
                                 Language
                             </label>
                             <div className="flex gap-2">
-                                {languages &&
-                                    languages.map((language) => (
-                                        <label className="w-full" key={language.id}>
-                                            <input
-                                                type="radio"
-                                                name="language"
-                                                value={language.id}
-                                                checked={addFactFormData.language === language.id}
-                                                onChange={() => {
-                                                    setAddFactFormData((prev) => ({
-                                                        ...prev,
-                                                        language: language.id,
-                                                        tag_ids: [],
-                                                    }));
-                                                    setIsAddingTag(false);
-                                                    setNewTagName("");
-                                                }}
-                                                className="sr-only peer"
-                                            />
-                                            <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
-                                                {`${language.flag} ${language.name}`}
-                                                {/* flags are not sown in chrome - google's political decision */}
-                                            </div>
-                                        </label>
-                                    ))}
+                                {languages.map((language) => (
+                                    <label className="w-full" key={language.id}>
+                                        <input
+                                            type="radio"
+                                            name="language"
+                                            value={language.id}
+                                            checked={addFactFormData.language === language.id}
+                                            onChange={() => {
+                                                setAddFactFormData((prev) => ({
+                                                    ...prev,
+                                                    language: language.id,
+                                                    tag_ids: [],
+                                                }));
+                                                setIsAddingTag(false);
+                                                setNewTagName("");
+                                            }}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="border border-gray-400 rounded-lg py-1 peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer text-center font-medium hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
+                                            {`${language.flag} ${language.name}`}
+                                            {/* flags are not sown in chrome - google's political decision */}
+                                        </div>
+                                    </label>
+                                ))}
                             </div>
                             {addFactFormData.language >= 0 && (
                                 <div>
@@ -341,45 +303,44 @@ const Header = () => {
                                             addFactFormDataErrors.tags ? "border-red-500" : "border-gray-400"
                                         } rounded-lg px-2.5 py-1.5 mt-1`}
                                     >
-                                        {tags &&
-                                            tags.map(
-                                                (tag) =>
-                                                    tag.language === addFactFormData.language && (
-                                                        <div key={tag.id}>
-                                                            <label>
-                                                                <input
-                                                                    type="checkbox"
-                                                                    name="tags"
-                                                                    value={tag.id}
-                                                                    className="sr-only peer"
-                                                                    checked={addFactFormData.tag_ids.includes(tag.id)}
-                                                                    onChange={(e) => {
-                                                                        setAddFactFormDataErrors((prev) => ({
+                                        {tags.map(
+                                            (tag) =>
+                                                tag.language === addFactFormData.language && (
+                                                    <div key={tag.id}>
+                                                        <label>
+                                                            <input
+                                                                type="checkbox"
+                                                                name="tags"
+                                                                value={tag.id}
+                                                                className="sr-only peer"
+                                                                checked={addFactFormData.tag_ids.includes(tag.id)}
+                                                                onChange={(e) => {
+                                                                    setAddFactFormDataErrors((prev) => ({
+                                                                        ...prev,
+                                                                        tags: false,
+                                                                    }));
+                                                                    if (e.target.checked) {
+                                                                        setAddFactFormData((prev) => ({
                                                                             ...prev,
-                                                                            tags: false,
+                                                                            tag_ids: [...prev.tag_ids, tag.id],
                                                                         }));
-                                                                        if (e.target.checked) {
-                                                                            setAddFactFormData((prev) => ({
-                                                                                ...prev,
-                                                                                tag_ids: [...prev.tag_ids, tag.id],
-                                                                            }));
-                                                                        } else {
-                                                                            setAddFactFormData((prev) => ({
-                                                                                ...prev,
-                                                                                tag_ids: prev.tag_ids.filter(
-                                                                                    (id) => id != tag.id
-                                                                                ),
-                                                                            }));
-                                                                        }
-                                                                    }}
-                                                                />
-                                                                <div className="bg-yellow-100 rounded-full px-3 whitespace-nowrap peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
-                                                                    {tag.tag_name}
-                                                                </div>
-                                                            </label>
-                                                        </div>
-                                                    )
-                                            )}
+                                                                    } else {
+                                                                        setAddFactFormData((prev) => ({
+                                                                            ...prev,
+                                                                            tag_ids: prev.tag_ids.filter(
+                                                                                (id) => id != tag.id
+                                                                            ),
+                                                                        }));
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <div className="bg-yellow-100 rounded-full px-3 whitespace-nowrap peer-checked:bg-yellow-400 peer-checked:text-gray-900 cursor-pointer hover:bg-gray-200 peer-checked:hover:bg-yellow-400">
+                                                                {tag.tag_name}
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                )
+                                        )}
 
                                         {/* TODO if no tags -> setIsAddingTag(true) */}
 

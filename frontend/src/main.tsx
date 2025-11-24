@@ -23,6 +23,7 @@ import FeedFollows from "./components/MainFeed/FeedFollows";
 import FeedProfileCreator from "./components/MainFeed/FeedProfileCreator";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
+import AppInitializer from "./components/AppInitializer";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
@@ -30,31 +31,33 @@ createRoot(document.getElementById("root")!).render(
             <BrowserRouter>
                 <FactProvider>
                     <AuthProvider>
-                        {/* <Header /> */}
-                        <Routes>
-                            {/* <Route element={<PrivateRoute />}>
-                        <Route path="/feed" element={<HomePage />} />
-                    </Route> */}
-                            {/* <Route path="/feed" element={<FeedPage />} />
-                    <Route path="/login" element={<LoginPage />} /> */}
-                            <Route path="/" element={<MainPage />}>
-                                {/* Redirect from "/" to "/discover" */}
-                                <Route index element={<Navigate to="discover" replace />} />
+                        <AppInitializer>
+                            {/* <Header /> */}
+                            <Routes>
+                                {/* <Route element={<PrivateRoute />}>
+                                <Route path="/feed" element={<HomePage />} />
+                                 </Route> */}
+                                {/* <Route path="/feed" element={<FeedPage />} />
+                                <Route path="/login" element={<LoginPage />} /> */}
+                                <Route path="/" element={<MainPage />}>
+                                    {/* Redirect from "/" to "/discover" */}
+                                    <Route index element={<Navigate to="discover" replace />} />
 
-                                <Route path="discover" element={<FeedDiscover />} />
-                                <Route path="profile/:profileId" element={<FeedProfileCreator />} />
-                                <Route path="profile" element={<FeedProfileUser />} />
-                                <Route path="login" element={<FeedLogin />} />
-                                <Route path="mine" element={<FeedMine />} />
-                                <Route path="saved" element={<FeedSaved />} />
-                                <Route path="following" element={<FeedFollowing />} />
-                                <Route path="follows" element={<FeedFollows />} />
-                            </Route>
-                            <Route path="/claude" element={<ClaudeAi />} />
-                            <Route path="/claude2" element={<ClaudeAi2 />} />
-                            <Route path="/claude3" element={<ClaudeAi3 />} />
-                            <Route path="/test" element={<TestPageMiddleScroll />} />
-                        </Routes>
+                                    <Route path="discover" element={<FeedDiscover />} />
+                                    <Route path="profile/:profileId" element={<FeedProfileCreator />} />
+                                    <Route path="profile" element={<FeedProfileUser />} />
+                                    <Route path="login" element={<FeedLogin />} />
+                                    <Route path="mine" element={<FeedMine />} />
+                                    <Route path="saved" element={<FeedSaved />} />
+                                    <Route path="following" element={<FeedFollowing />} />
+                                    <Route path="follows" element={<FeedFollows />} />
+                                </Route>
+                                <Route path="/claude" element={<ClaudeAi />} />
+                                <Route path="/claude2" element={<ClaudeAi2 />} />
+                                <Route path="/claude3" element={<ClaudeAi3 />} />
+                                <Route path="/test" element={<TestPageMiddleScroll />} />
+                            </Routes>
+                        </AppInitializer>
                     </AuthProvider>
                 </FactProvider>
             </BrowserRouter>

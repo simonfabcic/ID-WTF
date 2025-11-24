@@ -1,8 +1,10 @@
-import { Divide, FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
+import { FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
 import { useAuth } from "../../context/authContext";
 import { useAxios } from "../../utils/useAxios";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../app/store";
 
 interface UserProfileData {
     username: string;
@@ -15,29 +17,15 @@ interface UserProfileData {
     tag_most_posted: string;
 }
 
-interface Tag {
-    tag_name: string;
-    id: number;
-    language: number;
-}
-
-interface Language {
-    code: string;
-    flag: string;
-    id: number;
-    name: string;
-}
-
 const FeedProfileUser = () => {
     // Component for viewing the logged in user profile
-
     const [userProfileData, setUserProfileData] = useState<UserProfileData>();
     const { user, loading } = useAuth();
-    const [tags, setTags] = useState<Tag[]>([]);
-    const [languages, setLanguages] = useState<Language[]>([]);
     const [presentedLanguagesInTags, setPresentedLanguagesInTags] = useState<number[]>([]);
     let axiosInstance = useAxios();
-    // let presentedLanguagesInTags: Set<number> = new Set();
+
+    // global storage
+    const { languages, tags } = useSelector((state: RootState) => state.userData);
 
     useEffect(() => {
         if (!loading) {
@@ -46,26 +34,15 @@ const FeedProfileUser = () => {
                 .then((responseAxios) => {
                     setUserProfileData(responseAxios.data);
                 });
-            Promise.all([axiosInstance.get(`/api/language`), axiosInstance.get(`/api/tag`)]).then(
-                ([languageResponse, tagResponse]) => {
-                    setLanguages(languageResponse.data);
-                    setTags(tagResponse.data);
-                    // Extract unique language IDs
-                    const languageIds: number[] = tagResponse.data.map((tag: Tag) => tag.language);
-                    const uniqueLanguageIds: number[] = [...new Set(languageIds)];
-                    setPresentedLanguagesInTags(uniqueLanguageIds);
-                }
-            );
-            // axiosInstance.get(`/api/language`).then(function (axiosResponse) {
-            //     setLanguages(axiosResponse.data);
-            //     // console.log(axiosResponse.data);
-            // });
-            // axiosInstance.get(`/api/tag`).then(function (axiosResponse) {
-            //     setTags(axiosResponse.data);
-            //     console.log(axiosResponse.data);
-            // });
         }
     }, [loading]);
+
+    useEffect(() => {
+        if (languages && tags) {
+            const languageIds: number[] = tags.map((tag) => tag.language);
+            setPresentedLanguagesInTags([...new Set(languageIds)]);
+        }
+    }, [languages, tags]);
 
     return (
         <div className="flex flex-col gap-6">
@@ -99,10 +76,10 @@ const FeedProfileUser = () => {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col bg-white rounded-lg  gap-3">
-                <h3 className="w-1/2 border-b-2 border-yellow-400 text-center px-4 py-3">My achievements</h3>
-                <div className="flex justify-between text-center p-4">
-                    <div className="flex flex-col gap-2">
+            <div className="flex flex-col bg-white rounded-lg gap-3">
+                <h3 className="w-1/2 border-b-2 border-yellow-300 text-center px-4 py-3">My achievements</h3>
+                <div className="flex justify-between text-center p-4 gap-3">
+                    <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">📅</span>
                         <span className="text-sm">Member since</span>
                         <span className="text-xs font-semibold">
@@ -113,17 +90,17 @@ const FeedProfileUser = () => {
                                 })}
                         </span>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">🔖</span>
                         <span className="text-sm">Most posted</span>
-                        <span className="text-xs font-semibold">#{userProfileData?.tag_most_posted}</span>
+                        <span className="text-xs font-semibold truncate">#{userProfileData?.tag_most_posted}</span>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">🔥</span>
                         <span className="text-sm">Top fact</span>
                         <span className="text-xs font-semibold">{userProfileData?.fact_most_likes} Likes</span>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">💛</span>
                         <span className="text-sm">Total likes</span>
                         <span className="text-xs font-semibold">{userProfileData?.fact_total_likes}</span>
@@ -146,31 +123,32 @@ const FeedProfileUser = () => {
                                 <span>{`${language?.flag} ${language?.name}`}</span>
                                 {/* TODO handle not shown flag on the windows/chrome */}
                                 <div className="flex flex-wrap gap-1.5 p-2">
-                                    {languageTags.map((tag) => (
-                                        <div key={tag.id} className="flex content-center">
-                                            <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
-                                                {tag.tag_name}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer"
-                                                onClick={() => {
-                                                    // CONTINUE
-                                                }}
-                                            >
-                                                <Trash2 className="h-3 w-3" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer"
-                                                onClick={() => {
-                                                    // CONTINUE
-                                                }}
-                                            >
-                                                <Pencil className="h-3 w-3" />
-                                            </button>
-                                        </div>
-                                    ))}
+                                    {languageTags &&
+                                        languageTags.map((tag) => (
+                                            <div key={tag.id} className="flex content-center">
+                                                <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
+                                                    {tag.tag_name}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer"
+                                                    onClick={() => {
+                                                        // CONTINUE
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-3 w-3" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer"
+                                                    onClick={() => {
+                                                        // CONTINUE
+                                                    }}
+                                                >
+                                                    <Pencil className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        ))}
                                 </div>
                             </div>
                         );
