@@ -3,8 +3,9 @@ import { useAuth } from "../../context/authContext";
 import { useAxios } from "../../utils/useAxios";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../app/store";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../app/store";
+import { getTagsAsync } from "../../app/features/user/userDataSlice";
 
 interface UserProfileData {
     username: string;
@@ -26,6 +27,7 @@ const FeedProfileUser = () => {
 
     // global storage
     const { languages, tags } = useSelector((state: RootState) => state.userData);
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         if (!loading) {
@@ -133,7 +135,20 @@ const FeedProfileUser = () => {
                                                     type="button"
                                                     className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer"
                                                     onClick={() => {
-                                                        // CONTINUE
+                                                        // TODO notify user, that tag is used on the `fact_s`
+                                                        axiosInstance
+                                                            .delete(
+                                                                `${import.meta.env.VITE_API_ENDPOINT}/api/tag/${
+                                                                    tag.id
+                                                                }/`
+                                                            )
+                                                            .finally(() => dispatch(getTagsAsync(axiosInstance)))
+                                                            .catch((err) =>
+                                                                console.error(
+                                                                    `Something went wrong during deleting tag ${tag.tag_name} with no.: ${tag.id}. Error: `,
+                                                                    err
+                                                                )
+                                                            );
                                                     }}
                                                 >
                                                     <Trash2 className="h-3 w-3" />
