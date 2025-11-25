@@ -1,5 +1,4 @@
-import { Trash2 } from "lucide-react";
-import React from "react";
+import { Rss, Trash2 } from "lucide-react";
 
 const FeedFollowing = () => {
     return (
@@ -14,10 +13,10 @@ const FeedFollowing = () => {
                             className="w-24 h-24 rounded-full object-cover border-4 border-yellow-300"
                         />
                     </div>
-                    <div className="">
-                        <p>Followed profile user name</p>
-                        <div>
-                            <p>Followed tags</p>
+                    <div className="mb-2">
+                        <h2 className="font-semibold text-gray-900 mb-3">Followed profile user name</h2>
+                        <div className="mb-2">
+                            <h3 className="mb-1">Followed tags</h3>
                             {/* TODO this is not done */}
                             <div className="flex gap-1.5 text-sm">
                                 <div className="flex content-center">
@@ -42,6 +41,44 @@ const FeedFollowing = () => {
                                     </span>
                                     <div className="flex items-center justify-around bg-gray-300 rounded-r-full border-r border-r-white w-6 cursor-pointer">
                                         <Trash2 className="h-3 w-3" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 className="mb-1">Other available tags</h3>
+                            {/* TODO this is not done */}
+                            <div className="flex gap-1.5 text-sm">
+                                <div className="flex content-center">
+                                    <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
+                                        #tagA
+                                    </span>
+                                    <div className="flex items-center justify-around bg-gray-300 rounded-r-full border-r border-r-white w-6 cursor-pointer">
+                                        <Rss className="h-3 w-3" />
+                                    </div>
+                                </div>{" "}
+                                <div className="flex content-center">
+                                    <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
+                                        #tagB
+                                    </span>
+                                    <div className="flex items-center justify-around bg-gray-300 rounded-r-full border-r border-r-white w-6 cursor-pointer">
+                                        <Rss className="h-3 w-3" />
+                                    </div>
+                                </div>{" "}
+                                <div className="flex content-center">
+                                    <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
+                                        #tagC
+                                    </span>
+                                    <div className="flex items-center justify-around bg-gray-300 rounded-r-full border-r border-r-white w-6 cursor-pointer">
+                                        <Rss className="h-3 w-3" />
+                                    </div>
+                                </div>
+                                <div className="flex content-center">
+                                    <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
+                                        #tagD
+                                    </span>
+                                    <div className="flex items-center justify-around bg-gray-300 rounded-r-full border-r border-r-white w-6 cursor-pointer">
+                                        <Rss className="h-3 w-3" />
                                     </div>
                                 </div>
                             </div>

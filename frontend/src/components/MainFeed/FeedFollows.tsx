@@ -1,5 +1,3 @@
-import React from "react";
-
 const FeedFollows = () => {
     return (
         <div className="flex flex-col gap-6">
@@ -14,29 +12,36 @@ const FeedFollows = () => {
                         />
                     </div>
                     <div className="">
-                        <p>Follows profile user name</p>
+                        <h2 className="font-semibold text-gray-900 mb-3">Follows profile user name</h2>
                         <div>
-                            <p>Tags you follow</p>
                             {/* TODO this is not done */}
-                            <span>English</span>
-                            <div className="flex gap-1.5 text-sm">
-                                <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">#tag1</span>
-                                <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">
-                                    #longer-tag2
-                                </span>
-                                <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">
-                                    #random-tag3
-                                </span>
+                            <div className="mb-2">
+                                <h3 className="mb-1">English</h3>
+                                <div className="flex gap-1.5 text-sm">
+                                    <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">
+                                        #tag1
+                                    </span>
+                                    <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">
+                                        #longer-tag2
+                                    </span>
+                                    <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">
+                                        #random-tag3
+                                    </span>
+                                </div>
                             </div>
-                            <span>Spanish</span>
-                            <div className="flex gap-1.5 text-sm">
-                                <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">#tag1</span>
-                                <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">
-                                    #longer-tag2
-                                </span>
-                                <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">
-                                    #random-tag3
-                                </span>
+                            <div>
+                                <h3 className="mb-1">Spanish</h3>
+                                <div className="flex gap-1.5 text-sm">
+                                    <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">
+                                        #tag1
+                                    </span>
+                                    <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">
+                                        #longer-tag2
+                                    </span>
+                                    <span className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap">
+                                        #random-tag3
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
