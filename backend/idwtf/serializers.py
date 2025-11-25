@@ -105,7 +105,7 @@ class FactSerializer(ModelSerializer):
         model = Fact
         fields = [
             "id",
-            "username",
+            "username",  # For reading
             "profile",  # For reading
             "content",
             "source",

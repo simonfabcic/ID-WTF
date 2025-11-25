@@ -1,4 +1,4 @@
-import { ExternalLink, Heart, Save, Share2 } from "lucide-react";
+import { ExternalLink, Heart, Rss, Save, Share2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAxios } from "../../utils/useAxios";
 import { useAuth } from "../../context/authContext";
@@ -37,7 +37,7 @@ type Fact = {
 const FeedDiscover = () => {
     const [facts, setFacts] = useState<Fact[]>();
     let axiosInstance = useAxios();
-    const { loading } = useAuth();
+    const { user, loading } = useAuth();
 
     let getFacts = () => {
         axiosInstance
@@ -94,12 +94,50 @@ const FeedDiscover = () => {
                             )}
                             <div className="flex gap-1.5 text-sm">
                                 {fact.tags.map((tag, index) => (
-                                    <span
-                                        className="bg-yellow-100 rounded-full py-0 px-3 whitespace-nowrap"
-                                        key={index}
-                                    >
-                                        #{tag.tag_name}
-                                    </span>
+                                    <div className="flex" key={index}>
+                                        <span
+                                            className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap"
+                                            key={index}
+                                        >
+                                            #{tag.tag_name}
+                                        </span>
+                                        {fact.profile.id == user?.user_id ? (
+                                            <span
+                                                className="flex items-center justify-around bg-gray-300 w-6 cursor-pointer rounded-r-full"
+                                                onClick={() => {
+                                                    // create a list of tag IDs, without current one:
+                                                    const newTagsIDs = fact.tags
+                                                        .filter((tag_f) => tag_f.id !== tag.id)
+                                                        .map((tag_f) => tag_f.id);
+                                                    axiosInstance
+                                                        .patch(
+                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/facts/${
+                                                                fact.id
+                                                            }/`,
+                                                            {
+                                                                tag_ids: newTagsIDs,
+                                                            }
+                                                        )
+                                                        .finally(() => getFacts())
+                                                        .catch((err) =>
+                                                            console.error(
+                                                                `Something went wrong during updating fact ${fact.content} with no.: ${fact.id}. Error: `,
+                                                                err
+                                                            )
+                                                        );
+                                                }}
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </span>
+                                        ) : (
+                                            <span
+                                                className="flex items-center justify-around bg-gray-300 w-6 cursor-pointer rounded-r-full"
+                                                onClick={() => {}}
+                                            >
+                                                <Rss className="h-4 w-4" />
+                                            </span>
+                                        )}
+                                    </div>
                                 ))}
                             </div>
                             <div className="flex justify-between items-center mt-6">
