@@ -33,6 +33,11 @@ class PrivateProfileSerializer(HyperlinkedModelSerializer):
     tag_most_posted = SerializerMethodField()
     fact_most_likes = SerializerMethodField()
     fact_total_likes = SerializerMethodField()
+    follows = PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),  # validates that te `Tag` exist in the DB
+        many=True,
+        required=False,
+    )
 
     class Meta:
         model = Profile
@@ -41,6 +46,7 @@ class PrivateProfileSerializer(HyperlinkedModelSerializer):
             "user",
             "username",
             "email",
+            "follows",
             "created_at",
             "updated_at",
             "tag_most_posted",

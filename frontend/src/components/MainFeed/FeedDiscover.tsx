@@ -132,7 +132,15 @@ const FeedDiscover = () => {
                                         ) : (
                                             <span
                                                 className="flex items-center justify-around bg-gray-300 w-6 cursor-pointer rounded-r-full"
-                                                onClick={() => {}}
+                                                onClick={() => {
+                                                    axiosInstance.post(
+                                                        `${import.meta.env.VITE_API_ENDPOINT}/api/profile/${
+                                                            user?.user_id
+                                                        }/follow_tag/`,
+                                                        { tag_id: tag.id }
+                                                    );
+                                                    // CONTINUE adding new tag to follow
+                                                }}
                                             >
                                                 <Rss className="h-4 w-4" />
                                             </span>

@@ -22,6 +22,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
 from rest_framework import permissions, response, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from .models import Fact, Language, Profile, Tag
@@ -81,6 +82,23 @@ class ProfileViewSet(viewsets.ModelViewSet):
             serializer = PublicProfileSerializer(instance, context={"request": request})
 
         return response.Response(serializer.data)
+
+    # CONTINUE what is this action decorator for?
+    @action(detail=True, methods=["post"])
+    def follow_tag(self, request, pk=None):
+        profile = self.get_object()
+        tag_id = request.data.get("tag_id")
+
+        try:
+            tag = Tag.objects.get(id=tag_id)
+            profile.follows.add(tag)
+            return response.Response({"status": "tag followed"}, status=status.HTTP_200_OK)
+        except Tag.DoesNotExist:
+            return response.Response({"error": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    def unfollow_tag(self, request, pk=None):
+        pass
+        # CONTINUE https://claude.ai/chat/1d5a1f08-a5f0-4cc0-8748-6814bad273bf
 
 
 class TagViewSet(viewsets.ModelViewSet):
