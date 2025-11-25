@@ -1,4 +1,4 @@
-import { FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
+import { Check, FolderDown, Mail, Pencil, Tag, Trash2, UserPen, X } from "lucide-react";
 import { useAuth } from "../../context/authContext";
 import { useAxios } from "../../utils/useAxios";
 import { useEffect, useState } from "react";
@@ -18,9 +18,15 @@ interface UserProfileData {
     tag_most_posted: string;
 }
 
+interface EditedTag {
+    tag_id: number;
+    tag_name: string;
+}
+
 const FeedProfileUser = () => {
     // Component for viewing the logged in user profile
     const [userProfileData, setUserProfileData] = useState<UserProfileData>();
+    const [editedTag, setEditedTag] = useState<EditedTag>();
     const { user, loading } = useAuth();
     const [presentedLanguagesInTags, setPresentedLanguagesInTags] = useState<number[]>([]);
     let axiosInstance = useAxios();
@@ -113,7 +119,7 @@ const FeedProfileUser = () => {
             <div className="flex flex-col bg-white rounded-lg p-4 gap-4">
                 <div className="flex gap-1.5 items-center">
                     <Tag className="h-5 w-5" />
-                    <h3>My tagss</h3>
+                    <h3>My tags</h3>
                 </div>
 
                 {presentedLanguagesInTags &&
@@ -128,40 +134,92 @@ const FeedProfileUser = () => {
                                     {languageTags &&
                                         languageTags.map((tag) => (
                                             <div key={tag.id} className="flex content-center">
-                                                <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
-                                                    {tag.tag_name}
-                                                </span>
-                                                <button
-                                                    type="button"
-                                                    className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer"
-                                                    onClick={() => {
-                                                        // TODO notify user, that tag is used on the `fact_s`
-                                                        axiosInstance
-                                                            .delete(
-                                                                `${import.meta.env.VITE_API_ENDPOINT}/api/tag/${
-                                                                    tag.id
-                                                                }/`
-                                                            )
-                                                            .finally(() => dispatch(getTagsAsync(axiosInstance)))
-                                                            .catch((err) =>
-                                                                console.error(
-                                                                    `Something went wrong during deleting tag ${tag.tag_name} with no.: ${tag.id}. Error: `,
-                                                                    err
+                                                {editedTag?.tag_id == tag.id ? (
+                                                    <input
+                                                        className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white"
+                                                        type="text"
+                                                        value={editedTag.tag_name}
+                                                        onChange={(e) =>
+                                                            setEditedTag({ ...editedTag, tag_name: e.target.value })
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
+                                                        {tag.tag_name}
+                                                    </span>
+                                                )}
+                                                {editedTag?.tag_id == tag.id ? (
+                                                    <button
+                                                        type="button"
+                                                        className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer"
+                                                        onClick={() => {
+                                                            axiosInstance
+                                                                .patch(
+                                                                    `${import.meta.env.VITE_API_ENDPOINT}/api/tag/${
+                                                                        tag.id
+                                                                    }/`,
+                                                                    { tag_name: editedTag.tag_name }
                                                                 )
-                                                            );
-                                                    }}
-                                                >
-                                                    <Trash2 className="h-3 w-3" />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer"
-                                                    onClick={() => {
-                                                        // CONTINUE
-                                                    }}
-                                                >
-                                                    <Pencil className="h-3 w-3" />
-                                                </button>
+                                                                .finally(() => {
+                                                                    setEditedTag({ tag_id: -1, tag_name: "" });
+                                                                    dispatch(getTagsAsync(axiosInstance));
+                                                                })
+                                                                .catch((err) =>
+                                                                    console.error(
+                                                                        `Something went wrong during updating tag ${editedTag.tag_name} with no.: ${tag.id}. Error: `,
+                                                                        err
+                                                                    )
+                                                                );
+                                                        }}
+                                                        // TODO on add, focus on the plus sign (to add new tag)
+                                                    >
+                                                        <Check className="h-4 w-4" />
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer"
+                                                        onClick={() => {
+                                                            // TODO notify user, that tag is used on the `fact_s`
+                                                            axiosInstance
+                                                                .delete(
+                                                                    `${import.meta.env.VITE_API_ENDPOINT}/api/tag/${
+                                                                        tag.id
+                                                                    }/`
+                                                                )
+                                                                .finally(() => dispatch(getTagsAsync(axiosInstance)))
+                                                                .catch((err) =>
+                                                                    console.error(
+                                                                        `Something went wrong during deleting tag ${tag.tag_name} with no.: ${tag.id}. Error: `,
+                                                                        err
+                                                                    )
+                                                                );
+                                                        }}
+                                                    >
+                                                        <Trash2 className="h-3 w-3" />
+                                                    </button>
+                                                )}
+                                                {editedTag?.tag_id == tag.id ? (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setEditedTag({ tag_id: -1, tag_name: "" });
+                                                        }}
+                                                        className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        className="flex items-center justify-around bg-gray-300 rounded-r-full w-6 cursor-pointer"
+                                                        onClick={() => {
+                                                            setEditedTag({ tag_id: tag.id, tag_name: tag.tag_name });
+                                                        }}
+                                                    >
+                                                        <Pencil className="h-3 w-3" />
+                                                    </button>
+                                                )}
                                             </div>
                                         ))}
                                 </div>
