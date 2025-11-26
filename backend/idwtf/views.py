@@ -84,8 +84,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return response.Response(serializer.data)
 
     # CONTINUE what is this action decorator for?
+    # CONTINUE https://claude.ai/chat/1d5a1f08-a5f0-4cc0-8748-6814bad273bf
     @action(detail=True, methods=["post"])
-    def follow_tag(self, request, pk=None):
+    def tag_follow(self, request, pk=None):
         profile = self.get_object()
         tag_id = request.data.get("tag_id")
 
@@ -96,9 +97,17 @@ class ProfileViewSet(viewsets.ModelViewSet):
         except Tag.DoesNotExist:
             return response.Response({"error": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    def unfollow_tag(self, request, pk=None):
-        pass
-        # CONTINUE https://claude.ai/chat/1d5a1f08-a5f0-4cc0-8748-6814bad273bf
+    @action(detail=True, methods=["post"])
+    def tag_unfollow(self, request, pk=None):
+        profile = self.get_object()
+        tag_id = request.data.get("tag_id")
+
+        try:
+            tag = Tag.objects.get(id=tag_id)
+            profile.follows.remove(tag)
+            return response.Response({"status": "tag unfollowed"}, status=status.HTTP_200_OK)
+        except Tag.DoesNotExist:
+            return response.Response({"error": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class TagViewSet(viewsets.ModelViewSet):

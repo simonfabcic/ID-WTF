@@ -1,4 +1,4 @@
-import { ExternalLink, Heart, Rss, Save, Share2, X } from "lucide-react";
+import { BadgeMinus, ExternalLink, Heart, Rss, Save, Share2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAxios } from "../../utils/useAxios";
 import { useAuth } from "../../context/authContext";
@@ -6,13 +6,16 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 dayjs.extend(relativeTime);
 import validator from "validator";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../app/store";
+import { getUserProfileAsync } from "../../app/features/user/userDataSlice";
 
 type Fact = {
     id: number;
     username: string;
     profile: {
         id: number;
-        user: string; // user URL
+        // user: string; // TODO user URL
     };
     content: string;
     source: string;
@@ -38,6 +41,10 @@ const FeedDiscover = () => {
     const [facts, setFacts] = useState<Fact[]>();
     let axiosInstance = useAxios();
     const { user, loading } = useAuth();
+
+    // state manager
+    const { userProfile } = useSelector((state: RootState) => state.userData);
+    const dispatch = useDispatch<AppDispatch>();
 
     let getFacts = () => {
         axiosInstance
@@ -102,44 +109,50 @@ const FeedDiscover = () => {
                                             #{tag.tag_name}
                                         </span>
                                         {fact.profile.id == user?.user_id ? (
+                                            // first check the ownership -> if foreign show icon `follow` or `unfollow`
+                                            <span className=" bg-yellow-100 w-3 rounded-r-full"></span>
+                                        ) : userProfile?.follows.includes(tag.id) ? (
                                             <span
                                                 className="flex items-center justify-around bg-gray-300 w-6 cursor-pointer rounded-r-full"
                                                 onClick={() => {
-                                                    // create a list of tag IDs, without current one:
-                                                    const newTagsIDs = fact.tags
-                                                        .filter((tag_f) => tag_f.id !== tag.id)
-                                                        .map((tag_f) => tag_f.id);
                                                     axiosInstance
-                                                        .patch(
-                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/facts/${
-                                                                fact.id
-                                                            }/`,
-                                                            {
-                                                                tag_ids: newTagsIDs,
-                                                            }
+                                                        .post(
+                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/profile/${
+                                                                user?.user_id
+                                                            }/tag_unfollow/`,
+                                                            { tag_id: tag.id }
                                                         )
-                                                        .finally(() => getFacts())
-                                                        .catch((err) =>
-                                                            console.error(
-                                                                `Something went wrong during updating fact ${fact.content} with no.: ${fact.id}. Error: `,
-                                                                err
-                                                            )
-                                                        );
+                                                        .finally(() => {
+                                                            dispatch(
+                                                                getUserProfileAsync({
+                                                                    axiosInstance,
+                                                                    userID: userProfile.id,
+                                                                })
+                                                            );
+                                                        });
                                                 }}
                                             >
-                                                <X className="h-4 w-4" />
+                                                <BadgeMinus className="h-4 w-4" />
                                             </span>
                                         ) : (
                                             <span
                                                 className="flex items-center justify-around bg-gray-300 w-6 cursor-pointer rounded-r-full"
                                                 onClick={() => {
-                                                    axiosInstance.post(
-                                                        `${import.meta.env.VITE_API_ENDPOINT}/api/profile/${
-                                                            user?.user_id
-                                                        }/follow_tag/`,
-                                                        { tag_id: tag.id }
-                                                    );
-                                                    // CONTINUE adding new tag to follow
+                                                    axiosInstance
+                                                        .post(
+                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/profile/${
+                                                                user?.user_id
+                                                            }/tag_follow/`,
+                                                            { tag_id: tag.id }
+                                                        )
+                                                        .finally(() => {
+                                                            dispatch(
+                                                                getUserProfileAsync({
+                                                                    axiosInstance,
+                                                                    userID: userProfile?.id,
+                                                                })
+                                                            );
+                                                        });
                                                 }}
                                             >
                                                 <Rss className="h-4 w-4" />

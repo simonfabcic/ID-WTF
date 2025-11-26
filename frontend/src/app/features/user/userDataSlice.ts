@@ -14,11 +14,24 @@ interface Tag {
     language: number;
 }
 
+interface UserProfileData {
+    username: string;
+    id: number;
+    email: string;
+    created_at: string;
+    updated_at: string;
+    fact_most_likes: number;
+    fact_total_likes: number;
+    tag_most_posted: string;
+    follows: number[];
+}
+
 export interface UserDataState {
     languages: Language[];
     loading: boolean;
     error: string | null;
     tags: Tag[];
+    userProfile: UserProfileData | null;
 }
 
 const initialState: UserDataState = {
@@ -26,6 +39,7 @@ const initialState: UserDataState = {
     loading: false,
     error: null,
     tags: [],
+    userProfile: null,
 };
 
 export const getLanguagesAsync = createAsyncThunk("userData/getLanguages", async (axiosInstance: AxiosInstance) => {
@@ -37,6 +51,14 @@ export const getTagsAsync = createAsyncThunk("userData/getTags", async (axiosIns
     const response = await axiosInstance.get(`/api/tag`);
     return response.data;
 });
+
+export const getUserProfileAsync = createAsyncThunk(
+    "userData/getUserProfile",
+    async ({ axiosInstance, userID }: { axiosInstance: AxiosInstance; userID: number | undefined }) => {
+        const response = await axiosInstance.get(`/api/profile/${userID}/`);
+        return response.data;
+    }
+);
 
 export const UserDataSlice = createSlice({
     name: "userData",
@@ -73,6 +95,19 @@ export const UserDataSlice = createSlice({
             .addCase(getTagsAsync.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message || "Failed to fetch tags";
+            })
+            // userProfile cases
+            .addCase(getUserProfileAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getUserProfileAsync.fulfilled, (state, action) => {
+                state.loading = false;
+                state.userProfile = action.payload;
+            })
+            .addCase(getUserProfileAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "Failed to fetch user profile";
             });
     },
 });
