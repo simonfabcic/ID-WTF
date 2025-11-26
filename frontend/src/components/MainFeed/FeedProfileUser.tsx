@@ -7,43 +7,20 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../app/store";
 import { getTagsAsync } from "../../app/features/user/userDataSlice";
 
-interface UserProfileData {
-    username: string;
-    id: number;
-    email: string;
-    created_at: string;
-    updated_at: string;
-    fact_most_likes: number;
-    fact_total_likes: number;
-    tag_most_posted: string;
-}
-
 interface EditedTag {
     tag_id: number;
     tag_name: string;
 }
 
 const FeedProfileUser = () => {
-    // Component for viewing the logged in user profile
-    const [userProfileData, setUserProfileData] = useState<UserProfileData>();
     const [editedTag, setEditedTag] = useState<EditedTag>();
-    const { user, loading } = useAuth();
+    // const { user, loading } = useAuth();
     const [presentedLanguagesInTags, setPresentedLanguagesInTags] = useState<number[]>([]);
     let axiosInstance = useAxios();
 
     // global storage
-    const { languages, tags } = useSelector((state: RootState) => state.userData);
+    const { languages, tags, userProfile } = useSelector((state: RootState) => state.userData);
     const dispatch = useDispatch<AppDispatch>();
-
-    useEffect(() => {
-        if (!loading) {
-            axiosInstance
-                .get(`${import.meta.env.VITE_API_ENDPOINT}/api/profile/${user?.user_id}/`)
-                .then((responseAxios) => {
-                    setUserProfileData(responseAxios.data);
-                });
-        }
-    }, [loading]);
 
     useEffect(() => {
         if (languages && tags) {
@@ -63,10 +40,10 @@ const FeedProfileUser = () => {
                     />
                 </div>
                 <div className="flex flex-col flex-1">
-                    <h2 className="font-bold text-xl">{userProfileData?.username}</h2>
+                    <h2 className="font-bold text-xl">{userProfile?.username}</h2>
                     <div className="flex items-center text-sm gap-1 text-gray-600">
                         <Mail className="w-3 h-3" />
-                        <span>{userProfileData?.email}</span>
+                        <span>{userProfile?.email}</span>
                     </div>
                     <p className="text-gray-600 mt-3">
                         I am creator of the app. I hope many people will find this useful! My main college in the
@@ -75,7 +52,7 @@ const FeedProfileUser = () => {
                     <div className="flex items-center justify-between pt-3">
                         <div className="flex flex-col">
                             <span className="font-semibold">Last profile update:</span>
-                            <span className="text-sm">{dayjs(userProfileData?.updated_at).fromNow()}</span>
+                            <span className="text-sm">{dayjs(userProfile?.updated_at).fromNow()}</span>
                         </div>
                         <div className="flex gap-3">
                             <UserPen className="w-5 h-5" />
@@ -91,8 +68,8 @@ const FeedProfileUser = () => {
                         <span className="text-2xl">📅</span>
                         <span className="text-sm">Member since</span>
                         <span className="text-xs font-semibold">
-                            {userProfileData?.created_at &&
-                                new Date(userProfileData.created_at).toLocaleString("en-US", {
+                            {userProfile?.created_at &&
+                                new Date(userProfile.created_at).toLocaleString("en-US", {
                                     month: "long",
                                     year: "numeric",
                                 })}
@@ -101,17 +78,17 @@ const FeedProfileUser = () => {
                     <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">🔖</span>
                         <span className="text-sm">Most posted</span>
-                        <span className="text-xs font-semibold truncate">#{userProfileData?.tag_most_posted}</span>
+                        <span className="text-xs font-semibold truncate">#{userProfile?.tag_most_posted}</span>
                     </div>
                     <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">🔥</span>
                         <span className="text-sm">Top fact</span>
-                        <span className="text-xs font-semibold">{userProfileData?.fact_most_likes} Likes</span>
+                        <span className="text-xs font-semibold">{userProfile?.fact_most_likes} Likes</span>
                     </div>
                     <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">💛</span>
                         <span className="text-sm">Total likes</span>
-                        <span className="text-xs font-semibold">{userProfileData?.fact_total_likes}</span>
+                        <span className="text-xs font-semibold">{userProfile?.fact_total_likes}</span>
                     </div>
                 </div>
             </div>
