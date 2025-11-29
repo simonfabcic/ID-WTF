@@ -83,10 +83,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
         return response.Response(serializer.data)
 
-    # CONTINUE what is this action decorator for?
-    # CONTINUE https://claude.ai/chat/1d5a1f08-a5f0-4cc0-8748-6814bad273bf
     @action(detail=True, methods=["post"])
     def tag_follow(self, request, pk=None):
+        """Endpoint for POST /api/profile/5/follow_tag/."""
         profile = self.get_object()
         tag_id = request.data.get("tag_id")
 
