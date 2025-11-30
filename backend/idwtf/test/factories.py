@@ -101,7 +101,6 @@ class FactFactory(factory.django.DjangoModelFactory):
     source = factory.Faker("url")
     visibility = factory.Iterator(["public", "private", "followers"])
     language = factory.SubFactory(LanguageFactory)
-    upvotes = random.randint(150, 750)
 
     @factory.post_generation
     def set_created_at(obj, create, extracted, **kwargs):

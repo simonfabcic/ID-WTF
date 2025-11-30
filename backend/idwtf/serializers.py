@@ -97,6 +97,7 @@ class LanguageSerializer(ModelSerializer):
 class FactSerializer(ModelSerializer):
     username = CharField(source="profile.user.username", read_only=True)
     profile = PublicProfileSerializer(read_only=True)
+    upvotes = SerializerMethodField(read_only=True)
 
     # tags: for reading whole object / for writing: just tag IDs
     tags = TagSerializer(read_only=True, many=True)
@@ -122,6 +123,9 @@ class FactSerializer(ModelSerializer):
             "upvotes",
             "language",
         ]
+
+    def get_upvotes(self, obj):
+        return obj.upvotes.count()
 
     def validate(self, data):
         """

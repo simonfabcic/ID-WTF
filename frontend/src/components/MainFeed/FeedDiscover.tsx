@@ -163,9 +163,17 @@ const FeedDiscover = () => {
                             </div>
                             <div className="flex justify-between items-center mt-6">
                                 <div className="flex gap-3">
-                                    <div className="flex items-center gap-0.5 cursor-pointer">
+                                    <div
+                                        className="flex items-center gap-0.5 cursor-pointer"
+                                        onClick={() => {
+                                            {
+                                                /* CONTINUE */
+                                            }
+                                        }}
+                                    >
                                         <Heart className="h-4 w-4" />
                                         <span>{fact.upvotes}</span>
+                                        {/* CONTINUE get no. of upvotes from backend */}
                                     </div>
                                     <div className="flex items-center gap-0.5 cursor-pointer">
                                         <Share2 className="h-4 w-4" />

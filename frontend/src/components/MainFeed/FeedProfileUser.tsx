@@ -157,20 +157,27 @@ const FeedProfileUser = () => {
                                                         type="button"
                                                         className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer"
                                                         onClick={() => {
-                                                            // TODO notify user, that tag is used on the `fact_s`
-                                                            axiosInstance
-                                                                .delete(
-                                                                    `${import.meta.env.VITE_API_ENDPOINT}/api/tag/${
-                                                                        tag.id
-                                                                    }/`
+                                                            if (
+                                                                confirm(
+                                                                    "If you delete the tag, it will be removed from all the facts. Delete?"
                                                                 )
-                                                                .finally(() => dispatch(getTagsAsync(axiosInstance)))
-                                                                .catch((err) =>
-                                                                    console.error(
-                                                                        `Something went wrong during deleting tag ${tag.tag_name} with no.: ${tag.id}. Error: `,
-                                                                        err
+                                                            ) {
+                                                                axiosInstance
+                                                                    .delete(
+                                                                        `${import.meta.env.VITE_API_ENDPOINT}/api/tag/${
+                                                                            tag.id
+                                                                        }/`
                                                                     )
-                                                                );
+                                                                    .finally(() =>
+                                                                        dispatch(getTagsAsync(axiosInstance))
+                                                                    )
+                                                                    .catch((err) =>
+                                                                        console.error(
+                                                                            `Something went wrong during deleting tag ${tag.tag_name} with no.: ${tag.id}. Error: `,
+                                                                            err
+                                                                        )
+                                                                    );
+                                                            }
                                                         }}
                                                     >
                                                         <Trash2 className="h-3 w-3" />

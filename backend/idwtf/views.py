@@ -21,9 +21,11 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
-from rest_framework import permissions, response, status, viewsets
-from rest_framework.decorators import action
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action, permission_classes
 from rest_framework.exceptions import ValidationError as DRFValidationError
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from .models import Fact, Language, Profile, Tag
 from .serializers import (
@@ -62,7 +64,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         """Disable list option for the getting the all private profiles."""
-        return response.Response(
+        return Response(
             {"detail": "Getting all profiles not allowed."},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
@@ -81,7 +83,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         else:
             serializer = PublicProfileSerializer(instance, context={"request": request})
 
-        return response.Response(serializer.data)
+        return Response(serializer.data)
 
     @action(detail=True, methods=["post"])
     def tag_follow(self, request, pk=None):
@@ -92,9 +94,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
         try:
             tag = Tag.objects.get(id=tag_id)
             profile.follows.add(tag)
-            return response.Response({"status": "tag followed"}, status=status.HTTP_200_OK)
+            return Response({"status": "tag followed"}, status=status.HTTP_200_OK)
         except Tag.DoesNotExist:
-            return response.Response({"error": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=["post"])
     def tag_unfollow(self, request, pk=None):
@@ -104,9 +106,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
         try:
             tag = Tag.objects.get(id=tag_id)
             profile.follows.remove(tag)
-            return response.Response({"status": "tag unfollowed"}, status=status.HTTP_200_OK)
+            return Response({"status": "tag unfollowed"}, status=status.HTTP_200_OK)
         except Tag.DoesNotExist:
-            return response.Response({"error": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -219,3 +221,21 @@ class FactViewSet(viewsets.ModelViewSet):
             serializer.save(profile_id=self.request.user.id)
         except DjangoValidationError as err:
             raise DRFValidationError({"tags": err.message}) from err
+
+    @action(detail=True, methods=["post"])
+    @permission_classes([IsAuthenticated])
+    def upvote(self, request, pk=None):
+        profile = request.user.profile
+        fact = self.get_object()
+
+        fact.upvotes.add(profile)
+        return Response({"status": "fact upvoted"}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"])
+    @permission_classes([IsAuthenticated])
+    def unvote(self, request, pk=None):
+        profile = request.user.profile
+        fact = self.get_object()
+
+        fact.upvotes.remove(profile)
+        return Response({"status": "fact unvoted"}, status=status.HTTP_200_OK)
