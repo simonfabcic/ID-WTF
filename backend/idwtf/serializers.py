@@ -98,6 +98,7 @@ class FactSerializer(ModelSerializer):
     username = CharField(source="profile.user.username", read_only=True)
     profile = PublicProfileSerializer(read_only=True)
     upvotes = SerializerMethodField(read_only=True)
+    is_upvoted = SerializerMethodField(read_only=True)
 
     # tags: for reading whole object / for writing: just tag IDs
     tags = TagSerializer(read_only=True, many=True)
@@ -122,10 +123,17 @@ class FactSerializer(ModelSerializer):
             "visibility",
             "upvotes",
             "language",
+            "is_upvoted",
         ]
 
     def get_upvotes(self, obj):
         return obj.upvotes.count()
+
+    def get_is_upvoted(self, obj):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            return obj.upvotes.filter(id=request.user.profile.id).exists()
+        return False
 
     def validate(self, data):
         """

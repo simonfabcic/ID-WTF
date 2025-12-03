@@ -139,11 +139,15 @@ class FactViewSet(viewsets.ModelViewSet):
     # permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        """Override to handle list vs detail views differently."""
-        user = self.request.user
+        """
 
-        # print("self.request.user.is_authenticated: ", self.request.user.is_authenticated)
-        # print("self.request.user: ", self.request.user)
+        Override to handle list vs detail views differently.
+
+        `get_queryset` is called from `list()`, `retrieve()`, `create()` and so on.
+        `get_queryset` is like gatekeeper - it defines which objects the user is Allowed to see
+
+        """
+        user = self.request.user
 
         if not user.is_authenticated:
             # for detail view (retrieve), return ALL accessible facts
@@ -154,15 +158,27 @@ class FactViewSet(viewsets.ModelViewSet):
 
         users_profile = Profile.objects.get(user=user)
 
+        # for upvote, user needs to see all facts
+        if self.action in ["upvote"]:
+            return Fact.objects.all()
+
+        # For unvote, user needs to see his upvoted facts
+        if self.action in ["unvote"]:
+            return Fact.objects.filter(upvotes=users_profile)
+
         # For modifying actions - ONLY owner's facts
         if self.action in ["update", "partial_update", "destroy"]:
             return Fact.objects.filter(profile=users_profile)
 
         # for detail view (retrieve), return ALL accessible facts
         if self.action == "retrieve":
-            return Fact.objects.filter(
-                Q(profile=users_profile) | Q(tags__in=users_profile.follows.all()) | Q(visibility="public")
-            ).distinct()
+            return (
+                Fact.objects.filter(
+                    Q(profile=users_profile) | Q(tags__in=users_profile.follows.all()) | Q(visibility="public")
+                )
+                .distinct()
+                .prefetch_related("upvotes")
+            )
 
         # For list view, return limited set with logic
         followed_tags = users_profile.follows.all()
@@ -173,7 +189,7 @@ class FactViewSet(viewsets.ModelViewSet):
         # If too little facts from user, add random facts
         if Fact.objects.filter(user_facts_q).count() > 10:
             # Enough facts, just return user's facts
-            return Fact.objects.filter(user_facts_q)
+            return Fact.objects.filter(user_facts_q).prefetch_related("upvotes")
         else:
             # Need more facts - add random public ones
             user_fact_ids = Fact.objects.filter(user_facts_q).values_list("id", flat=True)
@@ -182,7 +198,8 @@ class FactViewSet(viewsets.ModelViewSet):
 
             # Combine both queries with OR
             combined_q = user_facts_q | additional_q
-        return Fact.objects.filter(combined_q).distinct()[:10]
+
+        return Fact.objects.filter(combined_q).distinct()[:10].prefetch_related("upvotes")
 
     # TODO thing about use the pagination instead
     # https://claude.ai/chat/64ff1cfa-dc1e-4014-b10d-64b20dd9c250

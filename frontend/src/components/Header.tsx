@@ -1,6 +1,6 @@
 // import { useAuth } from "../context/authContext";
 // import { useNavigate } from "react-router-dom";
-import { Search, Plus, X, Check, Tag } from "lucide-react";
+import { Search, Plus, X, Check } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
 import { useAxios } from "../utils/useAxios";
 // import { useAuth } from "../context/authContext";

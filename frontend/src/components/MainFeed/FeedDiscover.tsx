@@ -20,9 +20,8 @@ type Fact = {
     content: string;
     source: string;
     tags: {
-        // TODO check the content of the tags
         id: number;
-        profile: string;
+        language: number;
         tag_name: string;
     }[];
     created_at: string;
@@ -35,6 +34,7 @@ type Fact = {
     //     flag: string;
     //     name: string;
     // };
+    is_upvoted: boolean;
 };
 
 const FeedDiscover = () => {
@@ -49,7 +49,7 @@ const FeedDiscover = () => {
     let getFacts = () => {
         axiosInstance
             .get(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`)
-            .then(function (responseAxios) {
+            .then((responseAxios) => {
                 setFacts(responseAxios.data);
             })
             .catch(function (error) {
@@ -163,18 +163,49 @@ const FeedDiscover = () => {
                             </div>
                             <div className="flex justify-between items-center mt-6">
                                 <div className="flex gap-3">
-                                    <div
-                                        className="flex items-center gap-0.5 cursor-pointer"
-                                        onClick={() => {
-                                            {
-                                                /* CONTINUE */
-                                            }
-                                        }}
-                                    >
-                                        <Heart className="h-4 w-4" />
-                                        <span>{fact.upvotes}</span>
-                                        {/* CONTINUE get no. of upvotes from backend */}
-                                    </div>
+                                    {fact.is_upvoted ? (
+                                        <div
+                                            className="flex items-center gap-0.5 cursor-pointer"
+                                            onClick={() => {
+                                                {
+                                                    axiosInstance
+                                                        .post(
+                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/facts/${
+                                                                fact.id
+                                                            }/unvote/`
+                                                        )
+                                                        .then(() => getFacts())
+                                                        .catch((error) => {
+                                                            console.log(error);
+                                                        });
+                                                }
+                                            }}
+                                        >
+                                            <Heart className="h-4 w-4 fill-yellow-400 hover:fill-yellow-500" />
+                                            <span>{fact.upvotes}</span>
+                                        </div>
+                                    ) : (
+                                        <div
+                                            className="flex items-center gap-0.5 cursor-pointer"
+                                            onClick={() => {
+                                                {
+                                                    axiosInstance
+                                                        .post(
+                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/facts/${
+                                                                fact.id
+                                                            }/upvote/`
+                                                        )
+                                                        .then(() => getFacts())
+                                                        .catch((error) => {
+                                                            console.log(error);
+                                                        });
+                                                }
+                                            }}
+                                        >
+                                            <Heart className="h-4 w-4" />
+                                            <span>{fact.upvotes}</span>
+                                        </div>
+                                    )}
                                     <div className="flex items-center gap-0.5 cursor-pointer">
                                         <Share2 className="h-4 w-4" />
                                         <span>
