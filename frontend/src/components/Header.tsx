@@ -218,7 +218,7 @@ const Header = () => {
                             />
 
                             <label className="mb-1">Visibility</label>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 mb-3">
                                 <label className="w-full">
                                     <input
                                         type="radio"
@@ -269,7 +269,7 @@ const Header = () => {
                             <label htmlFor="language" className="mb-1">
                                 Language
                             </label>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 mb-3">
                                 {languages.map((language) => (
                                     <label className="w-full" key={language.id}>
                                         <input
@@ -301,7 +301,7 @@ const Header = () => {
                                     <div
                                         className={`flex flex-wrap gap-4 border ${
                                             addFactFormDataErrors.tags ? "border-red-500" : "border-gray-400"
-                                        } rounded-lg px-2.5 py-1.5 mt-1`}
+                                        } rounded-lg px-2.5 py-1.5 mt-1 mb-3`}
                                     >
                                         {tags.map(
                                             (tag) =>
@@ -368,7 +368,7 @@ const Header = () => {
                                                     }}
                                                     className="cursor-pointer px-1"
                                                 >
-                                                    <X />
+                                                    <X className="h-5 w-5" />
                                                 </button>
                                             ) : (
                                                 <button
@@ -376,7 +376,7 @@ const Header = () => {
                                                     onClick={() => setIsAddingTag(true)}
                                                     className="cursor-pointer px-1"
                                                 >
-                                                    <Plus />
+                                                    <Plus className="h-5 w-5" />
                                                 </button>
                                             )}
                                             <button
@@ -387,7 +387,7 @@ const Header = () => {
                                                 onClick={addTag}
                                                 // TODO on add, focus on the plus sign (to add new tag)
                                             >
-                                                <Check />
+                                                <Check className="h-5 w-5" />
                                             </button>
                                         </div>
                                     </div>
