@@ -56,7 +56,7 @@ class PrivateProfileSerializer(HyperlinkedModelSerializer):
 
     def get_tag_most_posted(self, obj):
         """Return the most used tag."""
-        facts = self.instance.facts.all()
+        facts = obj.facts.all()
         if not facts:
             return "No facts"
         # Flatten tags and count occurrences
@@ -71,14 +71,14 @@ class PrivateProfileSerializer(HyperlinkedModelSerializer):
 
     def get_fact_most_likes(self, obj):
         """Return the fact with the most upvotes."""
-        facts = self.instance.facts.all()
+        facts = obj.facts.all()
         if not facts:
             return 0
-        return max(fact.upvotes for fact in facts)
+        return max(fact.upvotes.count() for fact in facts)
 
     def get_fact_total_likes(self, obj):
         """Return sum of all user's received likes."""
-        return sum(fact.upvotes for fact in self.instance.facts.all())
+        return sum(fact.upvotes.count() for fact in obj.facts.all())
 
 
 class TagSerializer(ModelSerializer):
