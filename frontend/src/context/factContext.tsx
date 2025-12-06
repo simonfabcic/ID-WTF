@@ -12,10 +12,10 @@ export type SideMenuOptionsType =
     | "follows"
     | "other";
 
-interface FactContextType {
+type FactContextType = {
     sideMenuCurrentSelection: SideMenuOptionsType;
     setSideMenuCurrentSelection: (selection: SideMenuOptionsType) => void;
-}
+};
 
 const FactContext = createContext<FactContextType | undefined>(undefined);
 

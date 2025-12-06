@@ -1,20 +1,20 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AxiosInstance } from "axios";
 
-interface Language {
+type Language = {
     code: string;
     flag: string;
     id: number;
     name: string;
-}
+};
 
-interface Tag {
+type Tag = {
     tag_name: string;
     id: number;
     language: number;
-}
+};
 
-interface UserProfileData {
+type UserProfileData = {
     username: string;
     id: number;
     email: string;
@@ -24,15 +24,15 @@ interface UserProfileData {
     fact_total_likes: number;
     tag_most_posted: string;
     follows: number[];
-}
+};
 
-export interface UserDataState {
+export type UserDataState = {
     languages: Language[];
     loading: boolean;
     error: string | null;
     tags: Tag[];
     userProfile: UserProfileData | null;
-}
+};
 
 const initialState: UserDataState = {
     languages: [],

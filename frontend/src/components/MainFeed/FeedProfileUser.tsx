@@ -7,10 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../app/store";
 import { getTagsAsync } from "../../app/features/user/userDataSlice";
 
-interface EditedTag {
+type EditedTag = {
     tag_id: number;
     tag_name: string;
-}
+};
 
 const FeedProfileUser = () => {
     const [editedTag, setEditedTag] = useState<EditedTag>();

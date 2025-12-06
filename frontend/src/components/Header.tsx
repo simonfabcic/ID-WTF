@@ -8,19 +8,19 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../app/store";
 import { getTagsAsync } from "../app/features/user/userDataSlice";
 
-interface FactData {
+type FactData = {
     content: string;
     source: string;
     visibility: "public" | "private" | "followers";
     language: number;
     tag_ids: number[];
-}
+};
 
-interface FactErrorsMissingData {
+type FactErrorsMissingData = {
     factContent: boolean;
     source: boolean;
     tags: boolean;
-}
+};
 
 const Header = () => {
     const [showAddFactInputForm, setShowAddFactInputForm] = useState(false);
@@ -398,6 +398,7 @@ const Header = () => {
                                 <button
                                     className="cursor-pointer border border-gray-400 rounded-lg w-full py-2.5"
                                     onClick={() => setShowAddFactInputForm(false)}
+                                    type="button"
                                 >
                                     Cancel
                                 </button>

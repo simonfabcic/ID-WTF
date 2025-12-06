@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useFact } from "./factContext";
 import axios from "axios";
 
-interface AuthContextType {
+type AuthContextType = {
     userLogin: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     userLogout: () => void;
     user: MyJWTAccessPayload | null;
@@ -12,19 +12,19 @@ interface AuthContextType {
     JWTs: JWTs | null;
     setJWTs: (JWTs: JWTs | null) => void;
     loading: boolean;
-}
+};
 
-interface MyJWTAccessPayload extends JwtPayload {
+type MyJWTAccessPayload = JwtPayload & {
     // besides default JWT claims (https://datatracker.ietf.org/doc/html/rfc7519#section-4.1)
     // will add custom claims
     username: string;
     user_id: number;
-}
+};
 
-interface JWTs {
+type JWTs = {
     access: string;
     refresh: string;
-}
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
