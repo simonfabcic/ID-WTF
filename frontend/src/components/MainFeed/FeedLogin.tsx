@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/authContext";
 import axios from "axios";
+import { useFact } from "../../context/factContext";
+import { jwtDecode, type JwtPayload } from "jwt-decode";
 
 type LoginOptions = "login" | "register" | "forgot-password";
 
@@ -20,8 +22,14 @@ type RegisterFromDataErrors = {
     iAgree: boolean;
 };
 
+type MyJWTAccessPayload = JwtPayload & {
+    username: string;
+    user_id: number;
+};
+
 const FeedLogin = () => {
-    const { userLogin } = useAuth();
+    const { userLogin, setUser, setJWTs } = useAuth();
+    const { setSideMenuCurrentSelection } = useFact();
     const [loginMode, setLoginMode] = useState<LoginOptions>("login");
     const [registerFromData, setRegisterFromData] = useState<RegisterFromData>({
         username: "",
@@ -62,7 +70,18 @@ const FeedLogin = () => {
         }
 
         // POST the data to the backend if data OK
-        axios.post("");
+        axios
+            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/users/register/`, registerFromData)
+            .then((responseAxios) => {
+                const newJWTs = responseAxios.data.JWTs;
+                localStorage.setItem("JWTs", JSON.stringify(newJWTs));
+                setUser(jwtDecode<MyJWTAccessPayload>(newJWTs.access));
+                setJWTs(newJWTs);
+                setSideMenuCurrentSelection("profile");
+            })
+            .catch((error) => {
+                console.error("Registration failed", error);
+            });
     };
 
     return (

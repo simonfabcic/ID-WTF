@@ -20,12 +20,14 @@
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from django.db.models import Q
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, permission_classes
 from rest_framework.exceptions import ValidationError as DRFValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Fact, Language, Profile, Tag
 from .serializers import (
@@ -38,11 +40,65 @@ from .serializers import (
 )
 
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     """Viewset automatically provides `list` and `retrieve` actions."""
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    @action(detail=False, methods=["post"], permission_classes=[AllowAny])
+    def register(self, request):
+        """
+        Register a new user and create profile.
+
+        POST /api/users/register/
+        """
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        # validation
+        if not username or not email or not password:
+            return Response({"error": "Files required: username, email, password."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if User.objects.filter(username=username).exists():
+            return Response({"error": "User with this username already exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "User with this email already exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # ensures both User and Profile are created together, if profile fails, user creation is rolled back
+            with transaction.atomic():
+                # create user
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                )
+
+                # create profile
+                profile = Profile.objects.create(user=user)
+
+                # get JWT tokens
+                JWTs = RefreshToken.for_user(user)
+
+        except Exception as e:
+            return Response({"error": f"Registration failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(
+            {
+                "user": {
+                    "user_id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "profile_id": profile.id,
+                    "message": "User registered successfully.",
+                },
+                "JWTs": {"access": str(JWTs.access_token), "refresh": str(JWTs)},
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class IsProfileOwnerOrReadOnly(permissions.BasePermission):

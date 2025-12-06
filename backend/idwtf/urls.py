@@ -16,12 +16,6 @@ router.register(r"profile", views.ProfileViewSet, basename="profile")
 # TODO change `user` to `profile`
 urlpatterns = [
     path("", include(router.urls)),
-    # # Custom user actions
-    # path("users/<int:pk>/followers/", views.UserFollowersView.as_view(), name="user-followers"),
-    # path("users/<int:pk>/following/", views.UserFollowingView.as_view(), name="user-following"),
-    # path("users/<int:pk>/follow/", views.FollowUserView.as_view(), name="follow-user"),
-    # # Custom fact actions
-    # path("facts/<int:pk>/", views.FactsReactionView.as_view(), name="fact-wtf"),
 ]
 
 # TODO check if this is needed

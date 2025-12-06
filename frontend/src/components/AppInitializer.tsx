@@ -18,7 +18,7 @@ const AppInitializer = ({ children }: { children: ReactNode }) => {
                 dispatch(getUserProfileAsync({ axiosInstance, userID: user?.user_id }));
             }
         }
-    }, [loading]);
+    }, [loading, user]);
 
     return <>{children}</>;
 };

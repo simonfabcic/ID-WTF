@@ -12,8 +12,8 @@ type MenuButtonProps = {
 };
 
 const LeftSideBar = () => {
-    var { user, userLogout } = useAuth();
-    var { sideMenuCurrentSelection, setSideMenuCurrentSelection } = useFact();
+    const { user, userLogout } = useAuth();
+    const { sideMenuCurrentSelection, setSideMenuCurrentSelection } = useFact();
 
     const MenuButton = ({ buttonOption, icon: Icon, buttonLabel, count }: MenuButtonProps) => {
         return (
