@@ -12,9 +12,11 @@ const AppInitializer = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         if (!loading) {
-            dispatch(getLanguagesAsync(axiosInstance));
-            dispatch(getTagsAsync(axiosInstance));
-            dispatch(getUserProfileAsync({ axiosInstance, userID: user?.user_id }));
+            if (user) {
+                dispatch(getLanguagesAsync(axiosInstance));
+                dispatch(getTagsAsync(axiosInstance));
+                dispatch(getUserProfileAsync({ axiosInstance, userID: user?.user_id }));
+            }
         }
     }, [loading]);
 
