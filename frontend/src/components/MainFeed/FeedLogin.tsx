@@ -7,7 +7,6 @@ import { jwtDecode, type JwtPayload } from "jwt-decode";
 type LoginOptions = "login" | "register" | "forgot-password";
 
 type RegisterFromData = {
-    username: string;
     email: string;
     password: string;
     passwordConfirm: string;
@@ -15,7 +14,6 @@ type RegisterFromData = {
 };
 
 type RegisterFromDataErrors = {
-    username: boolean;
     email: boolean;
     password: boolean;
     passwordConfirm: boolean;
@@ -23,7 +21,6 @@ type RegisterFromDataErrors = {
 };
 
 type MyJWTAccessPayload = JwtPayload & {
-    username: string;
     user_id: number;
 };
 
@@ -32,14 +29,12 @@ const FeedLogin = () => {
     const { setSideMenuCurrentSelection } = useFact();
     const [loginMode, setLoginMode] = useState<LoginOptions>("login");
     const [registerFromData, setRegisterFromData] = useState<RegisterFromData>({
-        username: "",
         email: "",
         password: "",
         passwordConfirm: "",
         iAgree: false,
     });
     const [registerFromDataErrors, setRegisterFromDataErrors] = useState<RegisterFromDataErrors>({
-        username: false,
         email: false,
         password: false,
         passwordConfirm: false,
@@ -52,7 +47,6 @@ const FeedLogin = () => {
         //data validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const errors: RegisterFromDataErrors = {
-            username: !registerFromData.username.trim(),
             email: !registerFromData.email.trim() || !emailRegex.test(registerFromData.email),
             password:
                 !registerFromData.password ||
@@ -92,15 +86,15 @@ const FeedLogin = () => {
                     <div>
                         <form onSubmit={userLogin} className="flex flex-col gap-3 mb-1.5">
                             <div>
-                                <label htmlFor="username" className="text-sm font-semibold">
-                                    Username or Email
+                                <label htmlFor="email" className="text-sm font-semibold">
+                                    Email
                                 </label>
                                 <input
-                                    type="text"
-                                    name="username"
-                                    id="username"
+                                    type="email"
+                                    name="email"
+                                    id="email"
                                     className="border border-gray-400 rounded-lg w-full px-2 py-1"
-                                    placeholder="Enter your username or email"
+                                    placeholder="Enter your email"
                                     required
                                 />
                             </div>
@@ -143,24 +137,6 @@ const FeedLogin = () => {
                 {loginMode === "register" && (
                     <div>
                         <form onSubmit={userRegister} noValidate className="flex flex-col gap-4">
-                            <div>
-                                <label htmlFor="username" className="text-sm font-semibold">
-                                    Username
-                                </label>
-                                <input
-                                    type="text"
-                                    name="username"
-                                    id="username"
-                                    className={`border rounded-lg w-full px-2 py-1 ${
-                                        registerFromDataErrors.username ? "border-red-500" : "border-gray-400"
-                                    }`}
-                                    placeholder="Enter your username"
-                                    value={registerFromData.username}
-                                    onChange={(e) => {
-                                        setRegisterFromData((prev) => ({ ...prev, username: e.target.value }));
-                                    }}
-                                />
-                            </div>
                             <div>
                                 <label htmlFor="email" className="text-sm font-semibold">
                                     Email

@@ -17,7 +17,6 @@ type AuthContextType = {
 type MyJWTAccessPayload = JwtPayload & {
     // besides default JWT claims (https://datatracker.ietf.org/doc/html/rfc7519#section-4.1)
     // will add custom claims
-    username: string;
     user_id: number;
 };
 
@@ -53,12 +52,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const userLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         // according to the `name` parameter in the `<input ...>` element
-        const username = event.currentTarget.username.value;
+        const email = event.currentTarget.email.value;
         const password = event.currentTarget.password.value;
 
         axios
             .post(`${import.meta.env.VITE_API_ENDPOINT}/auth/token/`, {
-                username: username,
+                username: email,
                 password: password,
             })
             .then(function (responseAxios) {

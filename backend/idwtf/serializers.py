@@ -28,7 +28,7 @@ class PublicProfileSerializer(HyperlinkedModelSerializer):
 
 class PrivateProfileSerializer(HyperlinkedModelSerializer):
     # facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
-    username = CharField(source="user.username", read_only=True)
+    username = CharField(source="user.profile.username", read_only=True)
     email = CharField(source="user.email", read_only=True)
     tag_most_posted = SerializerMethodField()
     fact_most_likes = SerializerMethodField()
@@ -95,7 +95,7 @@ class LanguageSerializer(ModelSerializer):
 
 
 class FactSerializer(ModelSerializer):
-    username = CharField(source="profile.user.username", read_only=True)
+    username = CharField(source="profile.username", read_only=True)
     profile = PublicProfileSerializer(read_only=True)
     upvotes = SerializerMethodField(read_only=True)
     is_upvoted = SerializerMethodField(read_only=True)
@@ -162,7 +162,7 @@ class FactSerializer(ModelSerializer):
                 raise ValidationError(
                     {
                         "tags": f"These tags don't belong to the selected profile: {invalid_names}. "
-                        f"Only tags owned by '{profile.user.username}' can be used."
+                        f"Only tags owned by '{profile.username}' can be used."
                     }
                 )
 

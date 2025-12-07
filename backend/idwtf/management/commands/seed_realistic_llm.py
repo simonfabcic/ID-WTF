@@ -12,24 +12,24 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # --- ADMIN USER AND PROFILE ---
         # create the super user
-        if not User.objects.filter(username="admin").exists():
-            User.objects.create_superuser(username="admin", email="admin@email.com", password="asdfggfdsa")
-            self.stdout.write(self.style.SUCCESS("✅  Superuser 'admin' created successfully!"))
+        if not User.objects.filter(username="admin@email.com").exists():
+            User.objects.create_superuser(username="admin@email.com", email="admin@email.com", password="asdfggfdsa")
+            self.stdout.write(self.style.SUCCESS("✅  Superuser 'admin@email.com' created successfully!"))
         else:
-            self.stdout.write(self.style.WARNING("⚠️  Superuser 'admin' already exists."))
+            self.stdout.write(self.style.WARNING("⚠️  Superuser 'admin@email.com' already exists."))
 
         # create profile for superuser
-        superuser = User.objects.get(username="admin")
+        superuser = User.objects.get(username="admin@email.com")
         try:
             profile_adm = ProfileFactory(user=superuser)
-            self.stdout.write(self.style.SUCCESS("✅  Profile 'admin' created successfully!"))
+            self.stdout.write(self.style.SUCCESS("✅  Profile 'admin@email.com' created successfully!"))
         except IntegrityError:
             self.stdout.write(self.style.WARNING("⚠️  Skipped due to UNIQUE constraint"))
 
         # --- USERS ---
-        user_slo = UserFactory(username="iAmSlovene")
-        user_eng = UserFactory(username="iAmEnglish")
-        user_ger = UserFactory(username="iAmGerman")
+        user_slo = UserFactory(username="iAmSlovene@deun.eu")
+        user_eng = UserFactory(username="iAmEnglish@deun.eu")
+        user_ger = UserFactory(username="iAmGerman@deun.eu")
         self.stdout.write(self.style.SUCCESS("✅  Users created successfully!"))
 
         # --- PROFILES ---

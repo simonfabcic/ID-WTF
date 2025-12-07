@@ -36,6 +36,7 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     # SubFactory automatically creates a related User instance
     user = factory.SubFactory(UserFactory)
+    username = factory.LazyAttribute(lambda obj: obj.user.username.split("@")[0])
 
 
 class LanguageFactory(factory.django.DjangoModelFactory):

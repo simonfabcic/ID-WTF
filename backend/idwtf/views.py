@@ -43,8 +43,11 @@ from .serializers import (
 class UserViewSet(viewsets.ModelViewSet):
     """Viewset automatically provides `list` and `retrieve` actions."""
 
-    queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)
 
     @action(detail=False, methods=["post"], permission_classes=[AllowAny])
     def register(self, request):
@@ -53,18 +56,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
         POST /api/users/register/
         """
-        username = request.data.get("username")
         email = request.data.get("email")
         password = request.data.get("password")
 
         # validation
-        if not username or not email or not password:
+        if not email or not password:
             return Response({"error": "Files required: username, email, password."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if User.objects.filter(username=username).exists():
-            return Response({"error": "User with this username already exist."}, status=status.HTTP_400_BAD_REQUEST)
-
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(username=email).exists() or User.objects.filter(email=email).exists():
             return Response({"error": "User with this email already exist."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -72,13 +71,14 @@ class UserViewSet(viewsets.ModelViewSet):
             with transaction.atomic():
                 # create user
                 user = User.objects.create_user(
-                    username=username,
+                    username=email,
                     email=email,
                     password=password,
                 )
 
                 # create profile
-                profile = Profile.objects.create(user=user)
+                username = email.split("@")[0]
+                profile = Profile.objects.create(user=user, username=username)
 
                 # get JWT tokens
                 JWTs = RefreshToken.for_user(user)

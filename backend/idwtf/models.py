@@ -12,6 +12,7 @@ class Profile(models.Model):
     """User can follow many other users and vice versa."""
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    username = models.CharField(max_length=30, default="")
     follows = models.ManyToManyField(
         "Tag",
         related_name="followed_by_profile",
@@ -27,7 +28,7 @@ class Profile(models.Model):
     # languages = models.ManyToManyField("Language", related_name="profiles")  # TODO auto add "en"
 
     def __str__(self):
-        return f"User: {self.user.username}"
+        return f"User: {self.username}"
 
 
 class Language(models.Model):
@@ -98,7 +99,7 @@ class Fact(models.Model):
         ]
 
     def __str__(self):
-        return f"Fact by {self.profile.user.username}: {self.content[:30]}"
+        return f"Fact by {self.profile.username}: {self.content[:30]}"
 
     def delete(self, *args, **kwargs):
         self.is_deleted = True

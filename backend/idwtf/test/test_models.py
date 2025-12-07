@@ -46,7 +46,7 @@ class TestProfile(TestCase):
 
     def test_profile_string_representation(self):
         """Test the __str__ method of Profile model."""
-        user = UserFactory(username="testuser")
+        user = UserFactory(username="testuser@deun.eu")
         profile = ProfileFactory(user=user)
 
         self.assertEqual(str(profile), "User: testuser")

@@ -40,7 +40,7 @@ def validate_fact_tags(sender, instance, action, pk_set, **kwargs):
             invalid_names = ", ".join(invalid_tags.values_list("tag_name", flat=True))
             raise ValidationError(
                 f"Cannot add tags from other profiles: {invalid_names}. "
-                f"All tags must belong to user '{fact.profile.user.username}'."
+                f"All tags must belong to user '{fact.profile.username}'."
             )
 
     elif isinstance(instance, Tag):
@@ -50,8 +50,8 @@ def validate_fact_tags(sender, instance, action, pk_set, **kwargs):
 
         invalid_facts = facts.exclude(profile=tag.profile)
         if invalid_facts.exists():
-            invalid_users = ", ".join(invalid_facts.values_list("profile__user__username", flat=True))
+            invalid_users = ", ".join(invalid_facts.values_list("profile__username", flat=True))
             raise ValidationError(
                 f"Cannot add facts from other users: {invalid_users}. "
-                f"Tag '{tag.tag_name}' belongs to user '{tag.profile.user.username}'."
+                f"Tag '{tag.tag_name}' belongs to user '{tag.profile.username}'."
             )

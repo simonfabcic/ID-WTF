@@ -24,7 +24,7 @@ class ProfileAdmin(admin.ModelAdmin):
         """Display the profiles this profile follows."""
         following = obj.following.all()
         if following:
-            return ", ".join([profile.user.username for profile in following])
+            return ", ".join([profile.username for profile in following])
         return "None"
 
     def followers_count(self, obj):
