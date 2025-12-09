@@ -1,3 +1,6 @@
+import uuid
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -24,6 +27,7 @@ class Profile(models.Model):
     # `tag1.followed_by_profiles.all()` gets `Profile_s` who follows this tag
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    email_verified = models.BooleanField(default=False)
     # TODO profile_image = ...
     # languages = models.ManyToManyField("Language", related_name="profiles")  # TODO auto add "en"
 
@@ -109,3 +113,12 @@ class Fact(models.Model):
     def hard_delete(self, *args, **kwargs):
         # not call the `delete()`, this would call the soft delete
         super().delete(*args, **kwargs)
+
+
+class EmailVerificationToken(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_valid(self):
+        return timezone.now() < self.created_at + timedelta(hours=24)

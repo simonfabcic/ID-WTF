@@ -29,7 +29,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Fact, Language, Profile, Tag
+from .models import EmailVerificationToken, Fact, Language, Profile, Tag
 from .serializers import (
     FactSerializer,
     LanguageSerializer,
@@ -47,6 +47,8 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if self.action in ["register", "verify_email", "list"]:
+            return User.objects.none()
         return User.objects.filter(id=self.request.user.id)
 
     @action(detail=False, methods=["post"], permission_classes=[AllowAny])
@@ -70,6 +72,7 @@ class UserViewSet(viewsets.ModelViewSet):
             # ensures both User and Profile are created together, if profile fails, user creation is rolled back
             with transaction.atomic():
                 # create user
+                # CONTINUE create un-active user
                 user = User.objects.create_user(
                     username=email,
                     email=email,
@@ -82,6 +85,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
                 # get JWT tokens
                 JWTs = RefreshToken.for_user(user)
+
+                email_token = EmailVerificationToken.objects.create(profile=profile)
+
+                from .emails import send_verification_email
+
+                send_verification_email(profile, email_token.token)
 
         except Exception as e:
             return Response({"error": f"Registration failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -99,6 +108,39 @@ class UserViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_201_CREATED,
         )
+
+    @action(detail=False, methods=["post"], permission_classes=[AllowAny], url_path="verify-email")
+    def verify_email(self, request):
+        """
+        Activate user and profile.
+
+        POST /api/users/verify-email/
+        Token in body: {"token": "...."}
+        """
+        token = request.data.get("token")
+
+        if not token:
+            return Response({"error": "Token required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            verification_token = EmailVerificationToken.objects.get(token=token)
+
+            if not verification_token.is_valid():
+                return Response({"error": "Verification token has expired"}, status=status.HTTP_400_BAD_REQUEST)
+
+            profile = verification_token.profile
+            # CONTINUE activate user
+            profile.email_verified = True
+            profile.save()
+
+            verification_token.delete()
+            # CONTINUE return JWTs
+            return Response({"message": "Email verified successfully!"}, status=status.HTTP_200_OK)
+
+        except EmailVerificationToken.DoesNotExist:
+            return Response(
+                {"error": "Invalid verification token. Token may be already used."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class IsProfileOwnerOrReadOnly(permissions.BasePermission):

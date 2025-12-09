@@ -190,6 +190,9 @@ class Development(Base):
     ALLOWED_HOSTS = ["*"]
     CORS_ALLOW_ALL_ORIGINS = True
 
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    FRONTEND_URL = "http://localhost:5173"
+
 
 class Production(Base):
     """
@@ -205,6 +208,16 @@ class Production(Base):
         "https://example.com",
         "https://sub.example.com",
     ]
+
+    # TODO edit this for the user email confirmation
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "smtp.gmail.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = "your-email@gmail.com"
+    EMAIL_HOST_PASSWORD = "your-app-password"
+    DEFAULT_FROM_EMAIL = "your-email@gmail.com"
+    FRONTEND_URL = "http://localhost:3000"  # or your frontend URL
 
 
 class Staging(Base):
