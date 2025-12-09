@@ -47,9 +47,16 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        if self.action in ["register", "verify_email", "list"]:
+        if self.action in ["register", "verify_email"]:
             return User.objects.none()
         return User.objects.filter(id=self.request.user.id)
+
+    def list(self, request, *args, **kwargs):
+        """Disable list option for the getting the all users."""
+        return Response(
+            {"detail": "Getting all users not allowed."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
     @action(detail=False, methods=["post"], permission_classes=[AllowAny])
     def register(self, request):

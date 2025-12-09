@@ -180,14 +180,16 @@ class UserEndpointTestCase(APITestCase):
 
     def test_list_users_endpoint(self):
         """Test GET /users/ endpoint."""
+        self.client.force_authenticate(user=self.user)
         url = reverse("user-list")
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)  # error
 
     def test_retrieve_user_endpoint(self):
         """Test GET /users/{id}/ endpoint."""
         url = reverse("user-detail", args=[self.user.id])
+        self.client.force_authenticate(user=self.user)
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
