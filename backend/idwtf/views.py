@@ -67,10 +67,33 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         email = request.data.get("email")
         password = request.data.get("password")
+        repetition = request.data.get("repetition")
 
-        # validation
+        # repetition - ask for email confirmation again
+        if repetition:
+            if not email:
+                return Response({"error": "Field required: email."}, status=status.HTTP_400_BAD_REQUEST)
+            if not User.objects.filter(username=email):
+                return Response({"error": "User with this email not exist."}, status=status.HTTP_400_BAD_REQUEST)
+            if User.objects.filter(username=email, is_active=True):
+                return Response(
+                    {"error": "User with this email already confirmed email."}, status=status.HTTP_400_BAD_REQUEST
+                )
+
+            profile = Profile.objects.get(user__username=email)
+            email_token = EmailVerificationToken.objects.create(profile=profile)
+
+            from .emails import send_verification_email
+
+            send_verification_email(profile, email_token.token)
+            return Response(
+                {"message": "Email for confirmation identity sent again."},
+                status=status.HTTP_200_OK,
+            )
+
+        # validation - for first time
         if not email or not password:
-            return Response({"error": "Files required: username, email, password."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Fields required: email, password."}, status=status.HTTP_400_BAD_REQUEST)
 
         if User.objects.filter(username=email).exists() or User.objects.filter(email=email).exists():
             return Response({"error": "User with this email already exist."}, status=status.HTTP_400_BAD_REQUEST)
@@ -79,19 +102,16 @@ class UserViewSet(viewsets.ModelViewSet):
             # ensures both User and Profile are created together, if profile fails, user creation is rolled back
             with transaction.atomic():
                 # create user
-                # CONTINUE create un-active user
                 user = User.objects.create_user(
                     username=email,
                     email=email,
                     password=password,
+                    is_active=False,
                 )
 
                 # create profile
                 username = email.split("@")[0]
                 profile = Profile.objects.create(user=user, username=username)
-
-                # get JWT tokens
-                JWTs = RefreshToken.for_user(user)
 
                 email_token = EmailVerificationToken.objects.create(profile=profile)
 
@@ -103,16 +123,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({"error": f"Registration failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(
-            {
-                "user": {
-                    "user_id": user.id,
-                    "username": user.username,
-                    "email": user.email,
-                    "profile_id": profile.id,
-                    "message": "User registered successfully.",
-                },
-                "JWTs": {"access": str(JWTs.access_token), "refresh": str(JWTs)},
-            },
+            {"message": "User and profile created successfully! Email confirmation needed."},
             status=status.HTTP_201_CREATED,
         )
 
@@ -136,13 +147,32 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({"error": "Verification token has expired"}, status=status.HTTP_400_BAD_REQUEST)
 
             profile = verification_token.profile
-            # CONTINUE activate user
+            verification_token.delete()
+
             profile.email_verified = True
             profile.save()
 
-            verification_token.delete()
-            # CONTINUE return JWTs
-            return Response({"message": "Email verified successfully!"}, status=status.HTTP_200_OK)
+            profile.user.is_active = True
+            profile.user.save()
+
+            # get JWT tokens
+            JWTs = RefreshToken.for_user(profile.user)
+
+            # return Response({"message": "Email verified successfully!"}, status=status.HTTP_200_OK)
+
+            return Response(
+                {
+                    "user": {
+                        "user_id": profile.user.id,
+                        "username": profile.user.username,
+                        "email": profile.user.email,
+                        "profile_id": profile.id,
+                        "message": "User registered successfully.",
+                    },
+                    "JWTs": {"access": str(JWTs.access_token), "refresh": str(JWTs)},
+                },
+                status=status.HTTP_201_CREATED,
+            )
 
         except EmailVerificationToken.DoesNotExist:
             return Response(

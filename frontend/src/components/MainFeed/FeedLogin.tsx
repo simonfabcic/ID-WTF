@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/authContext";
 import axios from "axios";
 import { useFact } from "../../context/factContext";
 import { jwtDecode, type JwtPayload } from "jwt-decode";
+import { useLocation } from "react-router-dom";
 
 type LoginOptions = "login" | "register" | "forgot-password";
 
@@ -25,9 +26,11 @@ type MyJWTAccessPayload = JwtPayload & {
 };
 
 const FeedLogin = () => {
+    const location = useLocation();
     const { userLogin, setUser, setJWTs } = useAuth();
     const { setSideMenuCurrentSelection } = useFact();
     const [loginMode, setLoginMode] = useState<LoginOptions>("login");
+    const [registerDataSubmitted, setRegisterDataSubmitted] = useState(false);
     const [registerFromData, setRegisterFromData] = useState<RegisterFromData>({
         email: "",
         password: "",
@@ -66,33 +69,40 @@ const FeedLogin = () => {
         // POST the data to the backend if data OK
         axios
             .post(`${import.meta.env.VITE_API_ENDPOINT}/api/users/register/`, registerFromData)
-            .then((responseAxios) => {
-                const newJWTs = responseAxios.data.JWTs;
-                localStorage.setItem("JWTs", JSON.stringify(newJWTs));
-                setUser(jwtDecode<MyJWTAccessPayload>(newJWTs.access));
-                setJWTs(newJWTs);
-                setSideMenuCurrentSelection("profile");
+            .then(() => {
+                setRegisterDataSubmitted(true);
             })
             .catch((error) => {
                 console.error("Registration failed", error);
+                alert("Profile not created. " + error.response.data.error);
             });
     };
 
-    let confirmEmail = () => {
-        axios
-            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/users/verify-email/`, {
-                token: "37b7d162-6a4a-4418-889a-a34a35e48e95",
-            })
-            .then((responseAxios) => {
-                console.log(responseAxios);
-            })
-            .catch((error) => {
-                console.error("Registration failed", error);
-            });
-    };
-    // CONTINUE handle email confirmation
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const token = params.get("token");
+
+        if (token) {
+            axios
+                .post(`${import.meta.env.VITE_API_ENDPOINT}/api/users/verify-email/`, {
+                    token: token,
+                })
+                .then((responseAxios) => {
+                    const newJWTs = responseAxios.data.JWTs;
+                    localStorage.setItem("JWTs", JSON.stringify(newJWTs));
+                    setUser(jwtDecode<MyJWTAccessPayload>(newJWTs.access));
+                    setJWTs(newJWTs);
+                    setSideMenuCurrentSelection("profile");
+                })
+                .catch((error) => {
+                    console.error("Registration failed", error);
+                });
+        }
+    }, [location]);
+
     return (
         <div className="flex flex-col  bg-white rounded-lg p-4 gap-4">
+            {/* CONTINUE create forget password option */}
             {loginMode === "login" && (
                 <>
                     <h3 className="text-2xl font-semibold">Welcome back</h3>
@@ -146,120 +156,132 @@ const FeedLogin = () => {
                     </div>
                 </>
             )}
-            {loginMode === "register" && (
-                <>
-                    <h3 className="text-2xl font-semibold mb-2">Wanna share facts? Awesome!</h3>
-                    <form onSubmit={userRegister} noValidate className="flex flex-col gap-4">
+            {loginMode === "register" &&
+                (registerDataSubmitted ? (
+                    <>
+                        <h3 className="text-2xl font-semibold mb-2">Profile created! Great!</h3>
                         <div>
-                            <label htmlFor="email" className="text-sm font-semibold">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                className={`border rounded-lg w-full px-2 py-1 ${
-                                    registerFromDataErrors.email ? "border-red-500" : "border-gray-400"
-                                }`}
-                                placeholder="Enter your email"
-                                value={registerFromData.email}
-                                onChange={(e) => {
-                                    setRegisterFromDataErrors((prev) => ({ ...prev, email: false }));
-                                    setRegisterFromData((prev) => ({ ...prev, email: e.target.value }));
-                                }}
-                            />
+                            <p className="font-semibold">Next step</p>
+                            <p>
+                                Check your inbox and click on the link to confirm email ownership. Link is valid one
+                                hour.
+                            </p>
                         </div>
-                        <div>
-                            <label htmlFor="password" className="text-sm font-semibold">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                name="password"
-                                id="password"
-                                className={`border rounded-lg w-full px-2 py-1 ${
-                                    registerFromDataErrors.password ? "border-red-500" : "border-gray-400"
+                    </>
+                ) : (
+                    <>
+                        <h3 className="text-2xl font-semibold mb-2">Wanna share facts? Awesome!</h3>
+                        <form onSubmit={userRegister} noValidate className="flex flex-col gap-4">
+                            <div>
+                                <label htmlFor="email" className="text-sm font-semibold">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    className={`border rounded-lg w-full px-2 py-1 ${
+                                        registerFromDataErrors.email ? "border-red-500" : "border-gray-400"
+                                    }`}
+                                    placeholder="Enter your email"
+                                    value={registerFromData.email}
+                                    onChange={(e) => {
+                                        setRegisterFromDataErrors((prev) => ({ ...prev, email: false }));
+                                        setRegisterFromData((prev) => ({ ...prev, email: e.target.value }));
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="password" className="text-sm font-semibold">
+                                    Password
+                                </label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    id="password"
+                                    className={`border rounded-lg w-full px-2 py-1 ${
+                                        registerFromDataErrors.password ? "border-red-500" : "border-gray-400"
+                                    }`}
+                                    placeholder="Min 8 symbols"
+                                    value={registerFromData.password}
+                                    onChange={(e) => {
+                                        setRegisterFromDataErrors((prev) => ({
+                                            ...prev,
+                                            password: false,
+                                            passwordConfirm: false,
+                                        }));
+                                        setRegisterFromData((prev) => ({ ...prev, password: e.target.value }));
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="passwordConfirm" className="text-sm font-semibold">
+                                    Confirm Password
+                                </label>
+                                <input
+                                    type="password"
+                                    name="passwordConfirm"
+                                    id="passwordConfirm"
+                                    className={`border rounded-lg w-full px-2 py-1 ${
+                                        registerFromDataErrors.passwordConfirm ? "border-red-500" : "border-gray-400"
+                                    }`}
+                                    placeholder="Confirm your password"
+                                    value={registerFromData.passwordConfirm}
+                                    onChange={(e) => {
+                                        setRegisterFromDataErrors((prev) => ({
+                                            ...prev,
+                                            password: false,
+                                            passwordConfirm: false,
+                                        }));
+                                        setRegisterFromData((prev) => ({ ...prev, passwordConfirm: e.target.value }));
+                                    }}
+                                />
+                            </div>
+                            <div
+                                className={`flex gap-1.5 pl-2 items-center ${
+                                    registerFromDataErrors.iAgree && "border rounded-lg border-red-500 py-1"
                                 }`}
-                                placeholder="Min 8 symbols"
-                                value={registerFromData.password}
-                                onChange={(e) => {
-                                    setRegisterFromDataErrors((prev) => ({
-                                        ...prev,
-                                        password: false,
-                                        passwordConfirm: false,
-                                    }));
-                                    setRegisterFromData((prev) => ({ ...prev, password: e.target.value }));
-                                }}
-                            />
+                            >
+                                <input
+                                    type="checkbox"
+                                    name="i-agree"
+                                    id="i-agree"
+                                    onChange={(e) => {
+                                        setRegisterFromDataErrors((prev) => ({
+                                            ...prev,
+                                            iAgree: false,
+                                        }));
+                                        setRegisterFromData((prev) => ({
+                                            ...prev,
+                                            iAgree: e.target.checked,
+                                        }));
+                                    }}
+                                    className={`w-4 h-4 accent-yellow-400 border rounded-lg px-2 py-1 ${
+                                        registerFromDataErrors.iAgree ? "border-red-500" : "border-gray-400"
+                                    }`}
+                                />
+                                <label htmlFor="i-agree" className="text-xs">
+                                    I agree to the Terms of Service and Privacy Policy
+                                </label>
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full py-2 bg-yellow-400 font-semibold rounded-lg cursor-pointer"
+                            >
+                                Register
+                            </button>
+                        </form>
+                        <div className="flex gap-1 justify-center">
+                            <span>Already have an account?</span>
+                            <span
+                                className="text-yellow-600 hover:text-yellow-500 font-semibold cursor-pointer"
+                                onClick={() => setLoginMode("login")}
+                            >
+                                Login.
+                            </span>
                         </div>
-                        <div>
-                            <label htmlFor="passwordConfirm" className="text-sm font-semibold">
-                                Confirm Password
-                            </label>
-                            <input
-                                type="password"
-                                name="passwordConfirm"
-                                id="passwordConfirm"
-                                className={`border rounded-lg w-full px-2 py-1 ${
-                                    registerFromDataErrors.passwordConfirm ? "border-red-500" : "border-gray-400"
-                                }`}
-                                placeholder="Confirm your password"
-                                value={registerFromData.passwordConfirm}
-                                onChange={(e) => {
-                                    setRegisterFromDataErrors((prev) => ({
-                                        ...prev,
-                                        password: false,
-                                        passwordConfirm: false,
-                                    }));
-                                    setRegisterFromData((prev) => ({ ...prev, passwordConfirm: e.target.value }));
-                                }}
-                            />
-                        </div>
-                        <div
-                            className={`flex gap-1.5 pl-2 items-center ${
-                                registerFromDataErrors.iAgree && "border rounded-lg border-red-500 py-1"
-                            }`}
-                        >
-                            <input
-                                type="checkbox"
-                                name="i-agree"
-                                id="i-agree"
-                                onChange={(e) => {
-                                    setRegisterFromDataErrors((prev) => ({
-                                        ...prev,
-                                        iAgree: false,
-                                    }));
-                                    setRegisterFromData((prev) => ({
-                                        ...prev,
-                                        iAgree: e.target.checked,
-                                    }));
-                                }}
-                                className={`w-4 h-4 accent-yellow-400 border rounded-lg px-2 py-1 ${
-                                    registerFromDataErrors.iAgree ? "border-red-500" : "border-gray-400"
-                                }`}
-                            />
-                            <label htmlFor="i-agree" className="text-xs">
-                                I agree to the Terms of Service and Privacy Policy
-                            </label>
-                        </div>
-                        <button
-                            type="submit"
-                            className="w-full py-2 bg-yellow-400 font-semibold rounded-lg cursor-pointer"
-                        >
-                            Register
-                        </button>
-                    </form>
-                    <div className="flex gap-1 justify-center">
-                        <span>Already have an account?</span>
-                        <span
-                            className="text-yellow-600 hover:text-yellow-500 font-semibold cursor-pointer"
-                            onClick={() => setLoginMode("login")}
-                        >
-                            Login.
-                        </span>
-                    </div>
-                </>
-            )}
+                    </>
+                ))}
         </div>
     );
 };

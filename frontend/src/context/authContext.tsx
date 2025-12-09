@@ -69,8 +69,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setSideMenuCurrentSelection("discover");
             })
             .catch(function (error) {
+                console.log("err: ", error);
                 if (error.status === 401) {
-                    window.alert("Wrong user/pass combination. Fields are case sensitive");
+                    if (
+                        confirm(
+                            "Wrong user/pass combination. Fields are case sensitive.\n\nDo you want to resend confirmation email?"
+                        )
+                    ) {
+                        axios
+                            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/users/register/`, {
+                                email: email,
+                                repetition: true,
+                            })
+                            .then((response) => {
+                                console.log("response re-confirm: ", response);
+                                alert("Email sent.");
+                            })
+                            .catch((error) => {
+                                alert(error.response.data.error);
+                                console.error(error);
+                            });
+                    }
                 } else {
                     console.error("During the login, an error occurred: ", error);
                 }

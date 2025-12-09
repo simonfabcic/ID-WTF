@@ -121,4 +121,4 @@ class EmailVerificationToken(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def is_valid(self):
-        return timezone.now() < self.created_at + timedelta(hours=24)
+        return timezone.now() < self.created_at + timedelta(hours=1)
