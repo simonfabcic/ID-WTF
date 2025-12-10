@@ -25,12 +25,18 @@ type MyJWTAccessPayload = JwtPayload & {
     user_id: number;
 };
 
+let userToken: string | null = null;
+
 const FeedLogin = () => {
     const location = useLocation();
     const { userLogin, setUser, setJWTs } = useAuth();
     const { setSideMenuCurrentSelection } = useFact();
     const [loginMode, setLoginMode] = useState<LoginOptions>("login");
     const [registerDataSubmitted, setRegisterDataSubmitted] = useState(false);
+
+    const [forgotPasswordStep, setForgotPasswordStep] = useState<"enter-email" | "enter-password">();
+    const [forgotPasswordsSame, setForgotPasswordsSame] = useState(true);
+
     const [registerFromData, setRegisterFromData] = useState<RegisterFromData>({
         email: "",
         password: "",
@@ -80,12 +86,17 @@ const FeedLogin = () => {
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
-        const token = params.get("token");
+        const reason = params.get("reason");
+        userToken = params.get("token");
 
-        if (token) {
+        if (!userToken) {
+            return;
+        }
+
+        if (reason === "verify-email") {
             axios
                 .post(`${import.meta.env.VITE_API_ENDPOINT}/api/users/verify-email/`, {
-                    token: token,
+                    token: userToken,
                 })
                 .then((responseAxios) => {
                     const newJWTs = responseAxios.data.JWTs;
@@ -98,11 +109,63 @@ const FeedLogin = () => {
                     console.error("Registration failed", error);
                 });
         }
+
+        if (reason === "forgot-password") {
+            setLoginMode("forgot-password");
+            setForgotPasswordStep("enter-password");
+        }
     }, [location]);
+
+    const forgotPassword = (event: React.FormEvent<HTMLFormElement>): void => {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+
+        if (forgotPasswordStep === "enter-email") {
+            const email = formData.get("email") as string;
+            axios
+                .post(`${import.meta.env.VITE_API_ENDPOINT}/api/users/forgot-password-email/`, {
+                    email: email,
+                })
+                .then((responseAxios) => {
+                    const newJWTs = responseAxios.data.JWTs;
+                    localStorage.setItem("JWTs", JSON.stringify(newJWTs));
+                    setUser(jwtDecode<MyJWTAccessPayload>(newJWTs.access));
+                    setJWTs(newJWTs);
+                    setSideMenuCurrentSelection("profile");
+                })
+                .catch((error) => {
+                    console.error("Registration failed", error);
+                });
+        } else if (forgotPasswordStep === "enter-password") {
+            const password = formData.get("password") as string;
+            const passwordConfirm = formData.get("password-confirm") as string;
+
+            if (password !== passwordConfirm) {
+                setForgotPasswordsSame(false);
+                return;
+            }
+
+            axios
+                .post(`${import.meta.env.VITE_API_ENDPOINT}/api/users/forgot-password-new-password/`, {
+                    token: userToken,
+                    password: password,
+                })
+                .then((responseAxios) => {
+                    const newJWTs = responseAxios.data.JWTs;
+                    localStorage.setItem("JWTs", JSON.stringify(newJWTs));
+                    setUser(jwtDecode<MyJWTAccessPayload>(newJWTs.access));
+                    setJWTs(newJWTs);
+                    setSideMenuCurrentSelection("profile");
+                })
+                .catch((error) => {
+                    console.error("Changing password fails", error);
+                });
+        }
+    };
 
     return (
         <div className="flex flex-col  bg-white rounded-lg p-4 gap-4">
-            {/* CONTINUE create forget password option */}
             {loginMode === "login" && (
                 <>
                     <h3 className="text-2xl font-semibold">Welcome back</h3>
@@ -138,6 +201,18 @@ const FeedLogin = () => {
                                 <label htmlFor="remember-me">Remember me</label>
                             </div> */}
                         {/* TODO handle `remember me` checkbox */}
+                        <div className="flex justify-end">
+                            <button
+                                type="button"
+                                className="text-yellow-600 hover:text-yellow-500 font-semibold cursor-pointer"
+                                onClick={() => {
+                                    setLoginMode("forgot-password");
+                                    setForgotPasswordStep("enter-email");
+                                }}
+                            >
+                                Forgot Password?
+                            </button>
+                        </div>
                         <button
                             type="submit"
                             className="w-full py-2 mt-2 bg-yellow-400 hover:bg-yellow-500 font-semibold rounded-lg cursor-pointer"
@@ -282,6 +357,96 @@ const FeedLogin = () => {
                         </div>
                     </>
                 ))}
+            {loginMode === "forgot-password" && forgotPasswordStep === "enter-email" && (
+                <>
+                    <h3 className="text-2xl font-semibold">Forgot Password? It happens to all of us...</h3>
+                    <form onSubmit={forgotPassword} className="flex flex-col gap-3 mb-1.5">
+                        <div>
+                            <label htmlFor="email" className="text-sm font-semibold">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                className="border border-gray-400 rounded-lg w-full px-2 py-1"
+                                placeholder="Enter your email"
+                                required
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            className="w-full py-2 mt-2 bg-yellow-400 hover:bg-yellow-500 font-semibold rounded-lg cursor-pointer"
+                        >
+                            Send me mail to reset the password
+                            {/* CONTINUE show the success message */}
+                        </button>
+                    </form>
+                    <div className="flex gap-1 justify-center">
+                        <span>Know your password?</span>
+                        <span
+                            className="text-yellow-600 hover:text-yellow-500 font-semibold cursor-pointer"
+                            onClick={() => setLoginMode("login")}
+                        >
+                            Login.
+                        </span>
+                    </div>
+                </>
+            )}
+            {loginMode === "forgot-password" && forgotPasswordStep === "enter-password" && (
+                <>
+                    <h3 className="text-2xl font-semibold">Ready to change your password? Enter it here...</h3>
+                    <form onSubmit={forgotPassword} className="flex flex-col gap-3 mb-1.5">
+                        <div>
+                            <label htmlFor="password" className="text-sm font-semibold">
+                                New password
+                            </label>
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                className={`border rounded-lg w-full px-2 py-1 ${
+                                    forgotPasswordsSame ? "border-gray-400" : "border-red-500"
+                                }`}
+                                placeholder="Min 8 characters"
+                                required
+                                onChange={() => setForgotPasswordsSame(true)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="password-confirm" className="text-sm font-semibold">
+                                Confirm password
+                            </label>
+                            <input
+                                type="password"
+                                name="password-confirm"
+                                id="password-confirm"
+                                className={`border rounded-lg w-full px-2 py-1 ${
+                                    forgotPasswordsSame ? "border-gray-400" : "border-red-500"
+                                }`}
+                                placeholder="Password again"
+                                required
+                                onChange={() => setForgotPasswordsSame(true)}
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            className="w-full py-2 mt-2 bg-yellow-400 hover:bg-yellow-500 font-semibold rounded-lg cursor-pointer"
+                        >
+                            Change my password
+                        </button>
+                    </form>
+                    <div className="flex gap-1 justify-center">
+                        <span>Know your password?</span>
+                        <span
+                            className="text-yellow-600 hover:text-yellow-500 font-semibold cursor-pointer"
+                            onClick={() => setLoginMode("login")}
+                        >
+                            Login.
+                        </span>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
