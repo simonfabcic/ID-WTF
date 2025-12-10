@@ -120,5 +120,8 @@ class EmailVerificationToken(models.Model):
     token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.profile}, crated at {self.created_at}: ...{self.token[:6]}"
+
     def is_valid(self):
         return timezone.now() < self.created_at + timedelta(hours=1)
