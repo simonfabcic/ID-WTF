@@ -29,6 +29,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .emails import send_email_forgot_password, send_email_verification
 from .models import EmailVerificationToken, Fact, Language, Profile, Tag
 from .serializers import (
     FactSerializer,
@@ -83,9 +84,7 @@ class UserViewSet(viewsets.ModelViewSet):
             profile = Profile.objects.get(user__username=email)
             email_token = EmailVerificationToken.objects.create(profile=profile)
 
-            from .emails import send_verification_email
-
-            send_verification_email(profile, email_token.token)
+            send_email_verification(profile.user.email, email_token.token)
             return Response(
                 {"message": "Email for confirmation identity sent again."},
                 status=status.HTTP_200_OK,
@@ -115,9 +114,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
                 email_token = EmailVerificationToken.objects.create(profile=profile)
 
-                from .emails import send_verification_email
-
-                send_verification_email(profile, email_token.token)
+                send_email_verification(profile.user.email, email_token.token)
 
         except Exception as e:
             return Response({"error": f"Registration failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -158,8 +155,6 @@ class UserViewSet(viewsets.ModelViewSet):
             # get JWT tokens
             JWTs = RefreshToken.for_user(profile.user)
 
-            # return Response({"message": "Email verified successfully!"}, status=status.HTTP_200_OK)
-
             return Response(
                 {
                     "user": {
@@ -178,6 +173,62 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(
                 {"error": "Invalid verification token. Token may be already used."}, status=status.HTTP_400_BAD_REQUEST
             )
+
+    @action(detail=False, methods=["post"], permission_classes=[AllowAny], url_path="forgot-password-email")
+    def forgot_password_email(self, request):
+        email = request.data.get("email")
+
+        try:
+            profile = Profile.objects.get(user__email=email)
+        except Profile.DoesNotExist:
+            return Response({"error": "User with provided email does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        email_token = EmailVerificationToken.objects.create(profile=profile)
+
+        send_email_forgot_password(profile.user.email, email_token.token)
+        return Response(
+            {"message": "Email for reset password sent."},
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=["post"], permission_classes=[AllowAny], url_path="forgot-password-new-password")
+    def forgot_password_new_password(self, request):
+        token = request.data.get("token")
+        password = request.data.get("password")
+        print("token: ", token)
+        print("password: ", password)
+
+        if not token and not password:
+            return Response({"error": "Token and password required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            verification_token = EmailVerificationToken.objects.get(token=token)
+            if not verification_token.is_valid():
+                return Response({"error": "Verification token has expired"}, status=status.HTTP_400_BAD_REQUEST)
+
+        except EmailVerificationToken.DoesNotExist:
+            return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        profile = verification_token.profile
+        verification_token.delete()
+        profile.user.set_password(password)
+        profile.user.save()
+
+        # get JWT tokens
+        JWTs = RefreshToken.for_user(profile.user)
+        return Response(
+            {
+                "user": {
+                    "user_id": profile.user.id,
+                    "username": profile.user.username,
+                    "email": profile.user.email,
+                    "profile_id": profile.id,
+                    "message": "User registered successfully.",
+                },
+                "JWTs": {"access": str(JWTs.access_token), "refresh": str(JWTs)},
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class IsProfileOwnerOrReadOnly(permissions.BasePermission):
