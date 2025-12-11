@@ -36,6 +36,7 @@ const FeedLogin = () => {
 
     const [forgotPasswordStep, setForgotPasswordStep] = useState<"enter-email" | "enter-password">();
     const [forgotPasswordsSame, setForgotPasswordsSame] = useState(true);
+    const [forgotPasswordSubmitted, setForgotPasswordSubmitted] = useState(false);
 
     const [registerFromData, setRegisterFromData] = useState<RegisterFromData>({
         email: "",
@@ -127,12 +128,8 @@ const FeedLogin = () => {
                 .post(`${import.meta.env.VITE_API_ENDPOINT}/api/users/forgot-password-email/`, {
                     email: email,
                 })
-                .then((responseAxios) => {
-                    const newJWTs = responseAxios.data.JWTs;
-                    localStorage.setItem("JWTs", JSON.stringify(newJWTs));
-                    setUser(jwtDecode<MyJWTAccessPayload>(newJWTs.access));
-                    setJWTs(newJWTs);
-                    setSideMenuCurrentSelection("profile");
+                .then(() => {
+                    setForgotPasswordSubmitted(true);
                 })
                 .catch((error) => {
                     console.error("Registration failed", error);
@@ -357,42 +354,51 @@ const FeedLogin = () => {
                         </div>
                     </>
                 ))}
-            {loginMode === "forgot-password" && forgotPasswordStep === "enter-email" && (
-                <>
-                    <h3 className="text-2xl font-semibold">Forgot Password? It happens to all of us...</h3>
-                    <form onSubmit={forgotPassword} className="flex flex-col gap-3 mb-1.5">
+            {loginMode === "forgot-password" &&
+                forgotPasswordStep === "enter-email" &&
+                (forgotPasswordSubmitted ? (
+                    <>
+                        <h3 className="text-2xl font-semibold mb-2">Mail sent...</h3>
                         <div>
-                            <label htmlFor="email" className="text-sm font-semibold">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                className="border border-gray-400 rounded-lg w-full px-2 py-1"
-                                placeholder="Enter your email"
-                                required
-                            />
+                            <p className="font-semibold">Next step</p>
+                            <p>Check your inbox and click on the link to reset the password. Link is valid one hour.</p>
                         </div>
-                        <button
-                            type="submit"
-                            className="w-full py-2 mt-2 bg-yellow-400 hover:bg-yellow-500 font-semibold rounded-lg cursor-pointer"
-                        >
-                            Send me mail to reset the password
-                            {/* CONTINUE show the success message */}
-                        </button>
-                    </form>
-                    <div className="flex gap-1 justify-center">
-                        <span>Know your password?</span>
-                        <span
-                            className="text-yellow-600 hover:text-yellow-500 font-semibold cursor-pointer"
-                            onClick={() => setLoginMode("login")}
-                        >
-                            Login.
-                        </span>
-                    </div>
-                </>
-            )}
+                    </>
+                ) : (
+                    <>
+                        <h3 className="text-2xl font-semibold">Forgot Password? It happens to all of us...</h3>
+                        <form onSubmit={forgotPassword} className="flex flex-col gap-3 mb-1.5">
+                            <div>
+                                <label htmlFor="email" className="text-sm font-semibold">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    className="border border-gray-400 rounded-lg w-full px-2 py-1"
+                                    placeholder="Enter your email"
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full py-2 mt-2 bg-yellow-400 hover:bg-yellow-500 font-semibold rounded-lg cursor-pointer"
+                            >
+                                Send me mail to reset the password
+                            </button>
+                        </form>
+                        <div className="flex gap-1 justify-center">
+                            <span>Know your password?</span>
+                            <span
+                                className="text-yellow-600 hover:text-yellow-500 font-semibold cursor-pointer"
+                                onClick={() => setLoginMode("login")}
+                            >
+                                Login.
+                            </span>
+                        </div>
+                    </>
+                ))}
             {loginMode === "forgot-password" && forgotPasswordStep === "enter-password" && (
                 <>
                     <h3 className="text-2xl font-semibold">Ready to change your password? Enter it here...</h3>
