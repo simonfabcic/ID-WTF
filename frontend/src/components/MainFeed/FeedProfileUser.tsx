@@ -57,6 +57,7 @@ const FeedProfileUser = () => {
                         <div className="flex gap-3">
                             <UserPen className="w-5 h-5" />
                             <FolderDown className="w-5 h-5" />
+                            {/* CONTINUE add edit fields option */}
                         </div>
                     </div>
                 </div>
