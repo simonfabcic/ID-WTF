@@ -1,4 +1,4 @@
-import { Check, FolderDown, Mail, Pencil, Tag, Trash2, UserPen, X } from "lucide-react";
+import { Check, FolderDown, Mail, Pencil, PencilIcon, SaveIcon, Tag, Trash2, UserPen, X } from "lucide-react";
 import { useAuth } from "../../context/authContext";
 import { useAxios } from "../../utils/useAxios";
 import { useEffect, useState } from "react";
@@ -12,11 +12,20 @@ type EditedTag = {
     tag_name: string;
 };
 
+type ProfileField = {
+    username: { value: string; edit_request: boolean };
+    user_description: { value: string; edit_request: boolean };
+};
+
 const FeedProfileUser = () => {
     const [editedTag, setEditedTag] = useState<EditedTag>();
     // const { user, loading } = useAuth();
     const [presentedLanguagesInTags, setPresentedLanguagesInTags] = useState<number[]>([]);
     let axiosInstance = useAxios();
+    const [editProfileField, setEditProfileField] = useState<ProfileField>({
+        username: { value: "", edit_request: false },
+        user_description: { value: "", edit_request: false },
+    });
 
     // global storage
     const { languages, tags, userProfile } = useSelector((state: RootState) => state.userData);
@@ -40,15 +49,72 @@ const FeedProfileUser = () => {
                     />
                 </div>
                 <div className="flex flex-col flex-1">
-                    <h2 className="font-bold text-xl">{userProfile?.username}</h2>
+                    <div className="flex gap-2">
+                        {editProfileField.username.edit_request ? (
+                            <>
+                                <input
+                                    type="text"
+                                    className="font-bold text-xl"
+                                    // CONTINUE solve, how to show the user that  the field is in the edit mode
+                                    value={editProfileField.username.value}
+                                    onChange={(e) =>
+                                        setEditProfileField((prev) => ({
+                                            ...prev,
+                                            username: { ...prev.username, value: e.target.value },
+                                        }))
+                                    }
+                                ></input>
+                                <button
+                                    type="button"
+                                    className="bottom-0 right-0"
+                                    onClick={() => {
+                                        setEditProfileField((prev) => ({
+                                            ...prev,
+                                            username: { ...prev.username, edit_request: false },
+                                        }));
+                                        // CONTINUE call the backend to update profile
+                                    }}
+                                >
+                                    <SaveIcon className="w-4 h-4" />
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <span className="font-bold text-xl">{userProfile?.username}</span>
+                                <button
+                                    type="button"
+                                    className="bottom-0 right-0"
+                                    onClick={() =>
+                                        setEditProfileField((prev) => ({
+                                            ...prev,
+                                            username: { value: userProfile?.username || "", edit_request: true },
+                                        }))
+                                    }
+                                >
+                                    <PencilIcon className="w-4 h-4" />
+                                </button>
+                            </>
+                        )}
+                    </div>
                     <div className="flex items-center text-sm gap-1 text-gray-600">
                         <Mail className="w-3 h-3" />
                         <span>{userProfile?.email}</span>
                     </div>
-                    <p className="text-gray-600 mt-3">
-                        I am creator of the app. I hope many people will find this useful! My main college in the
-                        creation of the app was Z. Z.
-                    </p>
+                    <div className="relative">
+                        <p className="text-gray-600 mt-3">
+                            <span>
+                                I am creator of the app. I hope many people will find this useful! My main college in
+                                the creation of the app was Z. Z.
+                            </span>
+                            <button
+                                type="button"
+                                className="absolute bottom-0 right-0"
+                                // onClick={() => setEditProfileField((prev) => ({ ...prev, user_description: true }))}
+                            >
+                                <PencilIcon className="w-4 h-4" />
+                            </button>
+                        </p>
+                    </div>
                     <div className="flex items-center justify-between pt-3">
                         <div className="flex flex-col">
                             <span className="font-semibold">Last profile update:</span>
@@ -57,7 +123,6 @@ const FeedProfileUser = () => {
                         <div className="flex gap-3">
                             <UserPen className="w-5 h-5" />
                             <FolderDown className="w-5 h-5" />
-                            {/* CONTINUE add edit fields option */}
                         </div>
                     </div>
                 </div>
@@ -95,9 +160,12 @@ const FeedProfileUser = () => {
             </div>
 
             <div className="flex flex-col bg-white rounded-lg p-4 gap-4">
-                <div className="flex gap-1.5 items-center">
-                    <Tag className="h-5 w-5" />
-                    <h3>My tags</h3>
+                <div>
+                    <div className="flex gap-1.5 items-center">
+                        <Tag className="h-5 w-5" />
+                        <h3>My tags</h3>
+                    </div>
+                    <p className="text-xs">Tags will be added when you add the fact...</p>
                 </div>
 
                 {presentedLanguagesInTags &&
