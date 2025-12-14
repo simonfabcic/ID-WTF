@@ -142,7 +142,7 @@ class Base(Configuration):
     REST_FRAMEWORK = {"DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",)}
 
     SIMPLE_JWT = {
-        "ACCESS_TOKEN_LIFETIME": timedelta(seconds=3),
+        "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
         "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
         # If 'True' the rolling window for 'refresh_token' is created.
         # After every refresh, the refresh token extends lifespan

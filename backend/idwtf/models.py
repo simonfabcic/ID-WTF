@@ -28,6 +28,7 @@ class Profile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     email_verified = models.BooleanField(default=False)
+    description = models.TextField(default="")
     # TODO profile_image = ...
     # languages = models.ManyToManyField("Language", related_name="profiles")  # TODO auto add "en"
 

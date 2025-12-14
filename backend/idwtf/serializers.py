@@ -28,7 +28,7 @@ class PublicProfileSerializer(HyperlinkedModelSerializer):
 
 class PrivateProfileSerializer(HyperlinkedModelSerializer):
     # facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
-    username = CharField(source="user.profile.username", read_only=True)
+    # username = CharField(source="user.profile.username", read_only=True)
     email = CharField(source="user.email", read_only=True)
     tag_most_posted = SerializerMethodField()
     fact_most_likes = SerializerMethodField()
@@ -47,6 +47,7 @@ class PrivateProfileSerializer(HyperlinkedModelSerializer):
             "username",
             "email",
             "follows",
+            "description",
             "created_at",
             "updated_at",
             "tag_most_posted",

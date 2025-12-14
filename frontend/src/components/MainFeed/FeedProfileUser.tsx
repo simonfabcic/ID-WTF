@@ -1,11 +1,10 @@
-import { Check, FolderDown, Mail, Pencil, PencilIcon, SaveIcon, Tag, Trash2, UserPen, X } from "lucide-react";
-import { useAuth } from "../../context/authContext";
+import { Check, Mail, Pencil, PencilIcon, SaveIcon, Tag, Trash2, X } from "lucide-react";
 import { useAxios } from "../../utils/useAxios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../app/store";
-import { getTagsAsync } from "../../app/features/user/userDataSlice";
+import { getTagsAsync, getUserProfileAsync } from "../../app/features/user/userDataSlice";
 
 type EditedTag = {
     tag_id: number;
@@ -26,6 +25,8 @@ const FeedProfileUser = () => {
         username: { value: "", edit_request: false },
         user_description: { value: "", edit_request: false },
     });
+    const usernameInputRef = useRef<HTMLInputElement>(null);
+    const userDescriptionInputRef = useRef<HTMLTextAreaElement>(null);
 
     // global storage
     const { languages, tags, userProfile } = useSelector((state: RootState) => state.userData);
@@ -38,6 +39,65 @@ const FeedProfileUser = () => {
         }
     }, [languages, tags]);
 
+    useEffect(() => {
+        if (editProfileField.username.edit_request) {
+            usernameInputRef.current?.focus();
+        }
+    }, [editProfileField.username.edit_request]);
+
+    useEffect(() => {
+        // Move cursor to end if user click on edit description
+        if (editProfileField.user_description.edit_request) {
+            const textarea = userDescriptionInputRef.current;
+            if (textarea) {
+                textarea.focus();
+                const length = textarea.value.length;
+                textarea.setSelectionRange(length, length);
+            }
+        }
+    }, [editProfileField.user_description.edit_request]);
+
+    const handleSaveUsername = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (editProfileField.username.value !== userProfile?.username) {
+            axiosInstance
+                .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profile/${userProfile?.id}/`, {
+                    username: editProfileField.username.value,
+                })
+                .then(() => {
+                    dispatch(getUserProfileAsync({ axiosInstance, userID: userProfile?.id }));
+                })
+                .catch((err) => {
+                    console.error(`Something went wrong during updating profile username. Error: `, err);
+                });
+        }
+        setEditProfileField((prev) => ({
+            ...prev,
+            username: { ...prev.username, edit_request: false },
+        }));
+    };
+
+    const handleSaveUserDescription = (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log("save description");
+        if (editProfileField.user_description.value !== userProfile?.description) {
+            axiosInstance
+                .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profile/${userProfile?.id}/`, {
+                    description: editProfileField.user_description.value,
+                })
+                .then(() => {
+                    dispatch(getUserProfileAsync({ axiosInstance, userID: userProfile?.id }));
+                })
+                .catch((err) => {
+                    console.error(`Something went wrong during updating profile description. Error: `, err);
+                });
+        }
+        setEditProfileField((prev) => ({
+            ...prev,
+            user_description: { ...prev.user_description, edit_request: false },
+        }));
+    };
+
     return (
         <div className="flex flex-col gap-6">
             <div className="flex  bg-white rounded-lg p-4 gap-6">
@@ -49,80 +109,117 @@ const FeedProfileUser = () => {
                     />
                 </div>
                 <div className="flex flex-col flex-1">
-                    <div className="flex gap-2">
-                        {editProfileField.username.edit_request ? (
-                            <>
-                                <input
-                                    type="text"
-                                    className="font-bold text-xl"
-                                    // CONTINUE solve, how to show the user that  the field is in the edit mode
-                                    value={editProfileField.username.value}
-                                    onChange={(e) =>
-                                        setEditProfileField((prev) => ({
-                                            ...prev,
-                                            username: { ...prev.username, value: e.target.value },
-                                        }))
-                                    }
-                                ></input>
-                                <button
-                                    type="button"
-                                    className="bottom-0 right-0"
-                                    onClick={() => {
-                                        setEditProfileField((prev) => ({
-                                            ...prev,
-                                            username: { ...prev.username, edit_request: false },
-                                        }));
-                                        // CONTINUE call the backend to update profile
-                                    }}
-                                >
-                                    <SaveIcon className="w-4 h-4" />
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <span className="font-bold text-xl">{userProfile?.username}</span>
-                                <button
-                                    type="button"
-                                    className="bottom-0 right-0"
-                                    onClick={() =>
-                                        setEditProfileField((prev) => ({
-                                            ...prev,
-                                            username: { value: userProfile?.username || "", edit_request: true },
-                                        }))
-                                    }
-                                >
-                                    <PencilIcon className="w-4 h-4" />
-                                </button>
-                            </>
-                        )}
-                    </div>
+                    {editProfileField.username.edit_request ? (
+                        <form onSubmit={handleSaveUsername}>
+                            <input
+                                type="text"
+                                className="font-bold text-xl italic focus:border-none focus:outline-none focus:ring-0"
+                                value={editProfileField.username.value}
+                                ref={usernameInputRef}
+                                onBlur={() =>
+                                    setEditProfileField((prev) => ({
+                                        ...prev,
+                                        username: { ...prev.username, edit_request: false },
+                                    }))
+                                }
+                                onChange={(e) =>
+                                    setEditProfileField((prev) => ({
+                                        ...prev,
+                                        username: { ...prev.username, value: e.target.value },
+                                    }))
+                                }
+                            ></input>
+                            <button
+                                type="submit"
+                                className="bottom-0 right-0  cursor-pointer"
+                                onMouseDown={(e) => e.preventDefault()}
+                            >
+                                <SaveIcon className="w-4 h-4" />
+                            </button>
+                        </form>
+                    ) : (
+                        <div className="flex gap-2">
+                            <span className="font-bold text-xl">{userProfile?.username}</span>
+                            <button
+                                type="button"
+                                className="bottom-0 right-0 cursor-pointer"
+                                onClick={() =>
+                                    setEditProfileField((prev) => ({
+                                        ...prev,
+                                        username: { value: userProfile?.username || "", edit_request: true },
+                                    }))
+                                }
+                            >
+                                <PencilIcon className="w-4 h-4" />
+                            </button>
+                        </div>
+                    )}
                     <div className="flex items-center text-sm gap-1 text-gray-600">
                         <Mail className="w-3 h-3" />
                         <span>{userProfile?.email}</span>
                     </div>
-                    <div className="relative">
-                        <p className="text-gray-600 mt-3">
-                            <span>
-                                I am creator of the app. I hope many people will find this useful! My main college in
-                                the creation of the app was Z. Z.
-                            </span>
-                            <button
-                                type="button"
-                                className="absolute bottom-0 right-0"
-                                // onClick={() => setEditProfileField((prev) => ({ ...prev, user_description: true }))}
-                            >
-                                <PencilIcon className="w-4 h-4" />
-                            </button>
-                        </p>
-                    </div>
+                    {editProfileField.user_description.edit_request ? (
+                        <div className="relative mt-3">
+                            <form onSubmit={handleSaveUserDescription}>
+                                <textarea
+                                    rows={5}
+                                    ref={userDescriptionInputRef}
+                                    className="italic focus:border-none focus:outline-none focus:ring-0 w-full text-gray-600"
+                                    value={editProfileField.user_description.value}
+                                    onBlur={(e) => {
+                                        // CONTINUE if TAB pressed,
+                                        setEditProfileField((prev) => ({
+                                            ...prev,
+                                            user_description: { ...prev.user_description, edit_request: false },
+                                        }));
+                                    }}
+                                    onChange={(e) =>
+                                        setEditProfileField((prev) => ({
+                                            ...prev,
+                                            user_description: { ...prev.user_description, value: e.target.value },
+                                        }))
+                                    }
+                                />
+                                <button
+                                    type="submit"
+                                    className="absolute bottom-0 right-0 cursor-pointer"
+                                    onMouseDown={(e) => e.preventDefault()}
+                                >
+                                    <SaveIcon className="w-4 h-4" />
+                                </button>
+                            </form>
+                        </div>
+                    ) : (
+                        <div className="relative">
+                            <p className="text-gray-600 mt-3">
+                                <span>{userProfile?.description}</span>
+                                <button
+                                    type="button"
+                                    className="absolute bottom-0 right-0 "
+                                    onClick={() =>
+                                        setEditProfileField((prev) => ({
+                                            ...prev,
+                                            user_description: {
+                                                value: userProfile?.description || "",
+                                                edit_request: true,
+                                            },
+                                        }))
+                                    }
+                                >
+                                    <PencilIcon className="w-4 h-4 text-gray-900" />
+                                </button>
+                            </p>
+                        </div>
+                    )}
+
                     <div className="flex items-center justify-between pt-3">
                         <div className="flex flex-col">
                             <span className="font-semibold">Last profile update:</span>
                             <span className="text-sm">{dayjs(userProfile?.updated_at).fromNow()}</span>
                         </div>
                         <div className="flex gap-3">
-                            <UserPen className="w-5 h-5" />
-                            <FolderDown className="w-5 h-5" />
+                            {/* TODO download all user data */}
+                            {/* <FolderDown className="w-5 h-5" /> */}
                         </div>
                     </div>
                 </div>

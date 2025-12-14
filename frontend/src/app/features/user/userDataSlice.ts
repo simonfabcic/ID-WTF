@@ -24,6 +24,7 @@ type UserProfileData = {
     fact_total_likes: number;
     tag_most_posted: string;
     follows: number[];
+    description: string;
 };
 
 export type UserDataState = {
