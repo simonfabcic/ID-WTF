@@ -14,6 +14,7 @@ type EditedTag = {
 type ProfileField = {
     username: { value: string; edit_request: boolean };
     user_description: { value: string; edit_request: boolean };
+    // profile_picture: { value: string; edit_request: boolean };
 };
 
 const FeedProfileUser = () => {
@@ -24,9 +25,11 @@ const FeedProfileUser = () => {
     const [editProfileField, setEditProfileField] = useState<ProfileField>({
         username: { value: "", edit_request: false },
         user_description: { value: "", edit_request: false },
+        // profile_picture: { value: "", edit_request: false },
     });
     const usernameInputRef = useRef<HTMLInputElement>(null);
     const userDescriptionInputRef = useRef<HTMLTextAreaElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // global storage
     const { languages, tags, userProfile } = useSelector((state: RootState) => state.userData);
@@ -98,15 +101,36 @@ const FeedProfileUser = () => {
         }));
     };
 
+    const handleSaveUserImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) {
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+    };
+
     return (
         <div className="flex flex-col gap-6">
-            <div className="flex  bg-white rounded-lg p-4 gap-6">
-                <div className="w-fit">
+            <div className="flex  bg-white rounded-lg p-4 gap-6 items-start">
+                <div className="relative inline-block">
                     <img
                         src="https://picsum.photos/100/100"
                         alt="profile"
                         className="w-24 h-24 rounded-full object-cover border-4 border-yellow-300"
                     />
+                    <form action="">
+                        <input ref={fileInputRef} type="file" className="hidden" onChange={handleSaveUserImage} />
+                        <button
+                            type="button"
+                            className="absolute bottom-0 right-0"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            {/* CONTINUE allow only one file */}
+                            <PencilIcon className="w-4 h-4 text-gray-900" />
+                        </button>
+                    </form>
                 </div>
                 <div className="flex flex-col flex-1">
                     {editProfileField.username.edit_request ? (
@@ -116,18 +140,19 @@ const FeedProfileUser = () => {
                                 className="font-bold text-xl italic focus:border-none focus:outline-none focus:ring-0"
                                 value={editProfileField.username.value}
                                 ref={usernameInputRef}
+                                // TODO solve this: problem if pressed tab for save, the field is restarted
                                 onBlur={() =>
                                     setEditProfileField((prev) => ({
                                         ...prev,
                                         username: { ...prev.username, edit_request: false },
                                     }))
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     setEditProfileField((prev) => ({
                                         ...prev,
                                         username: { ...prev.username, value: e.target.value },
-                                    }))
-                                }
+                                    }));
+                                }}
                             ></input>
                             <button
                                 type="submit"
@@ -166,8 +191,8 @@ const FeedProfileUser = () => {
                                     ref={userDescriptionInputRef}
                                     className="italic focus:border-none focus:outline-none focus:ring-0 w-full text-gray-600"
                                     value={editProfileField.user_description.value}
+                                    // TODO solve this: problem if pressed tab for save, the field is restarted
                                     onBlur={(e) => {
-                                        // CONTINUE if TAB pressed,
                                         setEditProfileField((prev) => ({
                                             ...prev,
                                             user_description: { ...prev.user_description, edit_request: false },
