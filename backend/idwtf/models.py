@@ -29,7 +29,7 @@ class Profile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     email_verified = models.BooleanField(default=False)
     description = models.TextField(default="")
-    # TODO profile_image = ...
+    profile_image = models.ImageField(default="", upload_to="images/profiles_images")
     # languages = models.ManyToManyField("Language", related_name="profiles")  # TODO auto add "en"
 
     def __str__(self):

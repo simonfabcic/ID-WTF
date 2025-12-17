@@ -25,6 +25,7 @@ type UserProfileData = {
     tag_most_posted: string;
     follows: number[];
     description: string;
+    profile_image: string;
 };
 
 export type UserDataState = {

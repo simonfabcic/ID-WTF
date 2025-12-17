@@ -48,6 +48,7 @@ class PrivateProfileSerializer(HyperlinkedModelSerializer):
             "email",
             "follows",
             "description",
+            "profile_image",
             "created_at",
             "updated_at",
             "tag_most_posted",

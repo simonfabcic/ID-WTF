@@ -108,7 +108,20 @@ const FeedProfileUser = () => {
         }
 
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("profile_image", file);
+
+        axiosInstance
+            .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profile/${userProfile?.id}/`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            })
+            .then(() => {
+                dispatch(getUserProfileAsync({ axiosInstance, userID: userProfile?.id }));
+            })
+            .catch((err) => {
+                console.error(`Something went wrong during updating profile image. Error: `, err);
+            });
     };
 
     return (
@@ -116,7 +129,8 @@ const FeedProfileUser = () => {
             <div className="flex  bg-white rounded-lg p-4 gap-6 items-start">
                 <div className="relative inline-block">
                     <img
-                        src="https://picsum.photos/100/100"
+                        // src="https://picsum.photos/100/100"
+                        src={userProfile?.profile_image}
                         alt="profile"
                         className="w-24 h-24 rounded-full object-cover border-4 border-yellow-300"
                     />
