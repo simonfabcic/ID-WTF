@@ -23,7 +23,7 @@ class PublicProfileSerializer(HyperlinkedModelSerializer):
     # facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
     class Meta:
         model = Profile
-        fields = ["id"]
+        fields = ["id", "profile_image"]
 
 
 class PrivateProfileSerializer(HyperlinkedModelSerializer):

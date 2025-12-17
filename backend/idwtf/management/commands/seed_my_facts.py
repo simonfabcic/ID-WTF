@@ -32,7 +32,9 @@ class Command(BaseCommand):
         '''
         f = FactFactory(
             profile=profile_adm,
-            content=dedent("""Fact content"""),
+            content=dedent("""
+                Fact multiline content.
+            """).strip(),  # remove extra leading/trailing newlines,
             source="e.g.: www.fact-source.com; friend of mine; [Link text](www.example.com)",
             visibility="public",
             language=slovenian_language,
@@ -45,13 +47,17 @@ class Command(BaseCommand):
         # my facts ----------------------------------------------------------------------------------------------------
         f = FactFactory(
             profile=profile_adm,
-            content=dedent("""V podjetju prijatelja se jim ob koncu leta briše dopust, če ga ne porabijo.
+            content=dedent("""
+                V podjetju prijatelja se jim ob koncu leta briše dopust, če ga ne porabijo.
                 Imajo pa možnost tekom leta iti do 5 dni v minus.
                 Ob novem letu se briše tudi ta minus.
 
                 Še nekaj:
-                Če greš v minus npr. le 3 dni, imaš naslednje leto možnost minusa le tri dni."""),
-            source="Zasebni vir, povedal bivši lastnik firme, B. Š.",
+                Če greš v minus npr. le 3 dni, imaš naslednje leto možnost minusa le tri dni.
+
+                In bolniško odsotnost in nego imajo plačano 100 %.
+            """).strip(),
+            source="Zasebni vir, povedal bivši lastnik podjetja, B. Š.",
             visibility="public",
             language=slovenian_language,
         )

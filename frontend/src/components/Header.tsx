@@ -209,7 +209,7 @@ const Header = () => {
                                 className={`w-full px-2.5 py-1.5 rounded-lg border ${
                                     addFactFormDataErrors.source ? "border-red-500" : "border-gray-400"
                                 } mb-3`}
-                                placeholder="e.g.: www.fact-source.com; friend of mine; [Link text](www.example.com)"
+                                placeholder="e.g.: www.fact-source.com; friend of mine; [Link text](www.example.com)" // CONTINUE [text](url) not handled yet
                                 value={addFactFormData.source}
                                 onChange={(e) => {
                                     setAddFactFormDataErrors((prev) => ({ ...prev, source: false }));

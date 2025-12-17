@@ -1,4 +1,4 @@
-import { BadgeMinus, ExternalLink, Heart, Rss, Save, Share2, X } from "lucide-react";
+import { BadgeMinus, ExternalLink, Heart, Rss, Save, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAxios } from "../../utils/useAxios";
 import { useAuth } from "../../context/authContext";
@@ -15,6 +15,7 @@ type Fact = {
     username: string;
     profile: {
         id: number;
+        profile_image: string;
         // user: string; // TODO user URL
     };
     content: string;
@@ -71,7 +72,7 @@ const FeedDiscover = () => {
                     <div key={index} className="flex gap-4 bg-white rounded-lg p-4">
                         {/* fact creator image */}
                         <img
-                            src="https://picsum.photos/200/200"
+                            src={fact.profile.profile_image}
                             alt="profile"
                             className="w-16 h-16 rounded-full object-cover border-4 border-yellow-300"
                         />
