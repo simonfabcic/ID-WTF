@@ -9,6 +9,7 @@ import validator from "validator";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../app/store";
 import { getUserProfileAsync } from "../../app/features/user/userDataSlice";
+import { useNavigate } from "react-router-dom";
 
 type Fact = {
     id: number;
@@ -42,6 +43,7 @@ const FeedDiscover = () => {
     const [facts, setFacts] = useState<Fact[]>();
     let axiosInstance = useAxios();
     const { user, loading } = useAuth();
+    const navigate = useNavigate();
 
     // state manager
     const { userProfile } = useSelector((state: RootState) => state.userData);
@@ -81,7 +83,12 @@ const FeedDiscover = () => {
                         <div className="flex flex-col gap-4 w-full">
                             {/* fact title */}{" "}
                             <div>
-                                <h3 className="font-semibold text-gray-900">{fact.username}</h3>
+                                <h3
+                                    className="font-semibold text-gray-900 cursor-pointer"
+                                    onClick={() => navigate(`/profile/${fact.profile.id}`)}
+                                >
+                                    {fact.username}
+                                </h3>
                                 <p className="text-sm text-gray-500">{dayjs(fact.created_at).fromNow()}</p>
                             </div>
                             <p className="whitespace-pre-wrap">{fact.content}</p>

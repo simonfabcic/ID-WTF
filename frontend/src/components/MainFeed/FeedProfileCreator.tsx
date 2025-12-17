@@ -2,6 +2,7 @@ import { FolderDown, Mail, Pencil, Tag, Trash2, UserPen } from "lucide-react";
 
 const FeedProfileCreator = () => {
     // Component for viewing the others profiles
+    // CONTINUE change hardcoded data to the data from backend
     return (
         <div className="flex flex-col gap-6">
             <div className="flex  bg-white rounded-lg p-4 gap-6">
