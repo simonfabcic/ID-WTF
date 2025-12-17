@@ -17,6 +17,7 @@ pillow = "*"
 ruff = "*"
 pre-commit = "*"
 factory-boy = "*"
+pytz = "*"
 
 [requires]
 python_version = "3.12"

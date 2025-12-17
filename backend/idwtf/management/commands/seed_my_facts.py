@@ -1,0 +1,62 @@
+from textwrap import dedent
+
+import pytz
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+
+from idwtf.models import Language, Profile
+from idwtf.test.factories import FactFactory, TagFactory
+
+
+class Command(BaseCommand):
+    help = "Seed some real facts data using factory-boy."
+
+    def handle(self, *args, **kwargs):
+        # get profile
+        profile_adm = Profile.objects.get(user__username="admin@email.com")
+        profile_adm.username = "Simon"
+        profile_adm.save()
+
+        # set timezone
+        tz = pytz.timezone("Europe/Ljubljana")
+        # tz = pytz.timezone("Europe/Brussels")
+
+        # get languages
+        slovenian_language = Language.objects.get(code="sl")
+        english_language = Language.objects.get(code="en")
+
+        # create tags
+        slo_sluzba = TagFactory(tag_name="sluzba", profile=profile_adm, language=slovenian_language)
+
+        # create facts template
+        '''
+        f = FactFactory(
+            profile=profile_adm,
+            content=dedent("""Fact content"""),
+            source="e.g.: www.fact-source.com; friend of mine; [Link text](www.example.com)",
+            visibility="public",
+            language=slovenian_language,
+        )
+        f.tags.add(slo_sluzba)
+        f.created_at = timezone.datetime(YYYY, MM, DD, HH, MM, tzinfo=tz)
+        f.save()
+        '''
+
+        # my facts ----------------------------------------------------------------------------------------------------
+        f = FactFactory(
+            profile=profile_adm,
+            content=dedent("""V podjetju prijatelja se jim ob koncu leta briše dopust, če ga ne porabijo.
+                Imajo pa možnost tekom leta iti do 5 dni v minus.
+                Ob novem letu se briše tudi ta minus.
+
+                Še nekaj:
+                Če greš v minus npr. le 3 dni, imaš naslednje leto možnost minusa le tri dni."""),
+            source="Zasebni vir, povedal bivši lastnik firme, B. Š.",
+            visibility="public",
+            language=slovenian_language,
+        )
+        f.tags.add(slo_sluzba)
+        f.created_at = timezone.datetime(2025, 12, 16, 19, 00, tzinfo=tz)
+        f.save()
+
+        self.stdout.write(self.style.SUCCESS("✅  Fact/s created successfully!"))

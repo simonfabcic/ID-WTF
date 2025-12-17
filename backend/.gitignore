@@ -3,3 +3,6 @@ db.sqlite3
 **/__pycache__/**
 !.venv/.gitkepp
 media/**
+!media/images/
+!media/images/profiles_images/
+!media/images/profiles_images/default.png

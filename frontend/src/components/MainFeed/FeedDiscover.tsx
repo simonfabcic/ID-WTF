@@ -83,7 +83,7 @@ const FeedDiscover = () => {
                                 <h3 className="font-semibold text-gray-900">{fact.username}</h3>
                                 <p className="text-sm text-gray-500">{dayjs(fact.created_at).fromNow()}</p>
                             </div>
-                            <p>{fact.content}</p>
+                            <p className="whitespace-pre-wrap">{fact.content}</p>
                             {validator.isURL(fact.source) ? (
                                 <div className="flex gap-1 text-sm">
                                     <ExternalLink className="h-4 w-4" />
@@ -97,7 +97,7 @@ const FeedDiscover = () => {
                                     </a>
                                 </div>
                             ) : (
-                                <div>{fact.source}</div>
+                                <div className="text-sm">{fact.source}</div>
                             )}
                             <div className="flex gap-1.5 text-sm">
                                 {fact.tags.map((tag, index) => (
