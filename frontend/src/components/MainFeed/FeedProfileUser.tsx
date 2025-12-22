@@ -206,7 +206,7 @@ const FeedProfileUser = () => {
                                     className="italic focus:border-none focus:outline-none focus:ring-0 w-full text-gray-600"
                                     value={editProfileField.user_description.value}
                                     // TODO solve this: problem if pressed tab for save, the field is restarted
-                                    onBlur={(e) => {
+                                    onBlur={() => {
                                         setEditProfileField((prev) => ({
                                             ...prev,
                                             user_description: { ...prev.user_description, edit_request: false },

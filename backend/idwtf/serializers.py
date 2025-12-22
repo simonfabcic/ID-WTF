@@ -16,41 +16,26 @@ from idwtf.models import Fact, Language, Profile, Tag
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "date_joined"]
+        fields = [
+            "id",
+            "username",
+            "email",
+        ]
 
 
-class PublicProfileSerializer(HyperlinkedModelSerializer):
-    # facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
-    class Meta:
-        model = Profile
-        fields = ["id", "profile_image"]
-
-
-class PrivateProfileSerializer(HyperlinkedModelSerializer):
-    # facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
-    # username = CharField(source="user.profile.username", read_only=True)
-    email = CharField(source="user.email", read_only=True)
+class ProfileSerializer(HyperlinkedModelSerializer):
     tag_most_posted = SerializerMethodField()
     fact_most_likes = SerializerMethodField()
     fact_total_likes = SerializerMethodField()
-    follows = PrimaryKeyRelatedField(
-        queryset=Tag.objects.all(),  # validates that te `Tag` exist in the DB
-        many=True,
-        required=False,
-    )
 
     class Meta:
         model = Profile
         fields = [
             "id",
-            "user",
             "username",
-            "email",
-            "follows",
-            "description",
             "profile_image",
             "created_at",
-            "updated_at",
+            "description",
             "tag_most_posted",
             "fact_most_likes",
             "fact_total_likes",
@@ -81,6 +66,44 @@ class PrivateProfileSerializer(HyperlinkedModelSerializer):
     def get_fact_total_likes(self, obj):
         """Return sum of all user's received likes."""
         return sum(fact.upvotes.count() for fact in obj.facts.all())
+
+
+class PublicProfileSerializer(ProfileSerializer):
+    last_published_date = SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        fields = ProfileSerializer.Meta.fields + [
+            "last_published_date",
+        ]
+
+    def get_last_published_date(self, obj):
+        last_fact = obj.facts.order_by("created_at").first()
+        if last_fact:
+            return last_fact.created_at
+        return None
+
+
+class PrivateProfileSerializer(ProfileSerializer):
+    # facts = HyperlinkedRelatedField(many=True, view_name="fact-detail", read_only=True)
+    # username = CharField(source="user.profile.username", read_only=True)
+    email = CharField(source="user.email", read_only=True)
+
+    follows = PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),  # validates that te `Tag` exist in the DB
+        many=True,
+        required=False,
+    )
+
+    class Meta:
+        model = Profile
+        fields = ProfileSerializer.Meta.fields + [
+            "username",
+            "user",
+            "email",
+            "follows",
+            "updated_at",
+        ]
 
 
 class TagSerializer(ModelSerializer):

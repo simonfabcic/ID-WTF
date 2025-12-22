@@ -27,6 +27,7 @@ class Command(BaseCommand):
 
         # create tags
         slo_sluzba = TagFactory(tag_name="sluzba", profile=profile_adm, language=slovenian_language)
+        slo_dobro_zivljenje = TagFactory(tag_name="dobro zivljenje", profile=profile_adm, language=slovenian_language)
 
         # create facts template
         '''
@@ -64,5 +65,26 @@ class Command(BaseCommand):
         f.tags.add(slo_sluzba)
         f.created_at = timezone.datetime(2025, 12, 16, 19, 00, tzinfo=tz)
         f.save()
+        self.stdout.write(self.style.SUCCESS(f"✅  Fact created successfully! {f.content[:50]}"))
 
-        self.stdout.write(self.style.SUCCESS("✅  Fact/s created successfully!"))
+        f = FactFactory(
+            profile=profile_adm,
+            content=dedent("""
+                David Zupančič: Če me vprašaš kaj je pekel... Pustimo mlake lave kjer gorijo grešniki...
+
+                Ko ti parkirajo nekega gospoda na urgenci in tam čaka izvide v kotu, starejši gospod. In on šteje.
+                Ena, dva, tri, pride do 20 in spet šteje od ena.
+                Kognitivni upad je zelo napredoval, demenca. Pogovarja se z mamo, ki je ni že 20 let.
+
+                Vse kar me veseli v življenju je bazirano na nekem intelektu... Branje, pisanje, zdravniška služba, družina, ljubezen.
+
+                Upadanje, usihanje tega, ko telo usiha počasneje kot zavest, to se mi zdi prekletstvo.
+            """).strip(),
+            source="[Mihilizem - David Zupančič: Vsak večer berem poezijo](https://podcastaddict.com/mihilizem/episode/183894625)",
+            visibility="public",
+            language=slovenian_language,
+        )
+        f.tags.add(slo_dobro_zivljenje)
+        f.created_at = timezone.datetime(2025, 12, 18, 13, 00, tzinfo=tz)
+        f.save()
+        self.stdout.write(self.style.SUCCESS(f"✅  Fact created successfully! {f.content[:50]}"))
