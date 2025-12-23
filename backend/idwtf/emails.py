@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 
 def send_email_verification(email, token):
     verification_url = f"{settings.FRONTEND_URL}/login?token={token}&reason=verify-email"
+    print("verification_url: ", verification_url)  # DPL remove this line
     subject = "Verify your email address"
     message = f"Click the link to verify your email: {verification_url}"
 

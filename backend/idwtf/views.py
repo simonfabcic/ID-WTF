@@ -300,6 +300,31 @@ class ProfileViewSet(viewsets.ModelViewSet):
         except Tag.DoesNotExist:
             return Response({"error": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=True, methods=["get"])
+    def tags(self, request, pk=None):
+        profile = self.get_object()
+        tags = profile.tags.all()
+        serializer = TagSerializer(tags, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    def facts(self, request, pk=None):
+        profile = self.get_object()
+
+        if request.user.is_authenticated:
+            if request.user.profile == profile:
+                # owner see all facts
+                facts = profile.facts.all()
+            else:
+                # logged in user see pubic and follows
+                facts = profile.facts.filter(visibility__in=["public", "followers"])
+        else:
+            # anonymous user can see pubic facts
+            facts = profile.facts.filter(visibility__in=["public"])
+
+        serializer = FactSerializer(facts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """CRUD for Tags."""

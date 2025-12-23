@@ -21,16 +21,27 @@ const FeedProfileCreator = () => {
     const { profileId } = useParams<{ profileId: string }>();
     const [creatorProfileData, setCreatorProfileData] = useState<CreatorProfileData | null>();
     const [profileTags, setProfileTags] = useState();
+    const [profileFacts, setProfileFacts] = useState();
 
     useEffect(() => {
-        axiosInstance.get(`api/profiles/${profileId}`).then((axiosResponse) => {
-            setCreatorProfileData(axiosResponse.data);
-        });
-        // axiosInstance.get(`api/tags/${}`)
+        useEffect(() => {
+            axiosInstance // get profile data
+                .get(`api/profiles/${profileId}`)
+                .then((axiosResponse) => {
+                    setCreatorProfileData(axiosResponse.data);
+                });
+            axiosInstance // get profiles tags
+                .get(`api/profiles/${profileId}/tags`)
+                .then((axiosResponse) => {
+                    setProfileTags(axiosResponse.data);
+                });
+            axiosInstance // get profiles facts
+                .get(`api/profiles/${profileId}/facts`)
+                .then((axiosResponse) => {
+                    setProfileFacts(axiosResponse.data);
+                });
+        }, []);
     }, []);
-
-    // CONTINUE get tags
-    // CONTINUE get facts
 
     return (
         <div className="flex flex-col gap-6">
