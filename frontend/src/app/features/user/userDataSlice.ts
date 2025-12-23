@@ -45,19 +45,19 @@ const initialState: UserDataState = {
 };
 
 export const getLanguagesAsync = createAsyncThunk("userData/getLanguages", async (axiosInstance: AxiosInstance) => {
-    const response = await axiosInstance.get(`/api/language`);
+    const response = await axiosInstance.get(`/api/languages`);
     return response.data;
 });
 
 export const getTagsAsync = createAsyncThunk("userData/getTags", async (axiosInstance: AxiosInstance) => {
-    const response = await axiosInstance.get(`/api/tag`);
+    const response = await axiosInstance.get(`/api/tags`);
     return response.data;
 });
 
 export const getUserProfileAsync = createAsyncThunk(
     "userData/getUserProfile",
     async ({ axiosInstance, userID }: { axiosInstance: AxiosInstance; userID: number | undefined }) => {
-        const response = await axiosInstance.get(`/api/profile/${userID}/`);
+        const response = await axiosInstance.get(`/api/profiles/${userID}/`);
         return response.data;
     }
 );

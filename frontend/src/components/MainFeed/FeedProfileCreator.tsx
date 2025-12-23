@@ -20,11 +20,13 @@ const FeedProfileCreator = () => {
     const axiosInstance = useAxios();
     const { profileId } = useParams<{ profileId: string }>();
     const [creatorProfileData, setCreatorProfileData] = useState<CreatorProfileData | null>();
+    const [profileTags, setProfileTags] = useState();
 
     useEffect(() => {
-        axiosInstance.get(`api/profile/${profileId}`).then((axiosResponse) => {
+        axiosInstance.get(`api/profiles/${profileId}`).then((axiosResponse) => {
             setCreatorProfileData(axiosResponse.data);
         });
+        // axiosInstance.get(`api/tags/${}`)
     }, []);
 
     // CONTINUE get tags

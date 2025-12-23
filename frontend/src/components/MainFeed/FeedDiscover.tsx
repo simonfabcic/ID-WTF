@@ -125,7 +125,7 @@ const FeedDiscover = () => {
                                                 onClick={() => {
                                                     axiosInstance
                                                         .post(
-                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/profile/${
+                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${
                                                                 user?.user_id
                                                             }/tag_unfollow/`,
                                                             { tag_id: tag.id }
@@ -148,7 +148,7 @@ const FeedDiscover = () => {
                                                 onClick={() => {
                                                     axiosInstance
                                                         .post(
-                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/profile/${
+                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${
                                                                 user?.user_id
                                                             }/tag_follow/`,
                                                             { tag_id: tag.id }

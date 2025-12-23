@@ -106,7 +106,7 @@ const Header = () => {
             // TODO create nicer popup
         }
         axiosInstance
-            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/tag/`, {
+            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/tags/`, {
                 language: addFactFormData.language,
                 tag_name: newTagName,
             })

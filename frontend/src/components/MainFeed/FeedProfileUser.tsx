@@ -64,7 +64,7 @@ const FeedProfileUser = () => {
         e.preventDefault();
         if (editProfileField.username.value !== userProfile?.username) {
             axiosInstance
-                .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profile/${userProfile?.id}/`, {
+                .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${userProfile?.id}/`, {
                     username: editProfileField.username.value,
                 })
                 .then(() => {
@@ -85,7 +85,7 @@ const FeedProfileUser = () => {
         console.log("save description");
         if (editProfileField.user_description.value !== userProfile?.description) {
             axiosInstance
-                .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profile/${userProfile?.id}/`, {
+                .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${userProfile?.id}/`, {
                     description: editProfileField.user_description.value,
                 })
                 .then(() => {
@@ -111,7 +111,7 @@ const FeedProfileUser = () => {
         formData.append("profile_image", file);
 
         axiosInstance
-            .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profile/${userProfile?.id}/`, formData, {
+            .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${userProfile?.id}/`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -337,7 +337,7 @@ const FeedProfileUser = () => {
                                                         onClick={() => {
                                                             axiosInstance
                                                                 .patch(
-                                                                    `${import.meta.env.VITE_API_ENDPOINT}/api/tag/${
+                                                                    `${import.meta.env.VITE_API_ENDPOINT}/api/tags/${
                                                                         tag.id
                                                                     }/`,
                                                                     { tag_name: editedTag.tag_name }
@@ -369,7 +369,7 @@ const FeedProfileUser = () => {
                                                             ) {
                                                                 axiosInstance
                                                                     .delete(
-                                                                        `${import.meta.env.VITE_API_ENDPOINT}/api/tag/${
+                                                                        `${import.meta.env.VITE_API_ENDPOINT}/api/tags/${
                                                                             tag.id
                                                                         }/`
                                                                     )
