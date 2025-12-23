@@ -127,7 +127,7 @@ const FeedDiscover = () => {
                                                         .post(
                                                             `${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${
                                                                 user?.user_id
-                                                            }/tag_unfollow/`,
+                                                            }/tag-unfollow/`,
                                                             { tag_id: tag.id }
                                                         )
                                                         .finally(() => {
@@ -150,7 +150,7 @@ const FeedDiscover = () => {
                                                         .post(
                                                             `${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${
                                                                 user?.user_id
-                                                            }/tag_follow/`,
+                                                            }/tag-follow/`,
                                                             { tag_id: tag.id }
                                                         )
                                                         .finally(() => {

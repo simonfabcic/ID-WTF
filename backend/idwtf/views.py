@@ -35,6 +35,7 @@ from .serializers import (
     FactSerializer,
     LanguageSerializer,
     PrivateProfileSerializer,
+    ProfileSerializer,
     PublicProfileSerializer,
     TagSerializer,
     UserSerializer,
@@ -246,7 +247,19 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     queryset = Profile.objects.all()
     permission_classes = [IsProfileOwnerOrReadOnly]
-    serializer_class = PrivateProfileSerializer
+    serializer_class = ProfileSerializer
+
+    def get_serializer_class(self):
+        """Different serializers based on the action and user permissions."""
+        if self.action == "retrieve":
+            # Check if user is viewing their own profile
+            if self.request.user.is_authenticated:
+                profile = self.get_object()
+                if profile.user.id == self.request.user.id:
+                    return PrivateProfileSerializer
+            return PublicProfileSerializer
+        # Default serializer for other actions (create, update, partial_update)
+        return ProfileSerializer
 
     def list(self, request, *args, **kwargs):
         """Disable list option for the getting the all private profiles."""
@@ -256,24 +269,14 @@ class ProfileViewSet(viewsets.ModelViewSet):
         )
 
     def retrieve(self, request, *args, **kwargs):
-        """
-        Retrieve a profile and return either public or private data.
-
-        If the requested profile belongs to the authenticated user, return the
-        private version of the profile. Otherwise, return the public version.
-        """
-        instance = self.get_object()
-
-        if request.user.is_authenticated and instance.user.id == request.user.id:
-            serializer = PrivateProfileSerializer(instance, context={"request": request})
-        else:
-            serializer = PublicProfileSerializer(instance, context={"request": request})
-
+        """Retrieve a profile and return either public or private data."""
+        profile = self.get_object()
+        serializer = self.get_serializer(profile)
         return Response(serializer.data)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"], url_path="tag-follow")
     def tag_follow(self, request, pk=None):
-        """Endpoint for POST /api/profile/5/follow_tag/."""
+        """Endpoint for POST /api/profile/5/tag-follow/."""
         profile = self.get_object()
         tag_id = request.data.get("tag_id")
 
@@ -284,8 +287,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
         except Tag.DoesNotExist:
             return Response({"error": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"], url_path="tag-unfollow")
     def tag_unfollow(self, request, pk=None):
+        """Endpoint for POST /api/profile/5/tag-unfollow/."""
         profile = self.get_object()
         tag_id = request.data.get("tag_id")
 
