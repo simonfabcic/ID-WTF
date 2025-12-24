@@ -98,7 +98,6 @@ class PrivateProfileSerializer(ProfileSerializer):
     class Meta:
         model = Profile
         fields = ProfileSerializer.Meta.fields + [
-            "username",
             "user",
             "email",
             "follows",

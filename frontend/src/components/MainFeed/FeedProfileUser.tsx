@@ -369,9 +369,9 @@ const FeedProfileUser = () => {
                                                             ) {
                                                                 axiosInstance
                                                                     .delete(
-                                                                        `${import.meta.env.VITE_API_ENDPOINT}/api/tags/${
-                                                                            tag.id
-                                                                        }/`
+                                                                        `${
+                                                                            import.meta.env.VITE_API_ENDPOINT
+                                                                        }/api/tags/${tag.id}/`
                                                                     )
                                                                     .finally(() =>
                                                                         dispatch(getTagsAsync(axiosInstance))

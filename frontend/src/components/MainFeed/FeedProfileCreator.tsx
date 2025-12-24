@@ -2,6 +2,7 @@ import { Pencil, Tag, Trash2 } from "lucide-react";
 import { useAxios } from "../../utils/useAxios";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import DisplayFacts from "../Blocks/DisplayFacts";
 
 type CreatorProfileData = {
     id: number;
@@ -15,32 +16,42 @@ type CreatorProfileData = {
     fact_total_likes: string;
 };
 
+type TagData = {
+    id: string;
+    language: number;
+    tag_name: string;
+};
+
 const FeedProfileCreator = () => {
     // Component for viewing the others profiles
     const axiosInstance = useAxios();
     const { profileId } = useParams<{ profileId: string }>();
     const [creatorProfileData, setCreatorProfileData] = useState<CreatorProfileData | null>();
-    const [profileTags, setProfileTags] = useState();
+    const [profileTags, setProfileTags] = useState<TagData[]>();
     const [profileFacts, setProfileFacts] = useState();
 
+    let getFacts = () => {
+        axiosInstance // get profiles facts
+            .get(`api/profiles/${profileId}/facts`)
+            .then((axiosResponse) => {
+                setProfileFacts(axiosResponse.data);
+                console.log(axiosResponse.data);
+            });
+    };
+
     useEffect(() => {
-        useEffect(() => {
-            axiosInstance // get profile data
-                .get(`api/profiles/${profileId}`)
-                .then((axiosResponse) => {
-                    setCreatorProfileData(axiosResponse.data);
-                });
-            axiosInstance // get profiles tags
-                .get(`api/profiles/${profileId}/tags`)
-                .then((axiosResponse) => {
-                    setProfileTags(axiosResponse.data);
-                });
-            axiosInstance // get profiles facts
-                .get(`api/profiles/${profileId}/facts`)
-                .then((axiosResponse) => {
-                    setProfileFacts(axiosResponse.data);
-                });
-        }, []);
+        axiosInstance // get profile data
+            .get(`api/profiles/${profileId}`)
+            .then((axiosResponse) => {
+                setCreatorProfileData(axiosResponse.data);
+            });
+        axiosInstance // get profiles tags
+            .get(`api/profiles/${profileId}/tags`)
+            .then((axiosResponse) => {
+                setProfileTags(axiosResponse.data);
+                console.log(axiosResponse.data);
+            });
+        getFacts();
     }, []);
 
     return (
@@ -153,6 +164,7 @@ const FeedProfileCreator = () => {
                 </div>
             </div>
             <div>List of IAmFactCreator's facts: ...</div>
+            <DisplayFacts facts={profileFacts} getFacts={getFacts} />
         </div>
     );
 };

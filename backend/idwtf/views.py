@@ -255,7 +255,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
             # Check if user is viewing their own profile
             if self.request.user.is_authenticated:
                 profile = self.get_object()
-                if profile.user.id == self.request.user.id:
+                if profile.user == self.request.user:
                     return PrivateProfileSerializer
             return PublicProfileSerializer
         # Default serializer for other actions (create, update, partial_update)
@@ -304,7 +304,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def tags(self, request, pk=None):
         profile = self.get_object()
         tags = profile.tags.all()
-        serializer = TagSerializer(tags, many=True)
+        serializer = TagSerializer(tags, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
@@ -322,7 +322,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
             # anonymous user can see pubic facts
             facts = profile.facts.filter(visibility__in=["public"])
 
-        serializer = FactSerializer(facts, many=True)
+        serializer = FactSerializer(facts, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -420,6 +420,30 @@ class FactViewSet(viewsets.ModelViewSet):
     # https://claude.ai/chat/64ff1cfa-dc1e-4014-b10d-64b20dd9c250
     # search for "Can I use instead of [:10] pagination option?"
 
+    def perform_create(self, serializer):
+        try:
+            serializer.save(profile_id=self.request.user.id)
+        except DjangoValidationError as err:
+            raise DRFValidationError({"tags": err.message}) from err
+
+    @action(detail=True, methods=["post"])
+    @permission_classes([IsAuthenticated])
+    def upvote(self, request, pk=None):
+        profile = request.user.profile
+        fact = self.get_object()
+
+        fact.upvotes.add(profile)
+        return Response({"status": "fact upvoted"}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"])
+    @permission_classes([IsAuthenticated])
+    def unvote(self, request, pk=None):
+        profile = request.user.profile
+        fact = self.get_object()
+
+        fact.upvotes.remove(profile)
+        return Response({"status": "fact unvoted"}, status=status.HTTP_200_OK)
+
     def get_queryset_unused(self):
         """Return only Facts, that the user owns or which user follows by tag."""
         user = self.request.user
@@ -447,27 +471,3 @@ class FactViewSet(viewsets.ModelViewSet):
         else:
             # Anonymous users see random public facts
             return Fact.objects.filter(visibility="public").order_by("?")[:10]
-
-    def perform_create(self, serializer):
-        try:
-            serializer.save(profile_id=self.request.user.id)
-        except DjangoValidationError as err:
-            raise DRFValidationError({"tags": err.message}) from err
-
-    @action(detail=True, methods=["post"])
-    @permission_classes([IsAuthenticated])
-    def upvote(self, request, pk=None):
-        profile = request.user.profile
-        fact = self.get_object()
-
-        fact.upvotes.add(profile)
-        return Response({"status": "fact upvoted"}, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=["post"])
-    @permission_classes([IsAuthenticated])
-    def unvote(self, request, pk=None):
-        profile = request.user.profile
-        fact = self.get_object()
-
-        fact.upvotes.remove(profile)
-        return Response({"status": "fact unvoted"}, status=status.HTTP_200_OK)
