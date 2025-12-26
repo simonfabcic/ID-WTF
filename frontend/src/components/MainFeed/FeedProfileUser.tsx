@@ -5,8 +5,6 @@ import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../app/store";
 import { getTagsAsync, getUserProfileAsync } from "../../app/features/user/userDataSlice";
-import DisplayFacts from "../Blocks/DisplayFacts";
-import type { Fact } from "@/types";
 
 type EditedTag = {
     tag_id: number;
@@ -32,7 +30,6 @@ const FeedProfileUser = () => {
     const usernameInputRef = useRef<HTMLInputElement>(null);
     const userDescriptionInputRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [facts, setFacts] = useState<Fact[]>([]);
 
     // global storage
     const { languages, tags, userProfile } = useSelector((state: RootState) => state.userData);
