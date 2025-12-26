@@ -1,26 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/authContext";
 import { useAxios } from "../utils/useAxios";
-
-type Fact = {
-    id: number;
-    content: string;
-    created_at: string;
-    language: {
-        code: string;
-        flag: string;
-        name: string;
-    };
-    source: string;
-    tags: {
-        id: number;
-        profile: string;
-        tagname: string;
-    }[];
-    upvotes: number;
-    username: string;
-    visibility: "public" | "private" | "followers";
-};
+import type { Fact } from "@/types";
 
 const FeedPage = () => {
     const { loading } = useAuth();
@@ -58,7 +39,7 @@ const FeedPage = () => {
                             <p>Contributor: {fact.username}</p>
                             <p>Upvotes: {fact.upvotes}</p>
                             {fact.tags.map((tag) => (
-                                <div className="border-1 rounded">{tag.tagname}</div>
+                                <div className="border-1 rounded">{tag.tag_name}</div>
                             ))}
                         </div>
                     ))}

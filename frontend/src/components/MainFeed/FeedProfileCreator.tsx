@@ -27,12 +27,12 @@ const FeedProfileCreator = () => {
     const axiosInstance = useAxios();
     const { profileId } = useParams<{ profileId: string }>();
     const [creatorProfileData, setCreatorProfileData] = useState<CreatorProfileData | null>();
-    const [profileTags, setProfileTags] = useState<TagData[]>();
+    const [profileTags, setProfileTags] = useState<TagData[]>([]);
     const [profileFacts, setProfileFacts] = useState();
 
     let getFacts = () => {
         axiosInstance // get profiles facts
-            .get(`api/profiles/${profileId}/facts`)
+            .get(`/api/profiles/${profileId}/facts`)
             .then((axiosResponse) => {
                 setProfileFacts(axiosResponse.data);
                 console.log(axiosResponse.data);

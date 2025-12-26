@@ -7,34 +7,7 @@ import { useAuth } from "../../context/authContext";
 import type { AppDispatch, RootState } from "../../app/store";
 import { useAxios } from "../../utils/useAxios";
 import { getUserProfileAsync } from "../../app/features/user/userDataSlice";
-
-type Fact = {
-    id: number;
-    username: string;
-    profile: {
-        id: number;
-        profile_image: string;
-        // user: string; // TODO user URL
-    };
-    content: string;
-    source: string;
-    tags: {
-        id: number;
-        language: number;
-        tag_name: string;
-    }[];
-    created_at: string;
-    visibility: "public" | "private" | "followers";
-    upvotes: number;
-    // TODO currently is returned only `language` id
-    language: number;
-    // language: {
-    //     code: string;
-    //     flag: string;
-    //     name: string;
-    // };
-    is_upvoted: boolean;
-};
+import type { Fact } from "@/types";
 
 type DisplayFactsProps = {
     facts: Fact[] | undefined;
@@ -42,7 +15,6 @@ type DisplayFactsProps = {
 };
 
 const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
-    console.log("facts: ", facts);
     const navigate = useNavigate();
     const { userProfile } = useSelector((state: RootState) => state.userData);
     const { user } = useAuth();
@@ -50,6 +22,7 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
     let axiosInstance = useAxios();
 
     return (
+        // TODO handle facts.length === 0
         <div className="flex flex-col gap-6">
             {/* fact card */}
             {facts &&
@@ -107,12 +80,9 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
                                                 className="flex items-center justify-around bg-gray-300 w-6 cursor-pointer rounded-r-full"
                                                 onClick={() => {
                                                     axiosInstance
-                                                        .post(
-                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${
-                                                                user?.user_id
-                                                            }/tag-unfollow/`,
-                                                            { tag_id: tag.id }
-                                                        )
+                                                        .post(`/api/profiles/${user?.user_id}/tag-unfollow/`, {
+                                                            tag_id: tag.id,
+                                                        })
                                                         .finally(() => {
                                                             dispatch(
                                                                 getUserProfileAsync({
@@ -130,12 +100,9 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
                                                 className="flex items-center justify-around bg-gray-300 w-6 cursor-pointer rounded-r-full"
                                                 onClick={() => {
                                                     axiosInstance
-                                                        .post(
-                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${
-                                                                user?.user_id
-                                                            }/tag-follow/`,
-                                                            { tag_id: tag.id }
-                                                        )
+                                                        .post(`/api/profiles/${user?.user_id}/tag-follow/`, {
+                                                            tag_id: tag.id,
+                                                        })
                                                         .finally(() => {
                                                             dispatch(
                                                                 getUserProfileAsync({

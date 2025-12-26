@@ -5,6 +5,8 @@ import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../app/store";
 import { getTagsAsync, getUserProfileAsync } from "../../app/features/user/userDataSlice";
+import DisplayFacts from "../Blocks/DisplayFacts";
+import type { Fact } from "@/types";
 
 type EditedTag = {
     tag_id: number;
@@ -30,6 +32,7 @@ const FeedProfileUser = () => {
     const usernameInputRef = useRef<HTMLInputElement>(null);
     const userDescriptionInputRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [facts, setFacts] = useState<Fact[]>([]);
 
     // global storage
     const { languages, tags, userProfile } = useSelector((state: RootState) => state.userData);
@@ -64,7 +67,7 @@ const FeedProfileUser = () => {
         e.preventDefault();
         if (editProfileField.username.value !== userProfile?.username) {
             axiosInstance
-                .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${userProfile?.id}/`, {
+                .patch(`/api/profiles/${userProfile?.id}/`, {
                     username: editProfileField.username.value,
                 })
                 .then(() => {
@@ -80,12 +83,26 @@ const FeedProfileUser = () => {
         }));
     };
 
+    let getFacts = () => {
+        axiosInstance // get profiles facts
+            .get(`/api/profiles/${userProfile?.id}/facts`)
+            .then((axiosResponse) => {
+                setFacts(axiosResponse.data);
+            });
+    };
+
+    useEffect(() => {
+        if (userProfile) {
+            getFacts();
+        }
+    }, [userProfile]);
+
     const handleSaveUserDescription = (e: React.FormEvent) => {
         e.preventDefault();
         console.log("save description");
         if (editProfileField.user_description.value !== userProfile?.description) {
             axiosInstance
-                .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${userProfile?.id}/`, {
+                .patch(`/api/profiles/${userProfile?.id}/`, {
                     description: editProfileField.user_description.value,
                 })
                 .then(() => {
@@ -111,7 +128,7 @@ const FeedProfileUser = () => {
         formData.append("profile_image", file);
 
         axiosInstance
-            .patch(`${import.meta.env.VITE_API_ENDPOINT}/api/profiles/${userProfile?.id}/`, formData, {
+            .patch(`/api/profiles/${userProfile?.id}/`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -416,6 +433,8 @@ const FeedProfileUser = () => {
                         );
                     })}
             </div>
+
+            <DisplayFacts facts={facts} getFacts={getFacts} />
         </div>
     );
 };
