@@ -83,20 +83,6 @@ const FeedProfileUser = () => {
         }));
     };
 
-    let getFacts = () => {
-        axiosInstance // get profiles facts
-            .get(`/api/profiles/${userProfile?.id}/facts`)
-            .then((axiosResponse) => {
-                setFacts(axiosResponse.data);
-            });
-    };
-
-    useEffect(() => {
-        if (userProfile) {
-            getFacts();
-        }
-    }, [userProfile]);
-
     const handleSaveUserDescription = (e: React.FormEvent) => {
         e.preventDefault();
         console.log("save description");
@@ -251,7 +237,7 @@ const FeedProfileUser = () => {
                                 <span>{userProfile?.description}</span>
                                 <button
                                     type="button"
-                                    className="absolute bottom-0 right-0 "
+                                    className="absolute bottom-0 right-0 cursor-pointer"
                                     onClick={() =>
                                         setEditProfileField((prev) => ({
                                             ...prev,
@@ -433,8 +419,6 @@ const FeedProfileUser = () => {
                         );
                     })}
             </div>
-
-            <DisplayFacts facts={facts} getFacts={getFacts} />
         </div>
     );
 };

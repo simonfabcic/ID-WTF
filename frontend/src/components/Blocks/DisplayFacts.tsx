@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { BadgeMinus, ExternalLink, Heart, Rss, Save, Share2 } from "lucide-react";
+import { BadgeMinus, ExternalLink, Heart, PencilIcon, Rss, Save, SaveIcon, Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import validator from "validator";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,10 +8,17 @@ import type { AppDispatch, RootState } from "../../app/store";
 import { useAxios } from "../../utils/useAxios";
 import { getUserProfileAsync } from "../../app/features/user/userDataSlice";
 import type { Fact } from "@/types";
+import { useState } from "react";
 
 type DisplayFactsProps = {
     facts: Fact[] | undefined;
     getFacts: () => void;
+};
+
+type EditFact = {
+    id: number;
+    factContent: string;
+    sourceContent: string;
 };
 
 const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
@@ -20,6 +27,7 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
     const { user } = useAuth();
     const dispatch = useDispatch<AppDispatch>();
     let axiosInstance = useAxios();
+    const [editedFact, setEditedFact] = useState<EditFact>({ id: -1, factContent: "", sourceContent: "" });
 
     return (
         // TODO handle facts.length === 0
@@ -47,21 +55,118 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
                                 </h3>
                                 <p className="text-sm text-gray-500">{dayjs(fact.created_at).fromNow()}</p>
                             </div>
-                            <p className="whitespace-pre-wrap">{fact.content}</p>
-                            {validator.isURL(fact.source) ? (
-                                <div className="flex gap-1 text-sm">
-                                    <ExternalLink className="h-4 w-4" />
-                                    <a
-                                        href={fact.source}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 hover:underline"
+                            <div className="relative">
+                                {editedFact.factContent && editedFact.id == fact.id ? (
+                                    <form
+                                        onSubmit={(e) => {
+                                            e.preventDefault();
+                                            setEditedFact((prev) => ({
+                                                ...prev,
+                                                id: -1,
+                                            }));
+                                            // CONTINUE handle save
+                                        }}
                                     >
-                                        {fact.source}
-                                    </a>
-                                </div>
+                                        <textarea
+                                            className="italic focus:border-none focus:outline-none focus:ring-0 w-full text-gray-600 resize-none"
+                                            value={editedFact.factContent}
+                                            onChange={(e) =>
+                                                setEditedFact((prev) => ({ ...prev, factContent: e.target.value }))
+                                            }
+                                            rows={5}
+                                            ref={(el) => {
+                                                if (el) {
+                                                    el.style.height = el.scrollHeight + "px";
+                                                }
+                                            }}
+                                        />
+                                        <button type="submit" className="absolute bottom-0 right-0 cursor-pointer">
+                                            <SaveIcon className="h-5 w-5" />
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <>
+                                        <p className="whitespace-pre-wrap">{fact.content}</p>
+                                        {fact.profile.id == user?.user_id && (
+                                            <button
+                                                type="button"
+                                                className="absolute bottom-0 right-0 cursor-pointer"
+                                                onClick={() => {
+                                                    setEditedFact(() => ({
+                                                        id: fact.id,
+                                                        factContent: fact.content,
+                                                        sourceContent: "",
+                                                    }));
+                                                }}
+                                            >
+                                                <PencilIcon className="w-4 h-4 text-gray-900" />
+                                            </button>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                            {editedFact.sourceContent && editedFact.id == fact.id ? (
+                                <form
+                                    className="relative"
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        setEditedFact((prev) => ({
+                                            ...prev,
+                                            id: -1,
+                                        }));
+                                        // CONTINUE handle save
+                                    }}
+                                >
+                                    <textarea
+                                        className="italic focus:border-none focus:outline-none focus:ring-0 w-full text-gray-600 resize-none text-sm"
+                                        value={editedFact.sourceContent}
+                                        onChange={(e) =>
+                                            setEditedFact((prev) => ({ ...prev, sourceContent: e.target.value }))
+                                        }
+                                        rows={1}
+                                        ref={(el) => {
+                                            if (el) {
+                                                el.style.height = el.scrollHeight + "px";
+                                            }
+                                        }}
+                                    />
+                                    <button type="submit" className="absolute bottom-0 right-0 cursor-pointer">
+                                        <SaveIcon className="h-5 w-5" />
+                                    </button>
+                                </form>
                             ) : (
-                                <div className="text-sm">{fact.source}</div>
+                                <div className="relative">
+                                    {validator.isURL(fact.source) ? (
+                                        <div className="flex gap-1 text-sm">
+                                            <ExternalLink className="h-4 w-4" />
+                                            <a
+                                                href={fact.source}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:underline"
+                                            >
+                                                {fact.source}
+                                            </a>
+                                        </div>
+                                    ) : (
+                                        <div className="text-sm">{fact.source}</div>
+                                    )}
+                                    {fact.profile.id == user?.user_id && (
+                                        <button
+                                            type="button"
+                                            className="absolute bottom-0 right-0 cursor-pointer"
+                                            onClick={() => {
+                                                setEditedFact(() => ({
+                                                    id: fact.id,
+                                                    factContent: "",
+                                                    sourceContent: fact.source,
+                                                }));
+                                            }}
+                                        >
+                                            <PencilIcon className="w-4 h-4 text-gray-900" />
+                                        </button>
+                                    )}
+                                </div>
                             )}
                             <div className="flex gap-1.5 text-sm">
                                 {fact.tags.map((tag, index) => (
