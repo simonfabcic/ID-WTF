@@ -64,7 +64,11 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
                                                 ...prev,
                                                 id: -1,
                                             }));
-                                            // CONTINUE handle save
+                                            axiosInstance
+                                                .patch(`/api/facts/${fact.id}/`, {
+                                                    content: editedFact.factContent,
+                                                })
+                                                .then(() => getFacts());
                                         }}
                                     >
                                         <textarea
@@ -114,7 +118,11 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
                                             ...prev,
                                             id: -1,
                                         }));
-                                        // CONTINUE handle save
+                                        axiosInstance
+                                            .patch(`/api/facts/${fact.id}/`, {
+                                                source: editedFact.sourceContent,
+                                            })
+                                            .then(() => getFacts());
                                     }}
                                 >
                                     <textarea
@@ -232,11 +240,7 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
                                             onClick={() => {
                                                 {
                                                     axiosInstance
-                                                        .post(
-                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/facts/${
-                                                                fact.id
-                                                            }/unvote/`
-                                                        )
+                                                        .post(`/api/facts/${fact.id}/unvote/`)
                                                         .then(() => getFacts())
                                                         .catch((error) => {
                                                             console.log(error);
@@ -253,11 +257,7 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
                                             onClick={() => {
                                                 {
                                                     axiosInstance
-                                                        .post(
-                                                            `${import.meta.env.VITE_API_ENDPOINT}/api/facts/${
-                                                                fact.id
-                                                            }/upvote/`
-                                                        )
+                                                        .post(`/api/facts/${fact.id}/upvote/`)
                                                         .then(() => getFacts())
                                                         .catch((error) => {
                                                             console.log(error);

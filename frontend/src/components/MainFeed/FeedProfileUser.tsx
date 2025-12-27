@@ -336,12 +336,9 @@ const FeedProfileUser = () => {
                                                         className="flex items-center justify-around bg-gray-300 border-r border-r-white w-6 cursor-pointer"
                                                         onClick={() => {
                                                             axiosInstance
-                                                                .patch(
-                                                                    `${import.meta.env.VITE_API_ENDPOINT}/api/tags/${
-                                                                        tag.id
-                                                                    }/`,
-                                                                    { tag_name: editedTag.tag_name }
-                                                                )
+                                                                .patch(`/api/tags/${tag.id}/`, {
+                                                                    tag_name: editedTag.tag_name,
+                                                                })
                                                                 .finally(() => {
                                                                     setEditedTag({ tag_id: -1, tag_name: "" });
                                                                     dispatch(getTagsAsync(axiosInstance));
@@ -368,14 +365,8 @@ const FeedProfileUser = () => {
                                                                 )
                                                             ) {
                                                                 axiosInstance
-                                                                    .delete(
-                                                                        `${
-                                                                            import.meta.env.VITE_API_ENDPOINT
-                                                                        }/api/tags/${tag.id}/`
-                                                                    )
-                                                                    .finally(() =>
-                                                                        dispatch(getTagsAsync(axiosInstance))
-                                                                    )
+                                                                    .delete(`/api/tags/${tag.id}/`)
+                                                                    .then(() => dispatch(getTagsAsync(axiosInstance)))
                                                                     .catch((err) =>
                                                                         console.error(
                                                                             `Something went wrong during deleting tag ${tag.tag_name} with no.: ${tag.id}. Error: `,

@@ -78,7 +78,7 @@ const Header = () => {
         }
 
         axiosInstance
-            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/facts/`, addFactFormData)
+            .post(`/api/facts/`, addFactFormData)
             .then(() => {
                 setShowAddFactInputForm(false);
                 setAddFactFormData({
@@ -106,7 +106,7 @@ const Header = () => {
             // TODO create nicer popup
         }
         axiosInstance
-            .post(`${import.meta.env.VITE_API_ENDPOINT}/api/tags/`, {
+            .post(`/api/tags/`, {
                 language: addFactFormData.language,
                 tag_name: newTagName,
             })

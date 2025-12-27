@@ -90,8 +90,8 @@ const FeedProfileCreator = () => {
                 <h3 className="w-1/2 border-b-2 border-yellow-400 text-center px-4 py-3">
                     {creatorProfileData?.username}'s achievements
                 </h3>
-                <div className="flex justify-between text-center p-4">
-                    <div className="flex flex-col gap-2">
+                <div className="flex justify-between text-center p-4 gap-3">
+                    <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">📅</span>
                         <span className="text-sm">Member since</span>
                         <span className="text-xs font-semibold">
@@ -102,17 +102,17 @@ const FeedProfileCreator = () => {
                                 })}
                         </span>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">🔖</span>
                         <span className="text-sm">Most posted</span>
                         <span className="text-xs font-semibold">#{creatorProfileData?.tag_most_posted}</span>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">🔥</span>
                         <span className="text-sm">Top fact</span>
                         <span className="text-xs font-semibold">{creatorProfileData?.fact_most_likes} Likes</span>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 bg-yellow-100 rounded p-2 flex-1 min-w-0">
                         <span className="text-2xl">💛</span>
                         <span className="text-sm">Total likes</span>
                         <span className="text-xs font-semibold">{creatorProfileData?.fact_total_likes}</span>
