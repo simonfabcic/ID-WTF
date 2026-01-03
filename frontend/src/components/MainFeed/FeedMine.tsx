@@ -2,24 +2,19 @@ import { useEffect, useState } from "react";
 import { useAxios } from "../../utils/useAxios";
 import { useAuth } from "../../context/authContext";
 import DisplayFacts from "../Blocks/DisplayFacts";
+import type { Fact } from "@/types";
 
 const FeedMine = () => {
-    const [usersFacts, setUsersFacts] = useState([]);
-    const { user } = useAuth();
-
+    const [usersFacts, setUsersFacts] = useState<Fact[]>([]);
+    const { user, loading } = useAuth();
     let axiosInstance = useAxios();
-    const { loading } = useAuth();
 
     let getUsersFacts = async () => {
         if (user) {
             axiosInstance
                 .get(`/api/profiles/${user.user_id}/facts`)
-                .then(function (responseAxios) {
-                    setUsersFacts(responseAxios.data);
-                })
-                .catch(function (error) {
-                    console.error("During getting the users facts, error occurred: ", error);
-                });
+                .then((responseAxios) => setUsersFacts(responseAxios.data))
+                .catch((error) => console.error("During getting the users facts, error occurred: ", error));
         }
     };
 

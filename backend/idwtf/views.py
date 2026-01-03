@@ -325,6 +325,19 @@ class ProfileViewSet(viewsets.ModelViewSet):
         serializer = FactSerializer(facts, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=["get"], url_path="facts-liked")
+    def facts_liked(self, request, pk=None):
+        profile = self.get_object()
+        if request.user.is_authenticated and request.user.profile == profile:
+            liked_facts = profile.upvoted.all()
+            serializer = FactSerializer(liked_facts, many=True, context={"request": request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"detail": "You don't have permission to view this. Only logged in user can see his own liked facts"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """CRUD for Tags."""

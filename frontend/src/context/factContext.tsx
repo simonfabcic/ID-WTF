@@ -7,7 +7,7 @@ export type SideMenuOptionsType =
     | "profile"
     | "login"
     | "mine"
-    | "saved"
+    | "liked"
     | "following"
     | "follows"
     | "other";
@@ -32,7 +32,7 @@ export const FactProvider = ({ children }: { children: ReactNode }) => {
             "profile",
             "login",
             "mine",
-            "saved",
+            "liked",
             "following",
             "follows",
             "other",

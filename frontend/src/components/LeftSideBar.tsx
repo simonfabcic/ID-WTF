@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "../context/authContext";
-import { FileUser, Home, LogIn, LogOut, Rss, SaveAll, User, UserCheck } from "lucide-react";
+import { FileUser, Heart, Home, LogIn, LogOut, Rss, User, UserCheck } from "lucide-react";
 import { useFact } from "../context/factContext";
 import type { SideMenuOptionsType } from "../context/factContext";
 
@@ -65,8 +65,9 @@ const LeftSideBar = () => {
                             </div>
                         </button>
 
+                        {/* CONTINUE change hardcoded values to the real data from `components/AppInitializer` */}
                         <MenuButton buttonOption="mine" icon={FileUser} buttonLabel="Mine" count={345} />
-                        <MenuButton buttonOption="saved" icon={SaveAll} buttonLabel="Saved" count={33} />
+                        <MenuButton buttonOption="liked" icon={Heart} buttonLabel="Liked" count={33} />
                         <MenuButton buttonOption="following" icon={Rss} buttonLabel="Following" count={12} />
                         <MenuButton buttonOption="follows" icon={UserCheck} buttonLabel="Follows" count={85} />
                     </>

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { BadgeMinus, ExternalLink, Heart, PencilIcon, Rss, Save, SaveIcon, Share2 } from "lucide-react";
+import { BadgeMinus, ExternalLink, Heart, PencilIcon, Rss, SaveIcon, Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import validator from "validator";
 import { useDispatch, useSelector } from "react-redux";
@@ -255,14 +255,16 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
                                         <div
                                             className="flex items-center gap-0.5 cursor-pointer"
                                             onClick={() => {
-                                                {
-                                                    axiosInstance
-                                                        .post(`/api/facts/${fact.id}/upvote/`)
-                                                        .then(() => getFacts())
-                                                        .catch((error) => {
-                                                            console.log(error);
-                                                        });
+                                                if (!user) {
+                                                    window.alert("You must be logged in to like.");
+                                                    return;
                                                 }
+                                                axiosInstance
+                                                    .post(`/api/facts/${fact.id}/upvote/`)
+                                                    .then(() => getFacts())
+                                                    .catch((error) => {
+                                                        console.log(error);
+                                                    });
                                             }}
                                         >
                                             <Heart className="h-4 w-4" />
@@ -276,9 +278,6 @@ const DisplayFacts = ({ facts, getFacts }: DisplayFactsProps) => {
                                             {/* TODO create share option */}
                                         </span>
                                     </div>
-                                </div>
-                                <div className="cursor-pointer">
-                                    <Save className="h-5 w-5" />
                                 </div>
                             </div>
                         </div>

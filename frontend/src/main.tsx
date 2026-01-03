@@ -17,7 +17,7 @@ import FeedDiscover from "./components/MainFeed/FeedDiscover";
 import FeedProfileUser from "./components/MainFeed/FeedProfileUser";
 import FeedLogin from "./components/MainFeed/FeedLogin";
 import FeedMine from "./components/MainFeed/FeedMine";
-import FeedSaved from "./components/MainFeed/FeedSaved";
+import FeedLiked from "./components/MainFeed/FeedLiked";
 import FeedFollowing from "./components/MainFeed/FeedFollowing";
 import FeedFollows from "./components/MainFeed/FeedFollows";
 import FeedProfileCreator from "./components/MainFeed/FeedProfileCreator";
@@ -48,7 +48,7 @@ createRoot(document.getElementById("root")!).render(
                                     <Route path="profile" element={<FeedProfileUser />} />
                                     <Route path="login" element={<FeedLogin />} />
                                     <Route path="mine" element={<FeedMine />} />
-                                    <Route path="saved" element={<FeedSaved />} />
+                                    <Route path="liked" element={<FeedLiked />} />
                                     <Route path="following" element={<FeedFollowing />} />
                                     <Route path="follows" element={<FeedFollows />} />
                                 </Route>
