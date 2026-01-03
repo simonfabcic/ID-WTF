@@ -1,6 +1,44 @@
+import { useAuth } from "../../context/authContext";
+import type { Tag } from "../../types";
+import { useAxios } from "../../utils/useAxios";
 import { Rss, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+
+type UsersTags = {
+    username: string;
+    followed_tags: Tag[];
+    other_tags: Tag[];
+};
 
 const FeedFollowing = () => {
+    const [tags, setTags] = useState<UsersTags[]>([]);
+    const { loading, user } = useAuth();
+
+    const axiosInstance = useAxios();
+
+    const getTags = () => {
+        if (user) {
+            axiosInstance
+                .get(`/api/profiles/${user.user_id}/tags-followed`)
+                .then((axiosResponse) => {
+                    setTags(axiosResponse.data);
+                })
+                .catch((error) => {
+                    if (error.response?.status === 501) {
+                        console.log("Getting followed tags is not yet implemented in backend");
+                        return;
+                    }
+                    console.error("During getting the users followed facts, error occurred: ", error);
+                });
+        }
+    };
+
+    useEffect(() => {
+        if (user) {
+            getTags();
+        }
+    }, [loading, user]);
+
     return (
         <div className="flex flex-col gap-6">
             {[...Array(10)].map((_, index) => (
@@ -18,7 +56,7 @@ const FeedFollowing = () => {
                         <div className="mb-2">
                             <h3 className="mb-1">Followed tags</h3>
                             {/* TODO this is not done */}
-                            <div className="flex gap-1.5 text-sm">
+                            <div className="flex flex-wrap gap-1.5 text-sm">
                                 <div className="flex content-center">
                                     <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
                                         #tag1
@@ -48,7 +86,7 @@ const FeedFollowing = () => {
                         <div>
                             <h3 className="mb-1">Other available tags</h3>
                             {/* TODO this is not done */}
-                            <div className="flex gap-1.5 text-sm">
+                            <div className="flex flex-wrap gap-1.5 text-sm">
                                 <div className="flex content-center">
                                     <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
                                         #tagA

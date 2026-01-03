@@ -338,6 +338,18 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+    @action(detail=True, methods=["get"], url_path="tags-followed")
+    def tags_followed(self, request, pk=None):
+        profile = self.get_object()
+        if request.user.is_authenticated and request.user.profile == profile:
+            # CONTINUE implement get tags from DB
+            return Response({"error": "This endpoint is not yet implemented"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        else:
+            return Response(
+                {"detail": "You don't have permission to view this. Only logged in user can see his own followed tags"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """CRUD for Tags."""
