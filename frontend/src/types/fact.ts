@@ -1,11 +1,9 @@
+import type { ProfilePublic } from "./profile";
+
 export type Fact = {
     id: number;
     username: string;
-    profile: {
-        id: number;
-        profile_image: string;
-        // user: string; // TODO user URL
-    };
+    profile: ProfilePublic;
     content: string;
     source: string;
     tags: Tag[];
