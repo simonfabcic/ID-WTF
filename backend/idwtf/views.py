@@ -340,10 +340,48 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"], url_path="tags-followed")
     def tags_followed(self, request, pk=None):
+        """
+        Endpoint for POST /api/profile/5/tags-followed/.
+
+        This will return an array of objects, where each object contains:
+            profile: Profile data of the tag owner
+            followed_tags: Tags from that profile that the current user follows
+            other_tags: Tags from that profile that the current user doesn't follow
+
+        response will be ordered as:
+            First: All profiles where the user follows at least one tag
+            Second: All profiles where the user doesn't follow any tags
+        """
         profile = self.get_object()
         if request.user.is_authenticated and request.user.profile == profile:
-            # CONTINUE implement get tags from DB
-            return Response({"error": "This endpoint is not yet implemented"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            # Get all profiles that have tags (excluding the current user's profile)
+            profiles_with_tags = Profile.objects.exclude(id=profile.id).filter(tags__isnull=False).distinct()
+
+            profiles_with_followed = []
+            profiles_without_followed = []
+            for other_profile in profiles_with_tags:
+                # Get tags owned by this profile
+                owned_tags = other_profile.tags.all()
+
+                # Only include profiles that have at least one tag
+                if owned_tags.exists():
+                    # Separate into followed and other tags
+                    followed_tags = owned_tags.filter(followed_by_profile=profile)
+                    other_tags = owned_tags.exclude(followed_by_profile=profile)
+
+                    # prepare data
+                    profile_data = {
+                        "profile": PublicProfileSerializer(other_profile, context={"request": request}).data,
+                        "followed_tags": TagSerializer(followed_tags, many=True).data,
+                        "other_tags": TagSerializer(other_tags, many=True).data,
+                    }
+                if followed_tags.exists():
+                    profiles_with_followed.append(profile_data)
+                else:
+                    profiles_without_followed.append(profile_data)
+
+            result = profiles_with_followed + profiles_without_followed
+            return Response(result, status=status.HTTP_200_OK)
         else:
             return Response(
                 {"detail": "You don't have permission to view this. Only logged in user can see his own followed tags"},
