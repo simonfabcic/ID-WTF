@@ -388,6 +388,48 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+    @action(detail=True, methods=["get"], url_path="tags-follows")
+    def tags_follows(self, request, pk=None):
+        # CONTINUE this is not done
+        """
+        Endpoint for POST /api/profile/5/tags-follows/.
+
+        This will return an array of objects, where each object contains:
+            profile: Profile data of the tag owner
+            followed_tags: Tags from that profile that the current user follows
+            other_tags: Tags from that profile that the current user doesn't follow
+        """
+        profile = self.get_object()
+        if request.user.is_authenticated and request.user.profile == profile:
+            profiles_tags = profile.tags.all()
+
+            # Get all profiles that follow at least one of the current user's tags
+            profiles_who_follow = Profile.objects.filter(follows__in=profiles_tags).exclude(id=profile.id).distinct()
+
+            result = []
+            for other_profile in profiles_who_follow:
+                # Get tags owned by this profile
+                owned_tags = other_profile.tags.all()
+
+                # Separate into followed and other tags
+                followed_tags = owned_tags.filter(followed_by_profile=profile)
+                other_tags = owned_tags.exclude(followed_by_profile=profile)
+
+                # prepare data
+                profile_data = {
+                    "profile": PublicProfileSerializer(other_profile, context={"request": request}).data,
+                    "followed_tags": TagSerializer(followed_tags, many=True).data,
+                    "other_tags": TagSerializer(other_tags, many=True).data,
+                }
+
+                result.append(profile_data)
+            return Response(result, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"detail": "You don't have permission to view this. Only logged in user can see his own followed tags"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """CRUD for Tags."""
