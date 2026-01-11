@@ -1,8 +1,10 @@
+import { useSelector } from "react-redux";
 import { useAuth } from "../../context/authContext";
 import type { Tag, ProfilePublic } from "../../types";
 import { useAxios } from "../../utils/useAxios";
-import { BadgeMinus, Rss, Trash2 } from "lucide-react";
+import { BadgeMinus, Rss } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { RootState } from "@/app/store";
 
 type UsersTags = {
     profile: ProfilePublic;
@@ -14,6 +16,7 @@ const FeedFollowing = () => {
     const [usersTags, setUsersTags] = useState<UsersTags[]>([]);
     const { loading, user } = useAuth();
 
+    const { languages } = useSelector((state: RootState) => state.userData);
     const axiosInstance = useAxios();
 
     const getTags = () => {
@@ -57,7 +60,9 @@ const FeedFollowing = () => {
                                     {oneUsersTags.followed_tags.map((followed_tag) => (
                                         <div className="flex content-center" key={followed_tag.id}>
                                             <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
-                                                {`${followed_tag.language} ${followed_tag.tag_name}`}
+                                                {`${
+                                                    languages.find((lang) => lang.id === followed_tag.language)?.flag
+                                                } ${followed_tag.tag_name}`}
                                             </span>
                                             <div
                                                 onClick={() => {
@@ -85,7 +90,10 @@ const FeedFollowing = () => {
                                     {oneUsersTags.other_tags.map((non_followed_tag) => (
                                         <div className="flex content-center" key={non_followed_tag.id}>
                                             <span className="bg-yellow-100 rounded-l-full py-0 px-3 whitespace-nowrap border-r border-r-white">
-                                                {`${non_followed_tag.language} ${non_followed_tag.tag_name}`}
+                                                {`${
+                                                    languages.find((lang) => lang.id === non_followed_tag.language)
+                                                        ?.flag
+                                                } ${non_followed_tag.tag_name}`}
                                             </span>
                                             <div
                                                 onClick={() => {
